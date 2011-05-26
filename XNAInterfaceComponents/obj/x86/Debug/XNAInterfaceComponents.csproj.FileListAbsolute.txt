@@ -14,3 +14,11 @@ D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\ResolveAssembly
 D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.dll
 D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.pdb
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.dll
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.pdb
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.dll
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.pdb
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.dll
+C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.pdb

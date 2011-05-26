@@ -7,7 +7,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\node.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\node.xnb</Output>
       <Time>2011-05-20T10:52:51.1305823+02:00</Time>
     </Item>
     <Item>
@@ -16,7 +16,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\solid.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\solid.xnb</Output>
       <Time>2011-05-20T10:52:51.213587+02:00</Time>
     </Item>
     <Item>
@@ -25,7 +25,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap.xnb</Output>
       <Time>2011-05-20T10:51:53.0052577+02:00</Time>
     </Item>
     <Item>
@@ -34,7 +34,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap2.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap2.xnb</Output>
       <Time>2011-05-20T10:51:52.8402483+02:00</Time>
     </Item>
     <Item>
@@ -43,7 +43,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\Engineer.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\Engineer.xnb</Output>
       <Time>2011-05-20T10:52:51.2975918+02:00</Time>
     </Item>
     <Item>
@@ -52,7 +52,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap3.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap3.xnb</Output>
       <Time>2011-05-20T10:51:52.7602437+02:00</Time>
     </Item>
     <Item>
@@ -61,7 +61,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap4.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap4.xnb</Output>
       <Time>2011-05-20T10:51:52.9212529+02:00</Time>
     </Item>
     <Item>
@@ -70,7 +70,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\patternPreview.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Misc\patternPreview.xnb</Output>
       <Time>2011-05-20T10:52:51.0525778+02:00</Time>
     </Item>
     <Item>
@@ -79,7 +79,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Barracks.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Barracks.xnb</Output>
       <Time>2011-05-20T10:54:07.5729545+02:00</Time>
     </Item>
     <Item>
@@ -88,7 +88,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Factory.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Factory.xnb</Output>
       <Time>2011-05-20T10:54:07.563954+02:00</Time>
     </Item>
     <Item>
@@ -97,7 +97,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Resources.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Resources.xnb</Output>
       <Time>2011-05-20T10:54:07.5839552+02:00</Time>
     </Item>
     <Item>
@@ -106,7 +106,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Selection.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Selection.xnb</Output>
       <Time>2011-05-20T10:54:08.1329866+02:00</Time>
     </Item>
     <Item>
@@ -115,7 +115,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUD.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUD.xnb</Output>
       <Time>2011-05-20T10:54:07.7779663+02:00</Time>
     </Item>
     <Item>
@@ -124,7 +124,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDBarracks.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDBarracks.xnb</Output>
       <Time>2011-05-20T10:54:07.8179685+02:00</Time>
     </Item>
     <Item>
@@ -133,7 +133,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDFactory.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDFactory.xnb</Output>
       <Time>2011-05-20T10:54:07.7989675+02:00</Time>
     </Item>
     <Item>
@@ -142,7 +142,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDFortress.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDFortress.xnb</Output>
       <Time>2011-05-20T10:54:07.807968+02:00</Time>
     </Item>
     <Item>
@@ -151,7 +151,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDItemDetails.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDItemDetails.xnb</Output>
       <Time>2011-05-20T10:54:07.7879668+02:00</Time>
     </Item>
     <Item>
@@ -160,7 +160,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDResources.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\HUD\HUDResources.xnb</Output>
       <Time>2011-05-20T10:54:07.8279691+02:00</Time>
     </Item>
     <Item>
@@ -169,7 +169,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\Engineer.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\Engineer.xnb</Output>
       <Time>2011-05-20T10:54:08.0479817+02:00</Time>
     </Item>
     <Item>
@@ -178,7 +178,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Selected.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Selected.xnb</Output>
       <Time>2011-05-20T10:54:08.1429871+02:00</Time>
     </Item>
     <Item>
@@ -187,7 +187,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Fortress.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Buildings\Fortress.xnb</Output>
       <Time>2011-05-22T16:39:09.2910879+02:00</Time>
     </Item>
     <Item>
@@ -196,7 +196,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\bowman.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\bowman.xnb</Output>
       <Time>2011-05-22T18:19:24.8771598+02:00</Time>
     </Item>
     <Item>
@@ -205,7 +205,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\Projectiles\wooden_arrow.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\Projectiles\wooden_arrow.xnb</Output>
       <Time>2011-05-22T20:52:14.4586298+02:00</Time>
     </Item>
     <Item>
@@ -214,7 +214,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\Projectiles\wooden_arrow_scale.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\Projectiles\wooden_arrow_scale.xnb</Output>
       <Time>2011-05-22T21:47:50.1034178+02:00</Time>
     </Item>
     <Item>
@@ -223,7 +223,7 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\Arial.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\Arial.xnb</Output>
       <Time>2011-05-20T12:59:12.8422314+02:00</Time>
     </Item>
     <Item>
@@ -232,7 +232,7 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
       <Options>None</Options>
-      <Output>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\SpriteFont1.xnb</Output>
+      <Output>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\SpriteFont1.xnb</Output>
       <Time>2011-05-20T10:54:07.9109739+02:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
@@ -241,10 +241,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTestContent\</RootDirectory>
-      <LoggerRootDirectory>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\</LoggerRootDirectory>
-      <IntermediateDirectory>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTestContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTestContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTestContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>

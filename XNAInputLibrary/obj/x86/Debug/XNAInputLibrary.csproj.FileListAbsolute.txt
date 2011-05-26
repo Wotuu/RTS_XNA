@@ -10,3 +10,9 @@ D:\VisualStudioProjects\RTS\XNAInputLibrary\obj\x86\Debug\ResolveAssemblyReferen
 D:\VisualStudioProjects\RTS\XNAInputLibrary\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 D:\VisualStudioProjects\RTS\XNAInputLibrary\obj\x86\Debug\XNAInputLibrary.dll
 D:\VisualStudioProjects\RTS\XNAInputLibrary\obj\x86\Debug\XNAInputLibrary.pdb
+C:\Users\Wouter\RTS_XNA\XNAInputLibrary\bin\x86\Debug\XNAInputLibrary.dll
+C:\Users\Wouter\RTS_XNA\XNAInputLibrary\bin\x86\Debug\XNAInputLibrary.pdb
+C:\Users\Wouter\RTS_XNA\XNAInputLibrary\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Wouter\RTS_XNA\XNAInputLibrary\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Wouter\RTS_XNA\XNAInputLibrary\obj\x86\Debug\XNAInputLibrary.dll
+C:\Users\Wouter\RTS_XNA\XNAInputLibrary\obj\x86\Debug\XNAInputLibrary.pdb

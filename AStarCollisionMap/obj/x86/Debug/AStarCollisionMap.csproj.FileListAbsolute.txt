@@ -10,3 +10,9 @@ D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\ResolveAssemblyRefer
 D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.dll
 D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.pdb
+C:\Users\Wouter\RTS_XNA\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.dll
+C:\Users\Wouter\RTS_XNA\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.pdb
+C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.dll
+C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.pdb
