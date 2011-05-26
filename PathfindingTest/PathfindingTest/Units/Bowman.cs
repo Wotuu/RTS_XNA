@@ -30,6 +30,7 @@ namespace PathfindingTest.Units
         {
             UpdateMovement();
             AttemptReload();
+            //5wertyugh
             // Don't do this that often, not really needed.
             if (Game1.GetInstance().frames % 4 == 0)
             {
