@@ -1,0 +1,16 @@
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.dll
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.pdb
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.dll
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.pdb
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.dll
+D:\Dropbox\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.pdb
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.dll
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.pdb
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.dll
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.pdb
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.dll
+D:\VisualStudioProjects\RTS\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.pdb

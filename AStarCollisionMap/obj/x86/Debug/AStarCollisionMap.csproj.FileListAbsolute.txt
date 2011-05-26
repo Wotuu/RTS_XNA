@@ -1,0 +1,12 @@
+D:\Dropbox\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Dropbox\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+D:\Dropbox\VisualStudioProjects\RTS\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.dll
+D:\Dropbox\VisualStudioProjects\RTS\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.pdb
+D:\Dropbox\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.dll
+D:\Dropbox\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.pdb
+D:\VisualStudioProjects\RTS\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.dll
+D:\VisualStudioProjects\RTS\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.pdb
+D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.dll
+D:\VisualStudioProjects\RTS\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.pdb

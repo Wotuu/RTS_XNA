@@ -1,0 +1,13 @@
+Content\Units\Engineer.xnb
+Content\Selection.xnb
+Content\Selected.xnb
+Content\HUD\HUD.xnb
+Content\HUD\HUDFactory.xnb
+Content\HUD\HUDItemDetails.xnb
+Content\Fonts\SpriteFont1.xnb
+Content\HUD\HUDBarracks.xnb
+Content\HUD\HUDResources.xnb
+Content\HUD\HUDFortress.xnb
+Content\Buildings\Barracks.xnb
+Content\Buildings\Resources.xnb
+Content\Buildings\Factory.xnb

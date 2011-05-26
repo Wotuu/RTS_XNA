@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTS_Builder", "RTS_Builder\RTS_Builder\RTS_Builder.csproj", "{89C001DE-46BD-42BD-8EB1-C81F39B92854}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTS_BuilderContent", "RTS_Builder\RTS_BuilderContent\RTS_BuilderContent.contentproj", "{329D4536-7505-48C0-B680-45DAE8D2CAC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathfindingTest", "PathfindingTest\PathfindingTest\PathfindingTest.csproj", "{4C9F1CA3-DA6A-43CF-A87F-EC0DF20EB466}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathfindingTestContent", "PathfindingTest\PathfindingTestContent\PathfindingTestContent.contentproj", "{4D2301DD-4365-4830-AB89-2EAABE984844}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AStarCollisionMap", "AStarCollisionMap\AStarCollisionMap.csproj", "{A8E2F65D-4103-499F-8065-193B94CEEFD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XNAInterfaceComponents", "XNAInterfaceComponents\XNAInterfaceComponents.csproj", "{A0B677A5-93C5-4A26-99C1-7F35F049FA1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XNAInputLibrary", "XNAInputLibrary\XNAInputLibrary.csproj", "{2E801399-FA39-4B74-BBE6-69EC61F534C1}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{89C001DE-46BD-42BD-8EB1-C81F39B92854}.Debug|x86.ActiveCfg = Debug|x86
+		{89C001DE-46BD-42BD-8EB1-C81F39B92854}.Debug|x86.Build.0 = Debug|x86
+		{89C001DE-46BD-42BD-8EB1-C81F39B92854}.Release|x86.ActiveCfg = Release|x86
+		{89C001DE-46BD-42BD-8EB1-C81F39B92854}.Release|x86.Build.0 = Release|x86
+		{329D4536-7505-48C0-B680-45DAE8D2CAC8}.Debug|x86.ActiveCfg = Debug|x86
+		{329D4536-7505-48C0-B680-45DAE8D2CAC8}.Release|x86.ActiveCfg = Release|x86
+		{4C9F1CA3-DA6A-43CF-A87F-EC0DF20EB466}.Debug|x86.ActiveCfg = Debug|x86
+		{4C9F1CA3-DA6A-43CF-A87F-EC0DF20EB466}.Debug|x86.Build.0 = Debug|x86
+		{4C9F1CA3-DA6A-43CF-A87F-EC0DF20EB466}.Release|x86.ActiveCfg = Release|x86
+		{4C9F1CA3-DA6A-43CF-A87F-EC0DF20EB466}.Release|x86.Build.0 = Release|x86
+		{4D2301DD-4365-4830-AB89-2EAABE984844}.Debug|x86.ActiveCfg = Debug|x86
+		{4D2301DD-4365-4830-AB89-2EAABE984844}.Release|x86.ActiveCfg = Release|x86
+		{A8E2F65D-4103-499F-8065-193B94CEEFD0}.Debug|x86.ActiveCfg = Debug|x86
+		{A8E2F65D-4103-499F-8065-193B94CEEFD0}.Debug|x86.Build.0 = Debug|x86
+		{A8E2F65D-4103-499F-8065-193B94CEEFD0}.Release|x86.ActiveCfg = Release|x86
+		{A8E2F65D-4103-499F-8065-193B94CEEFD0}.Release|x86.Build.0 = Release|x86
+		{A0B677A5-93C5-4A26-99C1-7F35F049FA1F}.Debug|x86.ActiveCfg = Debug|x86
+		{A0B677A5-93C5-4A26-99C1-7F35F049FA1F}.Debug|x86.Build.0 = Debug|x86
+		{A0B677A5-93C5-4A26-99C1-7F35F049FA1F}.Release|x86.ActiveCfg = Release|x86
+		{A0B677A5-93C5-4A26-99C1-7F35F049FA1F}.Release|x86.Build.0 = Release|x86
+		{2E801399-FA39-4B74-BBE6-69EC61F534C1}.Debug|x86.ActiveCfg = Debug|x86
+		{2E801399-FA39-4B74-BBE6-69EC61F534C1}.Debug|x86.Build.0 = Debug|x86
+		{2E801399-FA39-4B74-BBE6-69EC61F534C1}.Release|x86.ActiveCfg = Release|x86
+		{2E801399-FA39-4B74-BBE6-69EC61F534C1}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

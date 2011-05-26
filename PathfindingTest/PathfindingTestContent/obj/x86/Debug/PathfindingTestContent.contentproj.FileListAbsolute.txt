@@ -1,0 +1,2 @@
+D:\Dropbox\VisualStudioProjects\RTS\PathfindingTest\PathfindingTestContent\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTestContent\obj\x86\Debug\ResolveAssemblyReference.cache
