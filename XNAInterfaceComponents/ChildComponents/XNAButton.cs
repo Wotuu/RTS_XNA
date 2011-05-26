@@ -26,15 +26,30 @@ namespace XNAInterfaceComponents.AbstractComponents
 
         public override void Draw(SpriteBatch sb)
         {
+            // Get a clear texture if there aint any yet.
             if (this.clearTexture == null) clearTexture = ComponentUtil.GetClearTexture2D(sb);
+            // Return if this component has no parent, or if it isn't visible
             if( this.parent == null || this.visible == false ) return;
 
+            // Determine the drawcolor
             Color drawColor = new Color();
             if (this.isMouseOver) drawColor = this.mouseOverColor;
             else drawColor = this.backgroundColor;
 
-            sb.Draw(clearTexture, this.GetScreenLocation(), drawColor);
+            // Get the location on the screen on which to draw this button.
+            Rectangle drawRect = this.GetScreenLocation();
+            // Draw the button
+            sb.Draw(clearTexture, drawRect, drawColor);
+            // Draw the border
             if (this.border != null) border.Draw(sb);
+            // Draw the text on the button
+            if (this.text != null)
+            {
+                Vector2 fontDimensions = this.font.MeasureString(this.text);
+                sb.DrawString(font, this.text,
+                    new Vector2(drawRect.X + (this.bounds.Width / 2) - (fontDimensions.X / 2),
+                       drawRect.Y + (this.bounds.Height / 2) - (fontDimensions.Y / 2)), this.fontColor);
+            }
         }
 
         public override void Update()

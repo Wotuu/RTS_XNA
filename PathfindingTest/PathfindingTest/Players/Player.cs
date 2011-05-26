@@ -127,6 +127,24 @@ namespace PathfindingTest.Players
                 b.Update(ks, ms);
             }
 
+            // Show healthbar over units that mouse is hovering over
+            Boolean selectedAUnit = false;
+            foreach (Player p in Game1.GetInstance().players)
+            {
+                foreach (Unit u in p.units)
+                {
+                    if (!selectedAUnit && u.DefineRectangle().Contains(ms.X, ms.Y))
+                    {
+                        u.selected = true;
+                        selectedAUnit = true;
+                    }
+                    else if (this.currentSelection == null || !this.currentSelection.units.Contains(u))
+                    {
+                        u.selected = false;
+                    }
+                }
+            }
+
             hud.Update(ks, ms);
         }
 
@@ -151,6 +169,10 @@ namespace PathfindingTest.Players
             {
                 u.Draw(sb);
             }
+            foreach( Unit u in units){
+                u.DefaultDraw(sb);
+            }
+
             if (currentSelection != null)
             {
                 foreach (Unit uH in currentSelection.units)
@@ -244,7 +266,7 @@ namespace PathfindingTest.Players
                     {
                         this.DeselectAllUnits();
                         // Performed a double click!
-                        if (Game1.GetInstance().frames - lastBtn1ClickFrames < 30)
+                        if (Game1.GetInstance().frames - lastBtn1ClickFrames < 20)
                         {
                             LinkedList<Unit> selectionUnits = new LinkedList<Unit>();
                             foreach (Unit unit in units)

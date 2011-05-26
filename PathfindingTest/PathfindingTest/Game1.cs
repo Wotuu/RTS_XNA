@@ -124,12 +124,12 @@ namespace PathfindingTest
 
 
 
-
-            /*XNAPanel panel = new XNAPanel(null, new Rectangle(
+            /*ChildComponent.DEFAULT_FONT = font;
+            XNAPanel panel = new XNAPanel(null, new Rectangle(
                 this.graphics.PreferredBackBufferWidth / 2 - 200,
                 this.graphics.PreferredBackBufferHeight / 2 - 200,
                 400, 400));
-            XNAButton button = new XNAButton(panel, new Rectangle(10, 10, 100, 40), "");*/
+            XNAButton button = new XNAButton(panel, new Rectangle(10, 10, 100, 40), "Click me");*/
 
 
             base.Initialize();

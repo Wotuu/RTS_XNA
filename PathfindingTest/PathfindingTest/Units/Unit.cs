@@ -298,6 +298,20 @@ namespace PathfindingTest.Units
             this.maxHealth = 100;
         }
 
+        /// <summary>
+        /// Performs a default draw of certain elements (Healthbar, etc). 
+        /// This should be called AFTER drawing all the units.
+        /// </summary>
+        /// <param name="sb">The SpriteBatch to draw on.</param>
+        public void DefaultDraw(SpriteBatch sb)
+        {
+            if (this.selected) this.DrawHealthBar(sb);
+        }
+        
+        /// <summary>
+        /// Draws the healthbar of this unit.
+        /// </summary>
+        /// <param name="sb">The spritebatch to draw on.</param>
         internal void DrawHealthBar(SpriteBatch sb)
         {
             healthBar.percentage = (int)((this.currentHealth / this.maxHealth) * 100.0);

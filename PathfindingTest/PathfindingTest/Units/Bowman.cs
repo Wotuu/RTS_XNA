@@ -47,11 +47,6 @@ namespace PathfindingTest.Units
         {
             sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
 
-            if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
-            {
-                this.DrawHealthBar(sb);
-            }
-
             for (int i = 0; i < projectiles.Count; i++)
             {
                 projectiles.ElementAt(i).Draw(sb);

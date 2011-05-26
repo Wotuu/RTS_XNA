@@ -55,11 +55,6 @@ namespace PathfindingTest.Units
             //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
             //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
             sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-
-            if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
-            {
-                this.DrawHealthBar(sb);
-            }
         }
 
         public override void OnAggroRecieved(AggroEvent e)
