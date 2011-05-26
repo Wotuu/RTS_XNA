@@ -69,14 +69,14 @@ namespace PathfindingTest.Units
 
 
         /// <summary>
-        /// Attempt to fire the weapon! Meany.
+        /// Attempt to fire the weapon!
         /// </summary>
         public override void Fire()
         {
             if (this.fireCooldown < 0)
             {
                 CheckForEnemiesInRange();
-                if (this.enemiesInRange.Count == 0) return;
+                if (this.enemiesInRange.Count == 0) { return; }
                 Unit targetUnit = this.enemiesInRange.ElementAt(0);
                 AggroEvent e = new AggroEvent(this, targetUnit, true);
                 targetUnit.OnAggroRecieved(e);
