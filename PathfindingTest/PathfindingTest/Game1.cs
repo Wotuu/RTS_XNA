@@ -31,6 +31,7 @@ namespace PathfindingTest
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game, MouseClickListener, MouseMotionListener
     {
+
         public GraphicsDeviceManager graphics { get; set; }
         SpriteBatch spriteBatch;
         private Texture2D drawLineTexture { get; set; }
