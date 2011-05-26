@@ -149,26 +149,44 @@ namespace PathfindingTest.Units
             }
             float xSpeedDirection = movementSpeed * (float)Math.Sin(direction);
             float ySpeedDirection = movementSpeed * (float)Math.Cos(direction);
+
             if (x < waypoint.X && y < waypoint.Y)
             {
-                if (x != waypoint.X) x += xSpeedDirection;
-                if (y != waypoint.Y) y += ySpeedDirection;
+                x += xSpeedDirection;
+                y += ySpeedDirection;
             }
             else if (x < waypoint.X && y > waypoint.Y)
             {
-                if (x != waypoint.X) x += xSpeedDirection;
-                if (y != waypoint.Y) y -= ySpeedDirection;
+                x += xSpeedDirection;
+                y -= ySpeedDirection;
+            }
+            else if (x < waypoint.X && y == waypoint.Y)
+            {
+                x += xSpeedDirection;
             }
             else if (x > waypoint.X && y < waypoint.Y)
             {
-                if (x != waypoint.X) x -= xSpeedDirection;
-                if (y != waypoint.Y) y += ySpeedDirection;
+                x -= xSpeedDirection;
+                y += ySpeedDirection;
             }
             else if (x > waypoint.X && y > waypoint.Y)
             {
-                if (x != waypoint.X) x -= xSpeedDirection;
-                if (y != waypoint.Y) y -= ySpeedDirection;
+                x -= xSpeedDirection;
+                y -= ySpeedDirection;
             }
+            else if (x > waypoint.X && y == waypoint.Y)
+            {
+                x -= xSpeedDirection;
+            }
+            else if (x == waypoint.X && y < waypoint.Y)
+            {
+                y += ySpeedDirection;
+            }
+            else if (x == waypoint.X && y > waypoint.Y)
+            {
+                y -= ySpeedDirection;
+            }
+
 
             if (Math.Abs(x - waypoint.X) < (xSpeedDirection * 1.1) && Math.Abs(y - waypoint.Y) < (ySpeedDirection * 1.1))
             {
