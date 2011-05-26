@@ -37,6 +37,7 @@ namespace PathfindingTest.Buildings
         public Texture2D texture { get; set; }
 
         public BuildingMesh mesh { get; set; }
+        public HealthBar healthBar { get; set; }
         public ProgressBar progressBar { get; set; }
 
         public enum BuildingType
@@ -165,6 +166,7 @@ namespace PathfindingTest.Buildings
 
             this.state = BuildState.Preview;
             this.progressBar = new ProgressBar(this);
+            this.healthBar = new HealthBar(this);
         }
     }
 }
