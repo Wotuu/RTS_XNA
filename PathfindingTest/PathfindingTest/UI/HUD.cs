@@ -18,7 +18,6 @@ namespace PathfindingTest.UI
 {
     public class HUD : MouseClickListener
     {
-
         Player player;
         Color color;
 
