@@ -132,7 +132,7 @@
     <Compile Include="Buildings\Building.cs" />
     <Compile Include="Buildings\Factory.cs" />
     <Compile Include="Buildings\Fortress.cs" />
-    <Compile Include="Buildings\ProgressBar.cs" />
+    <Compile Include="InfoBars\ProgressBar.cs" />
     <Compile Include="Buildings\ResourceGather.cs" />
     <Compile Include="Collision\BuildingMesh.cs" />
     <Compile Include="Collision\RTSCollisionMap.cs" />
@@ -158,7 +158,7 @@
     <Compile Include="Units\Bowman.cs" />
     <Compile Include="Units\CombatUnit.cs" />
     <Compile Include="Units\Engineer.cs" />
-    <Compile Include="Units\HealthBar.cs" />
+    <Compile Include="InfoBars\HealthBar.cs" />
     <Compile Include="Units\Projectiles\Arrow.cs" />
     <Compile Include="Units\Projectiles\Projectile.cs" />
     <Compile Include="XML\XMLAble.cs" />
