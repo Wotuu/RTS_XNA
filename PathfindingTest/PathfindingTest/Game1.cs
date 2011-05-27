@@ -38,7 +38,6 @@ namespace PathfindingTest
         public RTSCollisionMap collision { get; set; }
         public SpriteFont font { get; set; }
         public QuadRoot quadTree { get; set; }
-
         //
         private long previousFrameUpdateTime { get; set; }
         private int previousFrameUpdateFrames { get; set; }
