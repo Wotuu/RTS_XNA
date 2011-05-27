@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XNAInterfaceComponents", "X
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XNAInputLibrary", "XNAInputLibrary\XNAInputLibrary.csproj", "{2E801399-FA39-4B74-BBE6-69EC61F534C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapEditor", "MapEditor\MapEditor.csproj", "{3385252A-8968-4F3A-A05B-91DCAB00A827}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -49,6 +51,10 @@ Global
 		{2E801399-FA39-4B74-BBE6-69EC61F534C1}.Debug|x86.Build.0 = Debug|x86
 		{2E801399-FA39-4B74-BBE6-69EC61F534C1}.Release|x86.ActiveCfg = Release|x86
 		{2E801399-FA39-4B74-BBE6-69EC61F534C1}.Release|x86.Build.0 = Release|x86
+		{3385252A-8968-4F3A-A05B-91DCAB00A827}.Debug|x86.ActiveCfg = Debug|x86
+		{3385252A-8968-4F3A-A05B-91DCAB00A827}.Debug|x86.Build.0 = Debug|x86
+		{3385252A-8968-4F3A-A05B-91DCAB00A827}.Release|x86.ActiveCfg = Release|x86
+		{3385252A-8968-4F3A-A05B-91DCAB00A827}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
