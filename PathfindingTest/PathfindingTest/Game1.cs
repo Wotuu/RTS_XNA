@@ -39,6 +39,7 @@ namespace PathfindingTest
         public SpriteFont font { get; set; }
         public QuadRoot quadTree { get; set; }
 
+        //
         private long previousFrameUpdateTime { get; set; }
         private int previousFrameUpdateFrames { get; set; }
         public int frames { get; set; }
