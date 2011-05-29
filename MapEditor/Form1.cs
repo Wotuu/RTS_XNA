@@ -40,6 +40,7 @@ namespace MapEditor
         bool isMouseDown = false;
         bool isChanged = false;
         TileMapLayer currentLayer = null;
+        bool showGrid = true;
 
 
          int mouseX;
@@ -53,6 +54,7 @@ namespace MapEditor
         public Form1()
         {
             InitializeComponent();
+            BtnShowGrid.CheckOnClick = true;
             tileMapDisplay1.OnInitialize += new EventHandler(tileDisplay1_OnInitialize);
             tileMapDisplay1.OnDraw += new EventHandler(tileDisplay1_OnDraw);
             tileMapDisplay1.MouseEnter += 
@@ -218,6 +220,9 @@ namespace MapEditor
 
 
             //GRID Tekenen met SquareOffset !
+            if (BtnShowGrid.Checked )
+            {
+            
             spriteBatch.Begin();
             for (int x = 0; x < (tileMapDisplay1.Width + Engine.TileWidth)  / Engine.TileWidth ; x++)
                 for (int y = 0; y < (tileMapDisplay1.Height + Engine.TileHeight) / Engine.TileHeight; y++)
@@ -228,7 +233,7 @@ namespace MapEditor
                         Engine.TileHeight),
                         Color.White);
             spriteBatch.End();
-           
+            }
             ////Selected TILE Draw
             Rectangle dest = new Rectangle((int)(position.X / Engine.TileWidth) * Engine.TileWidth - (int)camera.Position.X,
                                            (int)(position.Y / Engine.TileHeight) * Engine.TileHeight - (int)camera.Position.Y,
@@ -338,5 +343,13 @@ namespace MapEditor
             if (e.Button == MouseButtons.Left)
                 isMouseDown = false;
         }
+
+
+        
+
+  
+
+       
+
     }
 }

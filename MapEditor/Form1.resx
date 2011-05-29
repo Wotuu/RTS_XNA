@@ -120,4 +120,29 @@
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <metadata name="toolStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>132, 17</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="BtnShowGrid.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAKuSURBVDhPtVRPaJJxGPYPkv8+NyEQFooHDTeTqQMRZMgG
+        Lj/QzT9Lx/DQdsgNglxEEs3cLLV2jA5BdomIiApGVqxDdIj+IIEbq7WDFLt69CSiv95n2WH02WVNeHh+
+        /D59fJ/3ed9PJDqij490D4O/yvK1223WarVYo9FgtVqNlctllslkGM/zzGw2M41Gw2QyGROLxYx+LYQD
+        or5ms4kviRhjEqlUerfT6SgInEKhKNGdFlCpVPeJ+wjq/v79s4y+O9H9g4OC9XqdnjMJiRyTy+X3iAcI
+        Q0aj8SnxKMFrMpmeEzsJ5sGTJx4RqziO4wUFK5UKQ2UQ02q1DwwGwxOyum61Wl85HI4Nwhu73b4xMjL8
+        2u22vRwbs70I8KfW3W79R0HBUqnEujYHIEZnHyHucrneEV8gLI2Pj74nnidEZuKet8RWcjAlKJhMJiHI
+        wSYqgxjhvNfr/UyB5akdN6NRvkp3aTqfW1iY+IRWWCyWiKCgx+NhCAA9g01UBjG/318Nh4PfZmeDu3Nz
+        kd3Fxamdi0uh7SuXJqvLy8EvkcjQlqCgXq9HKFr8K3oGm6gMYsQPCY9TqZkfxLfp2bXcavgrcdTpdMYE
+        BdVq9R9BLwJAz2ATlUGM8Cx9ObFHfIfuVwqF+HfiMz0FMbSYM4wG0kQA6BlsojKIZbOJvWIx8XNtLVa7
+        VYztFHKhzZ6WJRIJKuzDnGE0ummm0TPYRGUQI87Rs1Q+P71NfNpms00LWv69JEyNocWcYTSQJgJAz2AT
+        lUGMzmdvXJ9E4u6eKUMQ64QNwNBizjAaSBMBoGewicogtroSqGSv+j6EQoOb/6pQhnXCBmBokThGA2ki
+        APQMNlEZxOjuuE6nC/QUxKJjN7FO2ADYQdORJIAzeoZ7VAYxpVIpuMv7L5pD4ohe1f9b9heVHAwwF7Be
+        UAAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>45</value>
+  </metadata>
 </root>
