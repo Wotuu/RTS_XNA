@@ -5,6 +5,7 @@ using System.Text;
 using XNAInterfaceComponents.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using XNAInterfaceComponents.Misc;
 
 namespace XNAInterfaceComponents.AbstractComponents
 {
@@ -16,6 +17,7 @@ namespace XNAInterfaceComponents.AbstractComponents
         public Boolean enabled { get; set; }
         public SpriteFont font { get; set; }
         public Color fontColor { get; set; }
+        public Padding padding { get; set; }
 
         static ChildComponent()
         {
@@ -26,10 +28,14 @@ namespace XNAInterfaceComponents.AbstractComponents
             : base(bounds)
         {
             this.parent = parent;
+            parent.AddChild(this);
             this.enabled = true;
             this.backgroundColor = Color.Red;
             this.font = DEFAULT_FONT;
             this.fontColor = DEFAULT_FONT_COLOR;
+            this.padding = new Padding(5, 5, 5, 5);
+
+            this.text = "";
         }
     }
 }

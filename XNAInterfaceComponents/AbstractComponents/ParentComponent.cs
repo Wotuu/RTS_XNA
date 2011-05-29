@@ -93,7 +93,8 @@ namespace XNAInterfaceComponents.AbstractComponents
                 {
                     if (child.GetScreenLocation().Contains(p))
                     {
-                        ((Focusable)child).OnFocusReceived();
+                        Focusable f = ((Focusable)child);
+                        if( !child.isFocussed ) f.OnFocusReceived();
                         focussedComponent = child;
                     }
                 }

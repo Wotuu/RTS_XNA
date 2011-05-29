@@ -92,6 +92,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeyboardInput\KeyboardListener.cs" />
+    <Compile Include="KeyboardInput\KeyboardManager.cs" />
+    <Compile Include="KeyboardInput\KeyEvent.cs" />
     <Compile Include="MouseInput\MouseClickListener.cs" />
     <Compile Include="MouseInput\MouseEvent.cs" />
     <Compile Include="MouseInput\MouseManager.cs" />

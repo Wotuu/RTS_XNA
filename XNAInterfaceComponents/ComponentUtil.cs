@@ -86,7 +86,7 @@ namespace XNAInterfaceComponents
         {
             ComponentUtil.DrawLine(batch,
                 new Point(rect.Left, rect.Top),
-                new Point(rect.Left, rect.Bottom + 2),
+                new Point(rect.Left, rect.Bottom),
                 c,
                 width);
             // Top left to top right
@@ -98,13 +98,13 @@ namespace XNAInterfaceComponents
             // Top right to bottom right
             ComponentUtil.DrawLine(batch,
                 new Point(rect.Right, rect.Top),
-                new Point(rect.Right, rect.Bottom),
+                new Point(rect.Right, rect.Bottom - 1),
                 c,
                 width);
             // Bottom right to bottom left
             ComponentUtil.DrawLine(batch,
-                new Point(rect.Right, rect.Bottom),
-                new Point(rect.Left, rect.Bottom),
+                new Point(rect.Right, rect.Bottom - 1),
+                new Point(rect.Left, rect.Bottom - 1),
                 c,
                 width);
         }

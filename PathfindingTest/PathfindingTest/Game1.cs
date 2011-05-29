@@ -23,6 +23,8 @@ using XNAInputHandler.MouseInput;
 using XNAInterfaceComponents.Managers;
 using XNAInterfaceComponents.Components;
 using XNAInterfaceComponents.AbstractComponents;
+using XNAInterfaceComponents.ChildComponents;
+using XNAInputLibrary.KeyboardInput;
 
 namespace PathfindingTest
 {
@@ -124,12 +126,19 @@ namespace PathfindingTest
 
 
 
-            /*ChildComponent.DEFAULT_FONT = font;
+            ChildComponent.DEFAULT_FONT = font;
             XNAPanel panel = new XNAPanel(null, new Rectangle(
                 this.graphics.PreferredBackBufferWidth / 2 - 200,
                 this.graphics.PreferredBackBufferHeight / 2 - 200,
                 400, 400));
-            XNAButton button = new XNAButton(panel, new Rectangle(10, 10, 100, 40), "Click me");*/
+            XNALabel label = new XNALabel(panel, new Rectangle(10, 10, 100, 30), "Label test!");
+            label.border = new Border(label, 1, Color.Red);
+            label.textAlign = XNALabel.TextAlign.LEFT;
+            XNAButton button = new XNAButton(panel, new Rectangle(10, 50, 100, 40), "Click me");
+
+            XNACheckBox checkBox = new XNACheckBox(panel, new Rectangle(10, 110, 100, 20), "Checkbox test!");
+
+            XNATextField textField = new XNATextField(panel, new Rectangle(10, 140, 100, 30));
 
 
             base.Initialize();
@@ -172,8 +181,8 @@ namespace PathfindingTest
 
             // TODO: Add your update logic here
             // Update input
-            MouseManager mcManager = MouseManager.GetInstance();
-            mcManager.Update(this);
+            MouseManager.GetInstance().Update(this);
+            KeyboardManager.GetInstance().Update(Keyboard.GetState());
 
             // Updates all interface components
             ComponentManager.GetInstance().Update();

@@ -100,11 +100,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbstractComponents\Border.cs" />
+    <Compile Include="ChildComponents\XNACheckBox.cs" />
+    <Compile Include="ChildComponents\XNATextField.cs" />
+    <Compile Include="Misc\Border.cs" />
     <Compile Include="AbstractComponents\ChildComponent.cs" />
     <Compile Include="AbstractComponents\ParentComponent.cs" />
     <Compile Include="AbstractComponents\Component.cs" />
+    <Compile Include="ChildComponents\XNALabel.cs" />
     <Compile Include="Interfaces\MouseOverable.cs" />
+    <Compile Include="Misc\Caret.cs" />
+    <Compile Include="Misc\Padding.cs" />
     <Compile Include="ParentComponents\XNAPanel.cs" />
     <Compile Include="ChildComponents\XNAButton.cs" />
     <Compile Include="ComponentUtil.cs" />

@@ -10,6 +10,5 @@ namespace XNAInterfaceComponents.Interfaces
         void OnFocusReceived();
 
         void OnFocusLost();
-
     }
 }

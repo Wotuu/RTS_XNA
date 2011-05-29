@@ -19,7 +19,6 @@ namespace XNAInterfaceComponents.AbstractComponents
             : base(parent, bounds)
         {
             this.text = text;
-            parent.AddChild(this);
             MouseManager.GetInstance().mouseClickedListeners += OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += OnMouseRelease;
         }
@@ -101,6 +100,5 @@ namespace XNAInterfaceComponents.AbstractComponents
             this.isMouseOver = false;
             Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " mouse exitted!");
         }
-
     }
 }
