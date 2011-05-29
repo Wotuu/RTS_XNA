@@ -6,8 +6,11 @@ using Microsoft.Xna.Framework;
 using System.Xml;
 using System.IO;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MapEditor.TileMap
+
 {
     public class Tileset
     {
@@ -17,82 +20,44 @@ namespace MapEditor.TileMap
         public string TilesetTextureName;
 
 
-        public Tileset(string tileSetName)
+        public Tileset(Texture2D TilesetTexture)
         {
+           
             textureName = "";
             tileWidth = 0;
             tileHeight = 0;
             tiles = new List<Rectangle>();
-            ProcessTileSet(tileSetName);
+            ProcessTileSet(TilesetTexture);
         }
 
-        void ProcessTileSet(string filePath)
+        void ProcessTileSet(Texture2D TilesetTexture)
         {
-            XmlDocument input = new XmlDocument();
-
-            input.Load(filePath);
-            foreach (XmlNode node in input.DocumentElement.ChildNodes)
+            for (int y = 0; y <= TilesetTexture.Height / Engine.TileHeight; y++)
             {
-                if (node.Name == "TextureElement")
+                for (int x = 0; x <= TilesetTexture.Width / Engine.TileWidth; x++)
                 {
-                    textureName = node.Attributes["TextureName"].Value;
+                    Rectangle tile = new Rectangle(x * Engine.TileWidth, y * Engine.TileHeight, Engine.TileWidth, Engine.TileHeight);
+                    tiles.Add(tile);
                 }
-                if (node.Name == "TilesetDefinitions")
-                {
-                    tileWidth = Int32.Parse(node.Attributes["TileWidth"].Value);
-                    tileHeight = Int32.Parse(node.Attributes["TileHeight"].Value);
-                }
+            }
+        }
 
-                if (node.Name == "TilesetRectangles")
+        public int GetTileID(Rectangle TileRectangle, Texture2D TilesetTexture)
+        {
+            int TileID = 0;
+            for (int y = 0; y <= TilesetTexture.Height / Engine.TileHeight; y++)
+            {
+                for (int x = 0; x <= TilesetTexture.Width / Engine.TileWidth; x++)
                 {
-                    List<Rectangle> rectangles = new List<Rectangle>();
-
-                    foreach (XmlNode rectNode in node.ChildNodes)
+                    if ((TileRectangle.X / Engine.TileWidth).Equals(x) && (TileRectangle.Y / Engine.TileHeight).Equals(y))
                     {
-                        if (rectNode.Name == "Rectangle")
-                        {
-                            Rectangle rect;
-                            rect = new Rectangle(
-                                Int32.Parse(rectNode.Attributes["X"].Value),
-                                Int32.Parse(rectNode.Attributes["Y"].Value),
-                                Int32.Parse(rectNode.Attributes["Width"].Value),
-                                Int32.Parse(rectNode.Attributes["Height"].Value));
-                            rectangles.Add(rect);
-                        }
+                        return TileID;
                     }
-
-                    tiles = rectangles;
+                    TileID++;
                 }
             }
 
-            string fileName = Path.GetDirectoryName(filePath);
-            fileName += @"\" + textureName;
-
-            string[] extensions = { ".png", ".jpg", ".tga", ".bmp", ".gif" };
-            bool found = false;
-
-            foreach (string extension in extensions)
-            {
-                if (File.Exists(fileName + extension))
-                {
-                    found = true;
-                    fileName += extension;
-                    break;
-                }
-            }
-
-            if (found)
-            {
-                TilesetTextureName = fileName;
-            }
-            else
-            {
-                MessageBox.Show("Unrecognized image format in the tile set.",
-                    "Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                throw new Exception("Unable to load the tile set.");
-            }
+            return TileID;
         }
 
     }

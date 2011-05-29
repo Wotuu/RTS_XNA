@@ -33,8 +33,8 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.PnlPaletteContainer = new System.Windows.Forms.Panel();
             this.openTilesetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.PnlPaletteContainer = new System.Windows.Forms.Panel();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -68,9 +68,16 @@
             // newMapToolStripMenuItem
             // 
             this.newMapToolStripMenuItem.Name = "newMapToolStripMenuItem";
-            this.newMapToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newMapToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.newMapToolStripMenuItem.Text = "New Map";
             this.newMapToolStripMenuItem.Click += new System.EventHandler(this.newMapToolStripMenuItem_Click);
+            // 
+            // openTilesetToolStripMenuItem
+            // 
+            this.openTilesetToolStripMenuItem.Name = "openTilesetToolStripMenuItem";
+            this.openTilesetToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.openTilesetToolStripMenuItem.Text = "Open Tileset";
+            this.openTilesetToolStripMenuItem.Click += new System.EventHandler(this.openTilesetToolStripMenuItem_Click);
             // 
             // PnlPaletteContainer
             // 
@@ -79,24 +86,17 @@
             this.PnlPaletteContainer.Size = new System.Drawing.Size(400, 640);
             this.PnlPaletteContainer.TabIndex = 2;
             // 
-            // openTilesetToolStripMenuItem
-            // 
-            this.openTilesetToolStripMenuItem.Name = "openTilesetToolStripMenuItem";
-            this.openTilesetToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.openTilesetToolStripMenuItem.Text = "Open Tileset";
-            this.openTilesetToolStripMenuItem.Click += new System.EventHandler(this.openTilesetToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1264, 986);
+            this.ClientSize = new System.Drawing.Size(1264, 710);
             this.Controls.Add(this.PnlPaletteContainer);
             this.Controls.Add(this.tileMapDisplay1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "XNA Map Editor";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

@@ -16,8 +16,12 @@ namespace MapEditor.TileMap
 
         public void SetTile(int x, int y, int tileIndex)
         {
-            if (x < map.GetLength(1) && y < map.GetLength(0))
-                map[y, x] = tileIndex;
+            if (x >= 0 && y >= 0)
+            {
+                if (x < map.GetLength(1) && y < map.GetLength(0))
+                    map[y, x] = tileIndex;
+            }
+            
         }
 
         public int GetTile(int x, int y)

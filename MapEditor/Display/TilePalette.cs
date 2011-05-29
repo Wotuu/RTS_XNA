@@ -130,6 +130,7 @@ namespace MapEditor.Display
                 end_rectangle = GetSelectedCell(e.Location);
 
                 selected_area = CreateMarqueeArea(start_rectangle, end_rectangle);
+                baseform.selectedrectangle = new Microsoft.Xna.Framework.Rectangle(selected_area.X, selected_area.Y, selected_area.Width,selected_area.Height);
             }
             else
             {
@@ -140,6 +141,23 @@ namespace MapEditor.Display
 
         }
 
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            if (marquee_selection)
+            {
+
+                if (selected_area.Width == Engine.TileHeight && selected_area.Height == Engine.TileHeight)
+                {
+                    marquee_selection = false;
+                    return;
+                }
+       
+
+            }
+        }
+
         public System.Drawing.Rectangle GetSelectedCell(System.Drawing.Point Location)
         {
             //if (GLB_Data.TilesTexture == null)
@@ -147,21 +165,21 @@ namespace MapEditor.Display
             //    return new Rectangle(0, 0, 0, 0);
             //}
 
-            //for (int id_y = 0; id_y < tilesetimage.Height * Engine.TileWidth; id_y += Engine.TileWidth)
-            //{
-            //    for (int id_x = 0; id_x < tilesetimage.Width * Engine.TileHeight; id_x += Engine.TileHeight)
-            //    {
-            //        if ((Location.X >= id_x && Location.X <= id_x + Engine.TileHeight) &&
-            //            (Location.Y >= id_y && Location.Y <= id_y + Engine.TileHeight))
-            //        {
-            //            // FOUND                        
-            //            return new System.Drawing.Rectangle(new System.Drawing.Point(id_x, id_y), new Size(Engine.TileHeight, Engine.TileWidth));
-            //        }
-            //    }
-            //}
+            ////for (int id_y = 0; id_y < tilesetimage.Height * Engine.TileWidth; id_y += Engine.TileWidth)
+            ////{
+            ////    for (int id_x = 0; id_x < tilesetimage.Width * Engine.TileHeight; id_x += Engine.TileHeight)
+            ////    {
+            ////        if ((Location.X >= id_x && Location.X <= id_x + Engine.TileHeight) &&
+            ////            (Location.Y >= id_y && Location.Y <= id_y + Engine.TileHeight))
+            ////        {
+            ////             FOUND                        
+            ////            return new System.Drawing.Rectangle(new System.Drawing.Point(id_x, id_y), new Size(Engine.TileHeight, Engine.TileWidth));
+            ////        }
+            ////    }
+            ////}
             for (int id_y = 0; id_y < tilesetimage.Height; id_y += Engine.TileWidth)
             {
-                for (int id_x = 0; id_x < tilesetimage.Width ; id_x += Engine.TileHeight)
+                for (int id_x = 0; id_x < tilesetimage.Width; id_x += Engine.TileHeight)
                 {
                     if ((Location.X >= id_x && Location.X <= id_x + Engine.TileHeight) &&
                         (Location.Y >= id_y && Location.Y <= id_y + Engine.TileHeight))
