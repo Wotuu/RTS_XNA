@@ -2,16 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PathfindingTest.Units.Stores;
+using PathfindingTest.Players;
 
 namespace PathfindingTest.Units
 {
-    abstract class MeleeStore
+    public class MeleeStore : UnitStore
     {
-        public Unit getUnit(String type)
+
+        public MeleeStore(Player player)
         {
-            return createUnit(type);
+            this.player = player;
         }
 
-        protected abstract Unit createUnit(String type);
+        protected override Unit createUnit(String type, int x, int y)
+        {
+            if (type.Equals("normal"))
+            {
+                return null;
+            }
+            else if (type.Equals("heavy"))
+            {
+                return null;
+            }
+            else if (type.Equals("engineer"))
+            {
+                return new Engineer(player, x, y);
+            }
+            return null;
+        }
     }
 }

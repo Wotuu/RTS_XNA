@@ -17,7 +17,6 @@ namespace PathfindingTest.Units
             : base(p, x, y, 1f, 100f, 60)
         {
 
-            //TODO abstract factory
             this.player = p;
             this.x = x;
             this.y = y;

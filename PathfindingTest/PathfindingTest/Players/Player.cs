@@ -13,6 +13,7 @@ using PathfindingTest.Selection;
 using PathfindingTest.Selection.Patterns;
 using PathfindingTest.Pathfinding;
 using XNAInputHandler.MouseInput;
+using PathfindingTest.Units.Stores;
 
 namespace PathfindingTest.Players
 {
@@ -38,6 +39,9 @@ namespace PathfindingTest.Players
 
         private int lastBtn1ClickFrames { get; set; }
 
+        private UnitStore meleeStore;
+        private UnitStore rangedStore;
+
         /// <summary>
         /// Player constructor.
         /// </summary>
@@ -55,8 +59,8 @@ namespace PathfindingTest.Players
             buildings = new LinkedList<Building>();
             hud = new HUD(this, color);
 
-
-
+            meleeStore = new MeleeStore(this);
+            rangedStore = new RangedStore(this);
 
             MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += ((MouseClickListener)this).OnMouseRelease;
@@ -73,9 +77,11 @@ namespace PathfindingTest.Players
             LinkedList<Unit> temp_units = new LinkedList<Unit>();
             for (int i = 0; i < 25; i++)
             {
-                if( i % 2 == 0 ) temp_units.AddLast(new Engineer(this, 0, 0));
-                else 
-                    temp_units.AddLast(new Bowman(this, 0, 0));
+                if (i % 2 == 0) { temp_units.AddLast(meleeStore.getUnit("engineer", 0, 0)); }
+                else
+                {
+                    temp_units.AddLast(rangedStore.getUnit("bowman", 0, 0));
+                }
             }
             UnitSelection selection = new UnitSelection(temp_units);
 
@@ -169,8 +175,9 @@ namespace PathfindingTest.Players
             {
                 u.Draw(sb);
             }
-            foreach( Unit u in units){
-                u.DefaultDraw(sb);
+            foreach (Unit u in units)
+            {
+                u.Draw(sb);
             }
 
             if (currentSelection != null)
@@ -260,7 +267,7 @@ namespace PathfindingTest.Players
                         {
                             this.DeselectAllUnits();
                             this.currentSelection = null;
-                        } 
+                        }
                     }
                     else
                     {
@@ -274,7 +281,7 @@ namespace PathfindingTest.Players
                                 if (mouseOverUnit.type == unit.type) selectionUnits.AddLast(unit);
                             }
                             this.currentSelection = new UnitSelection(selectionUnits);
-                        } 
+                        }
                         else if (!mouseOverUnit.selected)
                         {
                             LinkedList<Unit> selectionUnits = new LinkedList<Unit>();

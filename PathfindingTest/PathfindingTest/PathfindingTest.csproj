@@ -163,6 +163,7 @@
     <Compile Include="Units\Projectiles\Arrow.cs" />
     <Compile Include="Units\Projectiles\Projectile.cs" />
     <Compile Include="Units\Stores\RangedStore.cs" />
+    <Compile Include="Units\Stores\UnitStore.cs" />
     <Compile Include="XML\XMLAble.cs" />
     <Compile Include="XML\SaveManager.cs" />
     <Compile Include="Units\Stores\Unit.cs" />

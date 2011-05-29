@@ -2,16 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PathfindingTest.Players;
 
 namespace PathfindingTest.Units.Stores
 {
-    class RangedStore
+    class RangedStore : UnitStore
     {
-        public Unit getUnit(String type)
+        public RangedStore(Player player)
         {
-            return createUnit(type);
+            this.player = player;
         }
 
-        protected abstract Unit createUnit(String type);
+        protected override Unit createUnit(String type, int x, int y)
+        {
+            if (type.Equals("bowman"))
+            {
+                return new Bowman(player, x, y);
+            }
+            else if (type.Equals("heavy"))
+            {
+                return null;
+            }
+            return null;
+        }
     }
 }
