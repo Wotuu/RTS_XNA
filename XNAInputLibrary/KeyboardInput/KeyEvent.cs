@@ -16,7 +16,8 @@ namespace XNAInputLibrary.KeyboardInput
         {
             ALT, 
             SHIFT,
-            CTRL
+            CONTROL,
+            NONE
         }
 
         public enum Type
@@ -26,10 +27,11 @@ namespace XNAInputLibrary.KeyboardInput
             Released
         }
 
-        public KeyEvent(Keys key, Type type)
+        public KeyEvent(Keys key, Type type, Modifier[] modifiers)
         {
             this.key = key;
             this.type = type;
+            this.modifiers = modifiers;
         }
     }
 }

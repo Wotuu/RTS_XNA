@@ -25,38 +25,57 @@ namespace XNAInputLibrary.KeyboardInput
 
         private Keys[] previousFramePressedKeys { get; set; }
 
+        public LinkedList<KeyEvent.Modifier> heldModifiers { get; set; }
+
 
 
         private KeyboardManager()
         {
             keyTypedLagMS = 500;
+            this.heldModifiers = new LinkedList<KeyEvent.Modifier>();
+        }
+
+        private KeyEvent.Modifier GetModifier(Keys key)
+        {
+            String keyString = key.ToString();
+            if (keyString.Equals("LeftControl") || keyString.Equals("RightControl")) return KeyEvent.Modifier.CONTROL;
+            else if (keyString.Equals("LeftAlt") || keyString.Equals("RightAlt")) return KeyEvent.Modifier.ALT;
+            else if (keyString.Equals("LeftShift") || keyString.Equals("RightShift")) return KeyEvent.Modifier.SHIFT;
+            return KeyEvent.Modifier.NONE;
         }
 
         private Boolean IsTypeable(Keys key)
         {
             if (key.ToString().Length == 1) return true;
-            if (key.ToString().Contains("Left") ||
-                key.ToString().Contains("Right") ||
-                key.ToString().Contains("Lock") ||
-                key.ToString().Contains("Tab") ||
-                key.ToString().Contains("Back") ||
-                key.ToString().Contains("Enter") ||
-                key.ToString().Contains("Up") ||
-                key.ToString().Contains("Down") ||
-                key.ToString().Contains("Del") ||
-                key.ToString().Contains("Esc") ||
-                key.ToString().Contains("F1") ||
-                key.ToString().Contains("F2") ||
-                key.ToString().Contains("F3") ||
-                key.ToString().Contains("F4") ||
-                key.ToString().Contains("F5") ||
-                key.ToString().Contains("F6") ||
-                key.ToString().Contains("F7") ||
-                key.ToString().Contains("F8") ||
-                key.ToString().Contains("F9") ||
-                key.ToString().Contains("F10") ||
-                key.ToString().Contains("F11") ||
-                key.ToString().Contains("F12"))
+            String keyString = key.ToString();
+            
+            if (
+                #region it's not typeable
+                keyString.Contains("Left") ||
+                keyString.Contains("Right") ||
+                keyString.Contains("Lock") ||
+                keyString.Contains("Tab") ||
+                keyString.Contains("Back") ||
+                keyString.Contains("Enter") ||
+                keyString.Contains("Up") ||
+                keyString.Contains("Down") ||
+                keyString.Contains("Del") ||
+                keyString.Contains("Esc") ||
+                keyString.Contains("F1") ||
+                keyString.Contains("F2") ||
+                keyString.Contains("F3") ||
+                keyString.Contains("F4") ||
+                keyString.Contains("F5") ||
+                keyString.Contains("F6") ||
+                keyString.Contains("F7") ||
+                keyString.Contains("F8") ||
+                keyString.Contains("F9") ||
+                keyString.Contains("F10") ||
+                keyString.Contains("F11") ||
+                keyString.Contains("F12")
+                #endregion
+                )
+            
             {
                 return false;
             }
@@ -66,30 +85,53 @@ namespace XNAInputLibrary.KeyboardInput
         public void Update(KeyboardState state)
         {
             LinkedList<Keys> releasedKeys = this.GetReleasedKeys(state.GetPressedKeys());
+            if (releasedKeys.Contains(this.firstPressedTypeableKey))
+            {
+                Console.Out.WriteLine("Reset first typed key!");
+                this.firstPressedTypeableKey = new Keys();
+                this.firstPressedKeyTicks = 0;
+            }
             foreach (Keys key in releasedKeys)
             {
-                if (this.keyReleasedListeners != null)
+                if (this.keyReleasedListeners != null && GetModifier(key) == KeyEvent.Modifier.NONE)
                 {
-                    keyReleasedListeners(new KeyEvent(key, KeyEvent.Type.Released));
-                }
-                if (state.GetPressedKeys().Length == 0)
-                {
-                    Console.Out.WriteLine("Reset first typed key!");
-                    this.firstPressedTypeableKey = new Keys();
-                    this.firstPressedKeyTicks = 0;
+                    keyReleasedListeners(new KeyEvent(key, KeyEvent.Type.Released, this.heldModifiers.ToArray()));
                 }
             }
 
 
+
+            // Set modifiers
+            this.heldModifiers.Clear();
             foreach (Keys key in state.GetPressedKeys())
             {
+                // Console.Out.WriteLine("Key: " + key.ToString());
+                KeyEvent.Modifier mod = GetModifier(key);
+                if (mod != KeyEvent.Modifier.NONE)
+                {
+                    if (!this.heldModifiers.Contains(mod))
+                    {
+                        // Console.Out.WriteLine("Adding a modifier!");
+                        this.heldModifiers.AddLast(mod);
+                    }
+                    continue;
+                }
+            }
+
+            // set rest of keys
+            foreach (Keys key in state.GetPressedKeys())
+            {
+                // No modifiers allowed here
+                if (GetModifier(key) != KeyEvent.Modifier.NONE) continue;
+
+                // The rest
                 if (this.keyPressedListeners != null
                     && !this.previousFramePressedKeys.Contains(key))
                 {
-                    keyPressedListeners(new KeyEvent(key, KeyEvent.Type.Pressed));
+                    keyPressedListeners(new KeyEvent(key, KeyEvent.Type.Pressed, this.heldModifiers.ToArray()));
                 }
 
-                if ( firstPressedTypeableKey.ToString() == "None" )
+                if ( firstPressedTypeableKey.ToString() == "None")
                 {
                     firstPressedTypeableKey = key;
                     firstPressedKeyTicks = System.DateTime.UtcNow.Ticks;
@@ -99,7 +141,7 @@ namespace XNAInputLibrary.KeyboardInput
                 {
                     if (System.DateTime.UtcNow.Ticks > ((firstPressedKeyTicks + (keyTypedLagMS * 10000))))
                     {
-                        keyTypedListeners(new KeyEvent(key, KeyEvent.Type.Typed));
+                        keyTypedListeners(new KeyEvent(key, KeyEvent.Type.Typed, this.heldModifiers.ToArray()));
                     }
                 }
             }

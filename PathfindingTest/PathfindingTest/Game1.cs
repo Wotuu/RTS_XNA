@@ -139,7 +139,7 @@ namespace PathfindingTest
             XNACheckBox checkBox = new XNACheckBox(panel, new Rectangle(10, 110, 100, 20), "Checkbox test!");
 
             XNATextField textField = new XNATextField(panel, new Rectangle(10, 140, 100, 30));
-
+            
 
             base.Initialize();
         }

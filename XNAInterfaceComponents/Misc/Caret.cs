@@ -6,6 +6,7 @@ using XNAInterfaceComponents.Interfaces;
 using Microsoft.Xna.Framework.Graphics;
 using XNAInterfaceComponents.AbstractComponents;
 using Microsoft.Xna.Framework;
+using XNAInterfaceComponents.ChildComponents;
 
 namespace XNAInterfaceComponents.Misc
 {
@@ -14,14 +15,14 @@ namespace XNAInterfaceComponents.Misc
         public int width { get; set; }
         public int index { get; set; }
         public int blinkTicks { get; set; }
-        public ChildComponent parent { get; set; }
+        public XNATextField parent { get; set; }
         public Color color { get; set; }
 
         private Boolean visible { get; set; }
 
         private long previousBlinkTicks { get; set; }
 
-        public Caret(ChildComponent parent)
+        public Caret(XNATextField parent)
         {
             this.parent = parent;
             previousBlinkTicks = System.DateTime.UtcNow.Ticks;
@@ -49,8 +50,9 @@ namespace XNAInterfaceComponents.Misc
             {
                 Rectangle drawLocation = parent.GetScreenLocation();
                 String toMeasure = "";
-                foreach( Char c in parent.text.ToArray() ){
-                    toMeasure += "" + c;
+                Char[] array = parent.GetDisplayText().ToArray();
+                for( int i = 0; i < this.index && i < array.Length; i++ ){
+                    toMeasure += "" + array[i];
                 }
                 float offsetX = parent.font.MeasureString(toMeasure).X;
                 if (offsetX == 0) offsetX = 1;
