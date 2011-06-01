@@ -25,6 +25,7 @@ using XNAInterfaceComponents.Components;
 using XNAInterfaceComponents.AbstractComponents;
 using XNAInterfaceComponents.ChildComponents;
 using XNAInputLibrary.KeyboardInput;
+using PathfindingTest.State;
 
 namespace PathfindingTest
 {
@@ -93,54 +94,11 @@ namespace PathfindingTest
 
             drawLineTexture = this.Content.Load<Texture2D>("Misc/solid");
             font = Content.Load<SpriteFont>("Fonts/Arial");
+            ChildComponent.DEFAULT_FONT = font;
             (collision = new RTSCollisionMap(this, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight)).PlaceNodesAroundEdges();
             graphics.PreferMultiSampling = true;
 
-            (quadTree = new QuadRoot(new Rectangle(0, 0,
-                graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight)
-                )).CreateTree(5);
-
-            players = new LinkedList<Player>();
-
-            Alliance redAlliance = new Alliance();
-            Player humanPlayer = new Player(redAlliance, Color.Red);
-            players.AddLast((CURRENT_PLAYER = humanPlayer));
-            humanPlayer.SpawnStartUnits(new Point((int)Game1.GetInstance().graphics.PreferredBackBufferWidth / 2,
-                (int)Game1.GetInstance().graphics.PreferredBackBufferWidth / 2));
-            
-            
-               
-
-            Alliance greenAlliance = new Alliance();
-            Player aiPlayer = new Player(greenAlliance, Color.Green);
-            players.AddLast(aiPlayer);
-            aiPlayer.SpawnStartUnits(new Point((int)Game1.GetInstance().graphics.PreferredBackBufferWidth / 2, 200));
-
-            //SaveManager.GetInstance().SaveNodes("C:\\Users\\Wouter\\Desktop\\test.xml");
-            MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
-            MouseManager.GetInstance().mouseReleasedListeners += ((MouseClickListener)this).OnMouseRelease;
-            MouseManager.GetInstance().mouseMotionListeners += ((MouseMotionListener)this).OnMouseMotion;
-            MouseManager.GetInstance().mouseDragListeners += ((MouseMotionListener)this).OnMouseDrag;
-
-
-
-
-
-            ChildComponent.DEFAULT_FONT = font;
-            XNAPanel panel = new XNAPanel(null, new Rectangle(
-                this.graphics.PreferredBackBufferWidth / 2 - 200,
-                this.graphics.PreferredBackBufferHeight / 2 - 200,
-                400, 400));
-            XNALabel label = new XNALabel(panel, new Rectangle(10, 10, 100, 30), "Label test!");
-            label.border = new Border(label, 1, Color.Red);
-            label.textAlign = XNALabel.TextAlign.LEFT;
-            XNAButton button = new XNAButton(panel, new Rectangle(10, 50, 100, 40), "Click me");
-
-            XNACheckBox checkBox = new XNACheckBox(panel, new Rectangle(10, 110, 100, 20), "Checkbox test!");
-
-            XNATextField textField = new XNATextField(panel, new Rectangle(10, 140, 100, 30));
-            
-
+            StateManager.GetInstance().gameState = StateManager.State.MainMenu;
             base.Initialize();
         }
 
@@ -177,55 +135,73 @@ namespace PathfindingTest
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+            StateManager sm = StateManager.GetInstance();
 
-
-            // TODO: Add your update logic here
             // Update input
             MouseManager.GetInstance().Update(this);
             KeyboardManager.GetInstance().Update(Keyboard.GetState());
 
-            // Updates all interface components
-            ComponentManager.GetInstance().Update();
-
-            // Update units
-            foreach (Player p in players)
+            if (sm.gameState == StateManager.State.MainMenu)
             {
-                p.Update(Keyboard.GetState(), Mouse.GetState());
+                // Updates all interface components
+                ComponentManager.GetInstance().Update();
             }
-
-            // Update other random stuff?
-            KeyboardState keyboardState = Keyboard.GetState();
-            MouseState mouseState = Mouse.GetState();
-            if ((keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
-                && mouseState.LeftButton == ButtonState.Pressed)
+            else if (sm.gameState == StateManager.State.GameInit)
             {
-                PathfindingNodeManager manager = PathfindingNodeManager.GetInstance();
-                if (manager.selectedNode != null)
+
+            }
+            else if (sm.gameState == StateManager.State.GameRunning)
+            {
+                // TODO: Add your update logic here
+
+                // Update units
+                foreach (Player p in players)
                 {
-                    manager.selectedNode.x = mouseState.X;
-                    manager.selectedNode.y = mouseState.Y;
+                    p.Update(Keyboard.GetState(), Mouse.GetState());
                 }
+
+                // Update other random stuff?
+                KeyboardState keyboardState = Keyboard.GetState();
+                MouseState mouseState = Mouse.GetState();
+                if ((keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
+                    && mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    PathfindingNodeManager manager = PathfindingNodeManager.GetInstance();
+                    if (manager.selectedNode != null)
+                    {
+                        manager.selectedNode.x = mouseState.X;
+                        manager.selectedNode.y = mouseState.Y;
+                    }
+                }
+
+                /*
+                 * The NodeProcessor has a stack of Nodes. When popping a node, it calculates the connections.
+                 * This is done to save a massive lagspike when updating the collision mesh!
+                 */
+                //if (frames % 2 == 0) 
+                PathfindingNodeProcessor.GetInstance().Process();
+                PathfindingProcessor.GetInstance().Process();
+
+                DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
+                DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
+                long timeStamp = (UtcNow - baseTime).Ticks / 10000;
+                if (timeStamp - previousFrameUpdateTime > 1000)
+                {
+                    // Console.Out.WriteLine("Updates this second: " + (frames - previousFrameUpdateFrames) + ", slowly: " + gameTime.IsRunningSlowly);
+                    previousFrameUpdateTime = timeStamp;
+                    previousFrameUpdateFrames = frames;
+                }
+
+                frames++;
             }
-
-            /*
-             * The NodeProcessor has a stack of Nodes. When popping a node, it calculates the connections.
-             * This is done to save a massive lagspike when updating the collision mesh!
-             */
-            //if (frames % 2 == 0) 
-            PathfindingNodeProcessor.GetInstance().Process();
-            PathfindingProcessor.GetInstance().Process();
-
-            DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
-            DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
-            long timeStamp = (UtcNow - baseTime).Ticks / 10000;
-            if (timeStamp - previousFrameUpdateTime > 1000)
+            else if (sm.gameState == StateManager.State.GamePaused)
             {
-                // Console.Out.WriteLine("Updates this second: " + (frames - previousFrameUpdateFrames) + ", slowly: " + gameTime.IsRunningSlowly);
-                previousFrameUpdateTime = timeStamp;
-                previousFrameUpdateFrames = frames;
-            }
 
-            frames++;
+            }
+            else if (sm.gameState == StateManager.State.GameShutdown)
+            {
+
+            }
             base.Update(gameTime);
         }
 
@@ -239,25 +215,46 @@ namespace PathfindingTest
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            collision.DrawMap(spriteBatch);
+
+            StateManager sm = StateManager.GetInstance();
+            if (sm.gameState == StateManager.State.MainMenu)
+            {
+                // Draws all interface components
+                ComponentManager.GetInstance().Draw(spriteBatch);
+            }
+            else if (sm.gameState == StateManager.State.GameInit)
+            {
+
+            }
+            else if (sm.gameState == StateManager.State.GameRunning)
+            {
+                collision.DrawMap(spriteBatch);
+
+                LinkedList<PathfindingNode> list = PathfindingNodeManager.GetInstance().nodeList;
+                foreach (Node node in list)
+                {
+                    node.Draw(spriteBatch);
+                }
+
+                foreach (Player p in players)
+                {
+                    p.Draw(this.spriteBatch);
+                }
+            }
+            else if (sm.gameState == StateManager.State.GamePaused)
+            {
+
+            }
+            else if (sm.gameState == StateManager.State.GameShutdown)
+            {
+
+            }
 
             // quadTree.Draw(spriteBatch);
 
 
-            LinkedList<PathfindingNode> list = PathfindingNodeManager.GetInstance().nodeList;
-            foreach (Node node in list)
-            {
-                node.Draw(spriteBatch);
-            }
-
-            foreach (Player p in players)
-            {
-                p.Draw(this.spriteBatch);
-            }
 
 
-            // Draws all interface components
-            ComponentManager.GetInstance().Draw(spriteBatch);
 
             spriteBatch.End();
 

@@ -13,17 +13,48 @@ using Microsoft.Xna.Framework.Input;
 
 namespace XNAInterfaceComponents.ChildComponents
 {
-    public class XNATextField : ChildComponent, Focusable, KeyboardListener
+    public class XNATextField : ChildComponent, Focusable, KeyboardListener, MouseClickListener, MouseMotionListener
     {
         public Caret caret { get; set; }
+        private Rectangle scrollbarBounds { get; set; }
+        private Rectangle scrollbarButtonBounds { get; set; }
+        private Boolean drawScrollbar { get; set; }
+        public int scrollbarIndex { get; set; }
+        public String hiddenCharacters { get; set; }
+        public int rows { get; set; }
 
-        public XNATextField(ParentComponent parent, Rectangle bounds)
+        public XNATextField(ParentComponent parent, Rectangle bounds, int rows)
             : base(parent, bounds)
         {
             this.caret = new Caret(this);
+            this.rows = rows;
+            Rectangle drawRect = this.GetScreenLocation();
+            this.scrollbarBounds = new Rectangle(drawRect.Left, drawRect.Bottom, drawRect.Width, 10);
+            this.scrollbarButtonBounds = new Rectangle(drawRect.Left, drawRect.Bottom, drawRect.Width, 8);
             KeyboardManager.GetInstance().keyPressedListeners += this.OnKeyPressed;
             KeyboardManager.GetInstance().keyTypedListeners += this.OnKeyTyped;
             KeyboardManager.GetInstance().keyReleasedListeners += this.OnKeyReleased;
+
+
+            MouseManager.GetInstance().mouseDragListeners += this.OnMouseDrag;
+            MouseManager.GetInstance().mouseMotionListeners += this.OnMouseMotion;
+
+            MouseManager.GetInstance().mouseClickedListeners += this.OnMouseClick;
+            MouseManager.GetInstance().mouseReleasedListeners += this.OnMouseRelease;
+            this.text = "abcdefghijklmnopqrstuvwxyz \nnext line";
+            this.hiddenCharacters = "";
+        }
+
+        private String previousDisplayText { get; set; }
+
+        /// <summary>
+        /// Gets the text on a row.
+        /// </summary>
+        /// <param name="row">The row.</param>
+        /// <returns>The text</returns>
+        public String GetTextOnRow(int row)
+        {
+            return this.text.Split(new char[] { '\n' })[row];
         }
 
         /// <summary>
@@ -38,23 +69,48 @@ namespace XNAInterfaceComponents.ChildComponents
             float textWidth = this.font.MeasureString(this.text).X;
             float viewportX = this.bounds.Width - this.padding.left - this.padding.right;
 
-            if (viewportX > textWidth) return this.text;
+            if (viewportX > textWidth)
+            {
+                this.previousDisplayText = this.text;
+                return this.text;
+            }
 
             String result = "";
-            for (int i = Math.Max(this.caret.index, array.Length) - 1; i >= 0; i--)
+            // this.caret.index -= this.scrollbarIndex;
+            int start = 0;
+            this.hiddenCharacters = "";
+            for (int i = 0; i < this.text.Length; i++)
             {
                 Char currentChar = array[i];
 
-                currentStringWidth += this.font.MeasureString(currentChar + "").X;
-                if (currentStringWidth < viewportX)
+                if( i >= start )
                 {
-                    result += currentChar + "";
+                    currentStringWidth += this.font.MeasureString(currentChar + "").X;
+                    if (currentStringWidth < viewportX)
+                    {
+                        result += currentChar + "";
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-            } 
+                else 
+                {
+                    this.hiddenCharacters += currentChar + "";
+                }
+            }
+            // this.caret.index += this.scrollbarIndex;
 
-            char[] charArray = result.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
+            //char[] charArray = hiddenCharacters.ToCharArray();
+            //Array.Reverse(charArray);
+            //hiddenCharacters = new String(charArray);
+
+            //charArray = result.ToCharArray();
+            //Array.Reverse(charArray);
+            //return new string(charArray);
+            this.previousDisplayText = result;
+            return result;
         }
 
         public override void Draw(SpriteBatch sb)
@@ -80,17 +136,57 @@ namespace XNAInterfaceComponents.ChildComponents
             // Draw the text
             String displayText = GetDisplayText();
             Vector2 fontDimensions = this.font.MeasureString(displayText);
-            float drawY = drawRect.Y + (this.bounds.Height / 2) - (fontDimensions.Y / 2);
+            float drawY = drawRect.Y + padding.top;
 
             sb.DrawString(font, displayText,
                 new Vector2(drawRect.X + this.padding.left,
                     drawY), this.fontColor);
 
+            // Draw scrollbar
+            if (drawScrollbar)
+            {
+                ComponentUtil.DrawClearRectangle(sb, this.scrollbarBounds, 1, Color.Pink);
+                sb.Draw(this.clearTexture, this.scrollbarButtonBounds, Color.Blue);
+            }
         }
 
         public override void Update()
         {
             this.caret.Update();
+            /*float percentageShown = (float)((GetDisplayText().Length / (float)text.Length) * 100.0);
+            // Draw it if we're hiding stuff
+            this.drawScrollbar = percentageShown < 99;
+
+            scrollbarButtonBounds = new Rectangle(scrollbarButtonBounds.X,
+                scrollbarButtonBounds.Y,
+                Math.Max((int)((scrollbarBounds.Width / 100.0) * percentageShown), 20),
+                scrollbarBounds.Height);
+
+            // Get the valid area (x) of the scrollbar
+            float scrollbarValidArea = this.scrollbarBounds.Width - this.scrollbarButtonBounds.Width;
+            // Get the percentage the bar is on the slider
+            float percentageOnBar = ((this.scrollbarButtonBounds.X - this.scrollbarBounds.X) / scrollbarValidArea) * 100;
+            // Measure the string width of the entire text
+            float stringWidth = this.font.MeasureString(text).X;
+            // Calculate the width that was hidden
+            float hiddenWidth = (float)((stringWidth / 100.0) * percentageOnBar);
+            
+            Char[] array = this.text.ToCharArray();
+            float currentWidth = 0;
+            int currentIndex = 0;
+            for (int i = 0; i < array.Length; i++)
+            {
+                currentWidth += this.font.MeasureString(array[i] + "").X;
+                if (currentWidth > hiddenWidth)
+                {
+                    break;
+                }
+                else currentIndex++;
+            }
+            this.scrollbarIndex = currentIndex;*/
+            // Console.Out.WriteLine(currentIndex);
+            //this.scrollbarIndex = 
+            // Console.Out.WriteLine((int)((scrollbarBounds.Width / 100.0) * percentageShown));
         }
 
         public override void OnMouseEnter(MouseEvent e)
@@ -124,12 +220,16 @@ namespace XNAInterfaceComponents.ChildComponents
         {
             String newString = "";
             Char[] array = this.text.ToCharArray();
-            for (int i = 0; i < this.caret.index; i++)
+
+
+            // Apply changes
+            int caretIndex = this.caret.GetCaretArrayIndex();
+            for (int i = 0; i < caretIndex; i++)
             {
                 newString += "" + array[i];
             }
             newString += s;
-            for (int i = this.caret.index; i < array.Length; i++)
+            for (int i = caretIndex; i < array.Length; i++)
             {
                 newString += "" + array[i];
             }
@@ -170,10 +270,9 @@ namespace XNAInterfaceComponents.ChildComponents
                 }
             }
             this.text = newString;
-            if (isBackspace) this.caret.index = index - 1;
-            else this.caret.index = index;
+            if (isBackspace) this.caret.index--;
         }
-#endregion
+        #endregion
 
         private void ProcessKey(KeyEvent e)
         {
@@ -182,25 +281,63 @@ namespace XNAInterfaceComponents.ChildComponents
                 String keyString = e.key.ToString();
                 if (keyString.Equals("Left"))
                 {
-                    if (this.caret.index > 0) this.caret.index--;
+                    if (this.caret.index > 1)
+                    {
+                        Console.Out.WriteLine(this.caret.index);
+                        this.caret.index--;
+                    }
+                    else if (this.caret.row > 0)
+                    {
+                        this.caret.row--;
+                        this.caret.index = this.caret.GetTextOnCaretRow().Length - 1;
+                    }
                 }
                 else if (keyString.Equals("Right"))
                 {
-                    if (this.caret.index < this.text.Length) this.caret.index++;
+                    if (this.caret.index < (this.caret.GetTextOnCaretRow().Length)) this.caret.index++;
+                    else 
+                    {
+                        int rowCount = this.text.Split(new char[] { '\n' }).Length;
+                        if (this.caret.row < rowCount - 1)
+                        {
+                            this.caret.index = 1;
+                            this.caret.row++;
+                        }
+                    }
+                    Console.Out.WriteLine(this.caret.index);
+                    Console.Out.WriteLine(this.caret.row);
+                }
+                else if( keyString.Equals("Up")){
+                    if (this.caret.row > 0) this.caret.row--; 
+                }
+                else if (keyString.Equals("Down"))
+                {
+                    if (this.caret.row < this.text.Split(new char[] { '\n' }).Length) this.caret.row++; 
                 }
                 else if (keyString.Contains("Back"))
                 {
-                    if (this.caret.index > 0) DeleteCharacterAt(this.caret.index, true);
+                    if (this.caret.index > 0) DeleteCharacterAt(this.caret.GetCaretArrayIndex(), true);
+                    else if (this.caret.row > 0)
+                    {
+                        this.caret.row--;
+                        this.caret.index = this.caret.GetTextOnCaretRow().Length;
+                    }
                 }
                 else if (keyString.Contains("Delete"))
                 {
-                    if (this.caret.index < this.text.Length) DeleteCharacterAt(this.caret.index, false);
+                    if (this.caret.index < this.text.Length) DeleteCharacterAt(this.caret.GetCaretArrayIndex(), false); 
                 }
                 else if (keyString.Equals("Enter"))
                 {
-                    this.OnFocusLost();
+                    if (this.caret.row < this.rows - 1)
+                    {
+                        this.InsertStringAtCaret("\n ");
+                        this.caret.row++;
+                        this.caret.index = 1;
+                    }
+                    // this.OnFocusLost();
                 }
-                else if( keyString.Equals("F1") ||
+                else if (keyString.Equals("F1") ||
                     keyString.Equals("F2") ||
                     keyString.Equals("F3") ||
                     keyString.Equals("F4") ||
@@ -225,7 +362,7 @@ namespace XNAInterfaceComponents.ChildComponents
                         if (e.modifiers.Contains(KeyEvent.Modifier.SHIFT)) typedChar = "?";
                         else typedChar = "/";
                     }
-                    else if (keyString.Equals("OemPeriod")) 
+                    else if (keyString.Equals("OemPeriod"))
                     {
                         if (e.modifiers.Contains(KeyEvent.Modifier.SHIFT)) typedChar = ">";
                         else typedChar = ".";
@@ -239,7 +376,7 @@ namespace XNAInterfaceComponents.ChildComponents
                     {
                         if (e.modifiers.Contains(KeyEvent.Modifier.SHIFT)) typedChar = "\"";
                         else typedChar = "'";
-                    } 
+                    }
                     else if (keyString.Equals("OemComma"))
                     {
                         if (e.modifiers.Contains(KeyEvent.Modifier.SHIFT)) typedChar = "<";
@@ -254,7 +391,7 @@ namespace XNAInterfaceComponents.ChildComponents
                     {
                         if (e.modifiers.Contains(KeyEvent.Modifier.SHIFT)) typedChar = "}";
                         else typedChar = "]";
-                    } 
+                    }
                     else if (keyString.Equals("OemPipe"))
                     {
                         if (e.modifiers.Contains(KeyEvent.Modifier.SHIFT)) typedChar = "|";
@@ -329,8 +466,8 @@ namespace XNAInterfaceComponents.ChildComponents
                     {
                         if (keyString.Length == 1)
                         {
-                            if( !e.modifiers.Contains(KeyEvent.Modifier.SHIFT) )
-                            keyString = keyString.ToLower();
+                            if (!e.modifiers.Contains(KeyEvent.Modifier.SHIFT))
+                                keyString = keyString.ToLower();
                         }
                         typedChar = keyString;
                     }
@@ -358,6 +495,94 @@ namespace XNAInterfaceComponents.ChildComponents
         {
             Console.Out.WriteLine("Released: " + e.key.ToString());
             // throw new NotImplementedException();
+        }
+
+        public void OnMouseMotion(MouseEvent e)
+        {
+
+        }
+
+        // private MouseEvent previousMouseEvent { get; set; }
+        public void OnMouseDrag(MouseEvent e)
+        {
+            /*if (this.scrollbarBounds.Contains(e.location))
+            {
+                if (previousMouseEvent != null)
+                {
+                    this.scrollbarButtonBounds = new Rectangle(
+                        (int)MathHelper.Clamp(
+                            (this.scrollbarButtonBounds.X + (e.location.X - previousMouseEvent.location.X)),
+                            scrollbarBounds.Left,
+                            scrollbarBounds.Right - scrollbarButtonBounds.Width),
+                        scrollbarButtonBounds.Y,
+                        scrollbarButtonBounds.Width,
+                        scrollbarButtonBounds.Height);
+                }
+            }
+            previousMouseEvent = e;*/
+        }
+
+        public void OnMouseClick(MouseEvent e)
+        {
+            /*if (this.scrollbarBounds.Contains(e.location))
+            {
+                if (previousMouseEvent != null)
+                {
+                    this.scrollbarButtonBounds = new Rectangle(
+                        (int)MathHelper.Clamp(
+                            (e.location.X  - (scrollbarButtonBounds.Width / 2 )),
+                            scrollbarBounds.Left,
+                            scrollbarBounds.Right - scrollbarButtonBounds.Width),
+                        scrollbarButtonBounds.Y,
+                        scrollbarButtonBounds.Width,
+                        scrollbarButtonBounds.Height);
+
+                }
+            }*/
+
+            Rectangle drawLocation = this.GetScreenLocation();
+
+            if (drawLocation.Contains(e.location))
+            {
+                // Get the index the cursor is at.
+                float currentWidth = 0;
+                Char[] array = this.previousDisplayText.ToArray();
+                int currentIndex = this.hiddenCharacters.Length;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    currentWidth += this.font.MeasureString(array[i] + "").X;
+                    if (currentWidth < e.location.X - drawLocation.X - this.padding.left) currentIndex++;
+                    else break; 
+                }
+                Console.Out.WriteLine(currentIndex);
+                this.caret.index = currentIndex;
+                this.caret.row = (int)Math.Min( 
+                    ((e.location.Y - drawLocation.Y) / this.font.MeasureString("I").Y),
+                    this.text.Split( new char[] { '\n' } ).Length - 1);
+                Console.Out.WriteLine(((e.location.Y - drawLocation.Y) + " / " + this.font.MeasureString("I").Y));
+                Console.Out.WriteLine("New row: " + this.caret.row);
+            }
+
+            // previousMouseEvent = e;
+        }
+
+        public void OnMouseRelease(MouseEvent e)
+        {
+            // throw new NotImplementedException();
+        }
+
+        public override void Unload()
+        {
+            KeyboardManager.GetInstance().keyPressedListeners -= this.OnKeyPressed;
+            KeyboardManager.GetInstance().keyTypedListeners -= this.OnKeyTyped;
+            KeyboardManager.GetInstance().keyReleasedListeners -= this.OnKeyReleased;
+
+
+            MouseManager.GetInstance().mouseDragListeners -= this.OnMouseDrag;
+            MouseManager.GetInstance().mouseMotionListeners -= this.OnMouseMotion;
+
+            MouseManager.GetInstance().mouseClickedListeners -= this.OnMouseClick;
+            MouseManager.GetInstance().mouseReleasedListeners -= this.OnMouseRelease;
         }
     }
 }

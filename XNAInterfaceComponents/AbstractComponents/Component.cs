@@ -61,5 +61,6 @@ namespace XNAInterfaceComponents.Components
         public abstract void Update();
         public abstract void OnMouseEnter(MouseEvent e);
         public abstract void OnMouseExit(MouseEvent e);
+        public abstract void Unload();
     }
 }

@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text;
 using XNAInterfaceComponents.AbstractComponents;
 using Microsoft.Xna.Framework;
-using XNAInterfaceComponents.Interfaces;
 using Microsoft.Xna.Framework.Graphics;
 using XNAInputHandler.MouseInput;
+using XNAInterfaceComponents.ChildComponents;
+using XNAInterfaceComponents.Interfaces;
+
+public delegate void OnCheckBoxClick(XNACheckBox source);
 
 namespace XNAInterfaceComponents.ChildComponents
 {
     public class XNACheckBox : ChildComponent, Drawable, MouseClickListener
     {
-        private OnClick onClickListeners { get; set; }
+        public OnCheckBoxClick onClickListeners { get; set; }
 
         public TextAlign textAlign { get; set; }
         public Vector2 checkBoxSize { get; set; }
@@ -130,7 +133,7 @@ namespace XNAInterfaceComponents.ChildComponents
                 {
                     Console.Out.WriteLine("Pressed on a checkbox!");
                     this.selected = !this.selected;
-                    if (this.onClickListeners != null) onClickListeners();
+                    if (this.onClickListeners != null) onClickListeners(this);
                 }
             }
         }
@@ -138,6 +141,12 @@ namespace XNAInterfaceComponents.ChildComponents
         public void OnMouseRelease(MouseEvent m_event)
         {
 
+        }
+
+        public override void Unload()
+        {
+            MouseManager.GetInstance().mouseClickedListeners -= OnMouseClick;
+            MouseManager.GetInstance().mouseReleasedListeners -= OnMouseRelease;
         }
     }
 }

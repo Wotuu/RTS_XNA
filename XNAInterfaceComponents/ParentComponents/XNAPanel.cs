@@ -6,6 +6,7 @@ using XNAInterfaceComponents.AbstractComponents;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using XNAInputHandler.MouseInput;
+using XNAInterfaceComponents.Managers;
 
 namespace XNAInterfaceComponents.Components
 {
@@ -24,8 +25,9 @@ namespace XNAInterfaceComponents.Components
             // Console.Out.WriteLine("Drawing panel!");
 
             Color drawColor = new Color();
-            if (this.isMouseOver) drawColor = this.mouseOverColor;
-            else drawColor = this.backgroundColor;
+            //if (this.isMouseOver) drawColor = this.mouseOverColor;
+            //else 
+                drawColor = this.backgroundColor;
 
             sb.Draw(clearTexture, this.GetScreenLocation(), drawColor);
             if( this.border != null ) this.border.Draw(sb);
@@ -47,13 +49,22 @@ namespace XNAInterfaceComponents.Components
         public override void OnMouseEnter(MouseEvent m_event)
         {
             this.isMouseOver = true;
-            Console.Out.WriteLine("Panel @ " + this.GetScreenLocation() + " mouse entered!");
+            // Console.Out.WriteLine("Panel @ " + this.GetScreenLocation() + " mouse entered!");
         }
 
         public override void OnMouseExit(MouseEvent m_event)
         {
             this.isMouseOver = false;
-            Console.Out.WriteLine("Panel @ " + this.GetScreenLocation() + " mouse exitted!");
+            // Console.Out.WriteLine("Panel @ " + this.GetScreenLocation() + " mouse exitted!");
+        }
+
+        public override void Unload()
+        {
+            ComponentManager.GetInstance().componentList.Remove(this);
+            for (int i = 0; i < children.Count; i++)
+            {
+                children.ElementAt(i).Unload();
+            }
         }
     }
 }

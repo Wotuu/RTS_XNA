@@ -155,7 +155,10 @@
     <Compile Include="Selection\SelectRectangle.cs" />
     <Compile Include="Selection\UnitControlManager.cs" />
     <Compile Include="Selection\UnitSelection.cs" />
+    <Compile Include="State\StateManager.cs" />
     <Compile Include="UI\HUD.cs" />
+    <Compile Include="UI\Menus\MainMenu.cs" />
+    <Compile Include="UI\Menus\MenuManager.cs" />
     <Compile Include="Units\Ranged\Bowman.cs" />
     <Compile Include="Units\Stores\CombatUnit.cs" />
     <Compile Include="Units\Melee\Engineer.cs" />

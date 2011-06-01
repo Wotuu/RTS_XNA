@@ -14,6 +14,20 @@ namespace XNAInterfaceComponents.Misc
     {
         public int width { get; set; }
         public int index { get; set; }
+        private int _row { get; set; }
+        public int row
+        {
+            get
+            {
+                return _row;
+            }
+            set
+            {
+                this._row = value;
+                int textLengthAtRow = this.GetTextOnCaretRow().Length;
+                this.index = Math.Min(textLengthAtRow, this.index);
+            }
+        }
         public int blinkTicks { get; set; }
         public XNATextField parent { get; set; }
         public Color color { get; set; }
@@ -22,14 +36,37 @@ namespace XNAInterfaceComponents.Misc
 
         private long previousBlinkTicks { get; set; }
 
+        public int GetCaretArrayIndex()
+        {
+            // Calculate real caret index
+            int caretIndex = 0;
+            for (int i = 0; i < this.row; i++)
+            {
+                caretIndex += this.parent.GetTextOnRow(i).Length;
+            }
+            // Account for \n's
+            caretIndex += this.row;
+            // Add caret index
+            caretIndex += this.index;
+            return caretIndex;
+        }
+
+        /// <summary>
+        /// Gets the text that is on the row of the caret.
+        /// </summary>
+        /// <returns>The string</returns>
+        public String GetTextOnCaretRow()
+        {
+            return this.parent.text.Split(new char[] { '\n' })[this.row];
+        }
+
         public Caret(XNATextField parent)
         {
             this.parent = parent;
             previousBlinkTicks = System.DateTime.UtcNow.Ticks;
-            blinkTicks = 1000000;
+            blinkTicks = 5000000;
             this.color = Color.Black;
             this.width = 1;
-
             this.visible = true;
         }
 
@@ -46,19 +83,22 @@ namespace XNAInterfaceComponents.Misc
 
         public void Draw(SpriteBatch sb)
         {
-            if (this.visible && this.parent.isFocussed )
+            if (this.visible && this.parent.isFocussed)
             {
                 Rectangle drawLocation = parent.GetScreenLocation();
                 String toMeasure = "";
-                Char[] array = parent.GetDisplayText().ToArray();
-                for( int i = 0; i < this.index && i < array.Length; i++ ){
+                Char[] array = this.GetTextOnCaretRow().ToCharArray();
+                for (int i = parent.hiddenCharacters.Length; i < this.index && i < array.Length; i++)
+                {
                     toMeasure += "" + array[i];
                 }
-                float offsetX = parent.font.MeasureString(toMeasure).X;
-                if (offsetX == 0) offsetX = 1;
+                Vector2 dimensions = parent.font.MeasureString(toMeasure);
+                if (dimensions.X == 0) dimensions.X = 1;
                 ComponentUtil.DrawLine(sb,
-                    new Point(drawLocation.X + parent.padding.left + (int)(offsetX), drawLocation.Y + parent.padding.top),
-                    new Point(drawLocation.X + parent.padding.left + (int)(offsetX), drawLocation.Y - /*( * 2)*/parent.padding.top + drawLocation.Height),
+                    new Point(drawLocation.X + parent.padding.left + (int)(dimensions.X),
+                        drawLocation.Y + parent.padding.top + (int)(dimensions.Y * (this.row))),
+                    new Point(drawLocation.X + parent.padding.left + (int)(dimensions.X),
+                        drawLocation.Y + parent.padding.top + (int)(dimensions.Y * (this.row + 1))),
                     this.color, width);
             }
         }
