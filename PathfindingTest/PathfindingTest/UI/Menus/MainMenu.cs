@@ -26,25 +26,25 @@ namespace PathfindingTest.UI
             XNAButton startGameButton = new XNAButton(this,
                 new Rectangle((this.bounds.Width / 2) - (buttonWidth / 2),
                     buttonSpacing, buttonWidth, buttonHeight), "Start Test Game");
-            startGameButton.font = Game1.GetInstance().Content.Load<SpriteFont>("Fonts/Menu");
+            startGameButton.font = MenuManager.BUTTON_FONT;
             startGameButton.onClickListeners += this.StartGameClicked;
 
             XNAButton multiplayerButton = new XNAButton(this,
                 new Rectangle((this.bounds.Width / 2) - (buttonWidth / 2),
                     buttonSpacing * 2 + buttonHeight, buttonWidth, buttonHeight), "Multiplayer");
-            multiplayerButton.font = startGameButton.font;
+            multiplayerButton.font = MenuManager.BUTTON_FONT;
             multiplayerButton.onClickListeners += this.MultiplayerClicked;
 
             XNAButton optionsButton = new XNAButton(this,
                 new Rectangle((this.bounds.Width / 2) - (buttonWidth / 2),
                     buttonSpacing * 3 + buttonHeight * 2, buttonWidth, buttonHeight), "Options");
-            optionsButton.font = startGameButton.font;
+            optionsButton.font = MenuManager.BUTTON_FONT;
             optionsButton.onClickListeners += this.OptionsClicked;
 
             XNAButton exitButton = new XNAButton(this,
                 new Rectangle((this.bounds.Width / 2) - (buttonWidth / 2),
                     buttonSpacing * 4 + buttonHeight * 3, buttonWidth, buttonHeight), "Exit Game");
-            exitButton.font = startGameButton.font;
+            exitButton.font = MenuManager.BUTTON_FONT;
             exitButton.onClickListeners += this.ExitClicked;
 
             /*XNALabel label = new XNALabel(this, new Rectangle(10, 10, 100, 30), "Label test!");
@@ -66,7 +66,7 @@ namespace PathfindingTest.UI
 
         public void MultiplayerClicked(XNAButton source)
         {
-
+            MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLogin);
         }
 
         public void OptionsClicked(XNAButton source)

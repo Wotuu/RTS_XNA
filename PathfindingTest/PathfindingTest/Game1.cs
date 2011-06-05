@@ -26,6 +26,9 @@ using XNAInterfaceComponents.AbstractComponents;
 using XNAInterfaceComponents.ChildComponents;
 using XNAInputLibrary.KeyboardInput;
 using PathfindingTest.State;
+using System.Collections;
+using SocketLibrary.Packets;
+using XNAInterfaceComponents.ParentComponents;
 
 namespace PathfindingTest
 {
@@ -69,6 +72,14 @@ namespace PathfindingTest
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+
+            String message = "";
+            message = "This is a text message.";
+            Packet p = new Packet();
+            p.AddString(message);
+            Console.Out.WriteLine(message);
+            Console.Out.WriteLine((message = PacketUtil.DecodePacketString(p, 0)));
+
             Content.RootDirectory = "Content";
             this.IsMouseVisible = true;
             this.IsFixedTimeStep = false;
@@ -95,10 +106,15 @@ namespace PathfindingTest
             drawLineTexture = this.Content.Load<Texture2D>("Misc/solid");
             font = Content.Load<SpriteFont>("Fonts/Arial");
             ChildComponent.DEFAULT_FONT = font;
+
+            XNAMessageDialog.CLIENT_WINDOW_WIDTH = graphics.PreferredBackBufferWidth;
+            XNAMessageDialog.CLIENT_WINDOW_HEIGHT = graphics.PreferredBackBufferHeight;
+
             (collision = new RTSCollisionMap(this, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight)).PlaceNodesAroundEdges();
             graphics.PreferMultiSampling = true;
 
             StateManager.GetInstance().gameState = StateManager.State.MainMenu;
+
             base.Initialize();
         }
 

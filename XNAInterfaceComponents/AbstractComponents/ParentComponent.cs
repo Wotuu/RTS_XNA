@@ -18,7 +18,8 @@ namespace XNAInterfaceComponents.AbstractComponents
         {
             this.parent = parent;
             this.children = new LinkedList<Component>();
-            if( parent == null ) ComponentManager.GetInstance().componentList.AddLast(this);
+            if (parent == null) ComponentManager.GetInstance().QueueLoad(this);
+            else this.parent.children.AddLast(this);
         }
 
         #region Child functions
@@ -97,13 +98,15 @@ namespace XNAInterfaceComponents.AbstractComponents
                         if( !child.isFocussed ) f.OnFocusReceived();
                         focussedComponent = child;
                     }
-                }
-                if (child is Focusable)
-                {
                     if (focussedComponent != child && child.isFocussed)
                     {
                         ((Focusable)child).OnFocusLost();
                     }
+                }
+                else if (child is ParentComponent)
+                {
+                    Boolean result = ((ParentComponent)child).RequestFocusAt(p);
+                    if (result) return result;
                 }
             }
             return focussedComponent != null;

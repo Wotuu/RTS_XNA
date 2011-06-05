@@ -87,7 +87,7 @@ namespace XNAInputLibrary.KeyboardInput
             LinkedList<Keys> releasedKeys = this.GetReleasedKeys(state.GetPressedKeys());
             if (releasedKeys.Contains(this.firstPressedTypeableKey))
             {
-                Console.Out.WriteLine("Reset first typed key!");
+                // Console.Out.WriteLine("Reset first typed key!");
                 this.firstPressedTypeableKey = new Keys();
                 this.firstPressedKeyTicks = 0;
             }
@@ -128,6 +128,7 @@ namespace XNAInputLibrary.KeyboardInput
                 if (this.keyPressedListeners != null
                     && !this.previousFramePressedKeys.Contains(key))
                 {
+                    if( keyPressedListeners != null ) 
                     keyPressedListeners(new KeyEvent(key, KeyEvent.Type.Pressed, this.heldModifiers.ToArray()));
                 }
 
@@ -141,6 +142,7 @@ namespace XNAInputLibrary.KeyboardInput
                 {
                     if (System.DateTime.UtcNow.Ticks > ((firstPressedKeyTicks + (keyTypedLagMS * 10000))))
                     {
+                        if (keyTypedListeners != null) 
                         keyTypedListeners(new KeyEvent(key, KeyEvent.Type.Typed, this.heldModifiers.ToArray()));
                     }
                 }

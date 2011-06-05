@@ -73,7 +73,7 @@ namespace XNAInterfaceComponents.AbstractComponents
 
         public void OnMouseClick(MouseEvent m_event)
         {
-            if (m_event.button == MouseEvent.MOUSE_BUTTON_1)
+            if (this.isFocussed && m_event.button == MouseEvent.MOUSE_BUTTON_1)
             {
                 Point screenLocation = parent.RequestScreenLocation(new Point(this.bounds.X, this.bounds.Y));
                 Rectangle screenRect = new Rectangle(screenLocation.X, screenLocation.Y, this.bounds.Width, this.bounds.Height);

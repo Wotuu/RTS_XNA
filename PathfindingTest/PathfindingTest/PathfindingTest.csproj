@@ -111,6 +111,7 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.3.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -141,6 +142,10 @@
     <Compile Include="Combat\Damageable.cs" />
     <Compile Include="InfoBars\HealthBar.cs" />
     <Compile Include="InfoBars\ProgressBar.cs" />
+    <Compile Include="Multiplayer\MultiplayerGame.cs" />
+    <Compile Include="Multiplayer\SocketConnection\ChatServerConnectionManager.cs" />
+    <Compile Include="Multiplayer\Users\User.cs" />
+    <Compile Include="Multiplayer\Users\UserManager.cs" />
     <Compile Include="Pathfinding\Node.cs" />
     <Compile Include="Pathfinding\NodeConnection.cs" />
     <Compile Include="Pathfinding\PathfindingProcessor.cs" />
@@ -161,6 +166,8 @@
     <Compile Include="UI\HUDObject.cs" />
     <Compile Include="UI\Menus\MainMenu.cs" />
     <Compile Include="UI\Menus\MenuManager.cs" />
+    <Compile Include="UI\Menus\Multiplayer\MultiplayerLobby.cs" />
+    <Compile Include="UI\Menus\Multiplayer\LoginScreen.cs" />
     <Compile Include="Units\Ranged\Bowman.cs" />
     <Compile Include="Units\Stores\CombatUnit.cs" />
     <Compile Include="Units\Melee\Engineer.cs" />
@@ -185,6 +192,10 @@
     <ProjectReference Include="..\..\AStarCollisionMap\AStarCollisionMap.csproj">
       <Project>{A8E2F65D-4103-499F-8065-193B94CEEFD0}</Project>
       <Name>AStarCollisionMap</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SocketLibrary\SocketLibrary.csproj">
+      <Project>{48B20ED9-3DB2-4A0A-A994-8D004E70130B}</Project>
+      <Name>SocketLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\XNAInputLibrary\XNAInputLibrary.csproj">
       <Project>{2E801399-FA39-4B74-BBE6-69EC61F534C1}</Project>
@@ -229,6 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="PathfindingTest_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup />

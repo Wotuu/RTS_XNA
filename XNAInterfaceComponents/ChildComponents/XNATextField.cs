@@ -11,6 +11,8 @@ using XNAInterfaceComponents.Misc;
 using XNAInputLibrary.KeyboardInput;
 using Microsoft.Xna.Framework.Input;
 
+public delegate void OnTextFieldKeyPressed(KeyEvent e);
+
 namespace XNAInterfaceComponents.ChildComponents
 {
     public class XNATextField : ChildComponent, Focusable, KeyboardListener, MouseClickListener, MouseMotionListener
@@ -22,12 +24,16 @@ namespace XNAInterfaceComponents.ChildComponents
         public int scrollbarIndex { get; set; }
         public String hiddenCharacters { get; set; }
         public int rows { get; set; }
+        public int maxLength { get; set; }
+        public Boolean isEditable { get; set; }
+        public OnTextFieldKeyPressed onTextFieldKeyPressedListeners { get; set; }
 
         public XNATextField(ParentComponent parent, Rectangle bounds, int rows)
             : base(parent, bounds)
         {
             this.caret = new Caret(this);
             this.rows = rows;
+            this.isEditable = true;
             Rectangle drawRect = this.GetScreenLocation();
             this.scrollbarBounds = new Rectangle(drawRect.Left, drawRect.Bottom, drawRect.Width, 10);
             this.scrollbarButtonBounds = new Rectangle(drawRect.Left, drawRect.Bottom, drawRect.Width, 8);
@@ -41,7 +47,7 @@ namespace XNAInterfaceComponents.ChildComponents
 
             MouseManager.GetInstance().mouseClickedListeners += this.OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += this.OnMouseRelease;
-            this.text = "abcdefghijklmnopqrstuvwxyz \nnext line";
+            //this.text = "abcdefghijklmnopqrstuvwxyz \nnext line";
             this.hiddenCharacters = "";
         }
 
@@ -77,9 +83,20 @@ namespace XNAInterfaceComponents.ChildComponents
 
             String result = "";
             // this.caret.index -= this.scrollbarIndex;
-            int start = 0;
+            // int start = 0;
+
             this.hiddenCharacters = "";
-            for (int i = 0; i < this.text.Length; i++)
+            for (int i = this.text.Length - 1; i >= 0; i--)
+            {
+                Char currentChar = array[i];
+                currentStringWidth += this.font.MeasureString(currentChar + "").X;
+                if (currentStringWidth < viewportX)
+                {
+                    result += currentChar + "";
+                }
+                else hiddenCharacters += currentChar + "";
+            }
+            /*for (int i = 0; i < this.text.Length; i++)
             {
                 Char currentChar = array[i];
 
@@ -99,18 +116,18 @@ namespace XNAInterfaceComponents.ChildComponents
                 {
                     this.hiddenCharacters += currentChar + "";
                 }
-            }
+            }*/
             // this.caret.index += this.scrollbarIndex;
 
             //char[] charArray = hiddenCharacters.ToCharArray();
             //Array.Reverse(charArray);
             //hiddenCharacters = new String(charArray);
 
-            //charArray = result.ToCharArray();
-            //Array.Reverse(charArray);
-            //return new string(charArray);
-            this.previousDisplayText = result;
-            return result;
+            array = result.ToCharArray();
+            Array.Reverse(array);
+            this.previousDisplayText = new string(array);
+            return new string(array);
+            // return result;
         }
 
         public override void Draw(SpriteBatch sb)
@@ -129,6 +146,8 @@ namespace XNAInterfaceComponents.ChildComponents
             Rectangle drawRect = this.GetScreenLocation();
             // Draw the button
             sb.Draw(clearTexture, drawRect, drawColor);
+            // Draw the border
+            if (this.border != null) border.Draw(sb);
 
             // Draw the caret
             this.caret.Draw(sb);
@@ -153,6 +172,7 @@ namespace XNAInterfaceComponents.ChildComponents
         public override void Update()
         {
             this.caret.Update();
+            #region Old scrollbar update code
             /*float percentageShown = (float)((GetDisplayText().Length / (float)text.Length) * 100.0);
             // Draw it if we're hiding stuff
             this.drawScrollbar = percentageShown < 99;
@@ -187,6 +207,7 @@ namespace XNAInterfaceComponents.ChildComponents
             // Console.Out.WriteLine(currentIndex);
             //this.scrollbarIndex = 
             // Console.Out.WriteLine((int)((scrollbarBounds.Width / 100.0) * percentageShown));
+            #endregion
         }
 
         public override void OnMouseEnter(MouseEvent e)
@@ -201,8 +222,11 @@ namespace XNAInterfaceComponents.ChildComponents
 
         public void OnFocusReceived()
         {
-            this.isFocussed = true;
-            Console.Out.WriteLine("TextField received focus");
+            if (this.isEditable)
+            {
+                this.isFocussed = true;
+                Console.Out.WriteLine("TextField received focus");
+            }
         }
 
         public void OnFocusLost()
@@ -224,7 +248,7 @@ namespace XNAInterfaceComponents.ChildComponents
 
             // Apply changes
             int caretIndex = this.caret.GetCaretArrayIndex();
-            for (int i = 0; i < caretIndex; i++)
+            for (int i = 0; i < caretIndex && i < array.Length; i++)
             {
                 newString += "" + array[i];
             }
@@ -276,14 +300,16 @@ namespace XNAInterfaceComponents.ChildComponents
 
         private void ProcessKey(KeyEvent e)
         {
+            if (this.maxLength != 0 && this.text.Length >= this.maxLength) return;
             if (this.isFocussed)
             {
+                if (onTextFieldKeyPressedListeners != null) onTextFieldKeyPressedListeners(e);
                 String keyString = e.key.ToString();
                 if (keyString.Equals("Left"))
                 {
                     if (this.caret.index > 1)
                     {
-                        Console.Out.WriteLine(this.caret.index);
+                        // Console.Out.WriteLine(this.caret.index);
                         this.caret.index--;
                     }
                     else if (this.caret.row > 0)
@@ -295,7 +321,7 @@ namespace XNAInterfaceComponents.ChildComponents
                 else if (keyString.Equals("Right"))
                 {
                     if (this.caret.index < (this.caret.GetTextOnCaretRow().Length)) this.caret.index++;
-                    else 
+                    else
                     {
                         int rowCount = this.text.Split(new char[] { '\n' }).Length;
                         if (this.caret.row < rowCount - 1)
@@ -304,15 +330,16 @@ namespace XNAInterfaceComponents.ChildComponents
                             this.caret.row++;
                         }
                     }
-                    Console.Out.WriteLine(this.caret.index);
-                    Console.Out.WriteLine(this.caret.row);
+                    // Console.Out.WriteLine(this.caret.index);
+                    // Console.Out.WriteLine(this.caret.row);
                 }
-                else if( keyString.Equals("Up")){
-                    if (this.caret.row > 0) this.caret.row--; 
+                else if (keyString.Equals("Up"))
+                {
+                    if (this.caret.row > 0) this.caret.row--;
                 }
                 else if (keyString.Equals("Down"))
                 {
-                    if (this.caret.row < this.text.Split(new char[] { '\n' }).Length) this.caret.row++; 
+                    if (this.rows > 1 && this.caret.row < this.text.Split(new char[] { '\n' }).Length) this.caret.row++;
                 }
                 else if (keyString.Contains("Back"))
                 {
@@ -325,7 +352,7 @@ namespace XNAInterfaceComponents.ChildComponents
                 }
                 else if (keyString.Contains("Delete"))
                 {
-                    if (this.caret.index < this.text.Length) DeleteCharacterAt(this.caret.GetCaretArrayIndex(), false); 
+                    if (this.caret.index < this.text.Length) DeleteCharacterAt(this.caret.GetCaretArrayIndex(), false);
                 }
                 else if (keyString.Equals("Enter"))
                 {
@@ -473,7 +500,6 @@ namespace XNAInterfaceComponents.ChildComponents
                     }
                     #endregion
 
-
                     this.InsertStringAtCaret(typedChar);
                 }
             }
@@ -482,18 +508,18 @@ namespace XNAInterfaceComponents.ChildComponents
         public void OnKeyPressed(KeyEvent e)
         {
             ProcessKey(e);
-            Console.Out.WriteLine("Pressed: " + e.key.ToString());
+            // Console.Out.WriteLine("Pressed: " + e.key.ToString());
         }
 
         public void OnKeyTyped(KeyEvent e)
         {
             ProcessKey(e);
-            Console.Out.WriteLine("Typed: " + e.key.ToString());
+            // Console.Out.WriteLine("Typed: " + e.key.ToString());
         }
 
         public void OnKeyReleased(KeyEvent e)
         {
-            Console.Out.WriteLine("Released: " + e.key.ToString());
+            // Console.Out.WriteLine("Released: " + e.key.ToString());
             // throw new NotImplementedException();
         }
 
@@ -546,19 +572,22 @@ namespace XNAInterfaceComponents.ChildComponents
             {
                 // Get the index the cursor is at.
                 float currentWidth = 0;
-                Char[] array = this.previousDisplayText.ToArray();
                 int currentIndex = this.hiddenCharacters.Length;
-                for (int i = 0; i < array.Length; i++)
+                if (this.previousDisplayText != null)
                 {
-                    currentWidth += this.font.MeasureString(array[i] + "").X;
-                    if (currentWidth < e.location.X - drawLocation.X - this.padding.left) currentIndex++;
-                    else break; 
+                    Char[] array = this.previousDisplayText.ToArray();
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        currentWidth += this.font.MeasureString(array[i] + "").X;
+                        if (currentWidth < e.location.X - drawLocation.X - this.padding.left) currentIndex++;
+                        else break;
+                    }
                 }
                 Console.Out.WriteLine(currentIndex);
                 this.caret.index = currentIndex;
-                this.caret.row = (int)Math.Min( 
+                this.caret.row = (int)Math.Min(
                     ((e.location.Y - drawLocation.Y) / this.font.MeasureString("I").Y),
-                    this.text.Split( new char[] { '\n' } ).Length - 1);
+                    this.text.Split(new char[] { '\n' }).Length - 1);
                 Console.Out.WriteLine(((e.location.Y - drawLocation.Y) + " / " + this.font.MeasureString("I").Y));
                 Console.Out.WriteLine("New row: " + this.caret.row);
             }

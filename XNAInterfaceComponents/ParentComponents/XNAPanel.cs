@@ -32,9 +32,9 @@ namespace XNAInterfaceComponents.Components
             sb.Draw(clearTexture, this.GetScreenLocation(), drawColor);
             if( this.border != null ) this.border.Draw(sb);
 
-            foreach (Component child in this.children)
+            for( int i = 0; i < this.children.Count; i++ )
             {
-                child.Draw(sb);
+                this.children.ElementAt(i).Draw(sb);
             }
         }
 
@@ -60,7 +60,8 @@ namespace XNAInterfaceComponents.Components
 
         public override void Unload()
         {
-            ComponentManager.GetInstance().componentList.Remove(this);
+            Console.Out.WriteLine("Unloading a panel");
+            ComponentManager.GetInstance().QueueUnload(this);
             for (int i = 0; i < children.Count; i++)
             {
                 children.ElementAt(i).Unload();

@@ -88,12 +88,17 @@ namespace XNAInterfaceComponents.Misc
                 Rectangle drawLocation = parent.GetScreenLocation();
                 String toMeasure = "";
                 Char[] array = this.GetTextOnCaretRow().ToCharArray();
-                for (int i = parent.hiddenCharacters.Length; i < this.index && i < array.Length; i++)
+                if (array.Length == 0) toMeasure = "I"; 
+                else
                 {
-                    toMeasure += "" + array[i];
+                    for (int i = parent.hiddenCharacters.Length; i < this.index && i < array.Length; i++)
+                    {
+                        toMeasure += "" + array[i];
+                    }
                 }
                 Vector2 dimensions = parent.font.MeasureString(toMeasure);
-                if (dimensions.X == 0) dimensions.X = 1;
+                if (array.Length == 0) dimensions.X = 0;
+                else dimensions.X += 2;
                 ComponentUtil.DrawLine(sb,
                     new Point(drawLocation.X + parent.padding.left + (int)(dimensions.X),
                         drawLocation.Y + parent.padding.top + (int)(dimensions.Y * (this.row))),

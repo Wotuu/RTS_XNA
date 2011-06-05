@@ -7,12 +7,15 @@ using XNAInterfaceComponents.Interfaces;
 using Microsoft.Xna.Framework.Graphics;
 using XNAInterfaceComponents.AbstractComponents;
 using XNAInputHandler.MouseInput;
+using XNAInterfaceComponents.ParentComponents;
 
 namespace XNAInterfaceComponents.Managers
 {
     public class ComponentManager : Drawable, MouseClickListener, MouseMotionListener
     {
-        public LinkedList<ParentComponent> componentList = new LinkedList<ParentComponent>();
+        private LinkedList<ParentComponent> componentList = new LinkedList<ParentComponent>();
+        private LinkedList<ParentComponent> unloadList = new LinkedList<ParentComponent>();
+        private LinkedList<ParentComponent> loadList = new LinkedList<ParentComponent>();
         private static ComponentManager instance = null;
 
         /// <summary>
@@ -36,8 +39,38 @@ namespace XNAInterfaceComponents.Managers
             {
                 c.Update();
             }
+            for (int i = 0; i < unloadList.Count; i++)
+            {
+                componentList.Remove(unloadList.ElementAt(i));
+            }
+            unloadList.Clear();
+
+            if( loadList.Count > 0 ) {
+                foreach (ParentComponent pc in loadList)
+                {
+                    componentList.AddLast(pc);
+                }
+                loadList.Clear();
+            }
         }
 
+        /// <summary>
+        /// Queues the element for loading by the mananger.
+        /// </summary>
+        /// <param name="component">The component to load.</param>
+        public void QueueLoad(ParentComponent component)
+        {
+            loadList.AddLast(component);
+        }
+
+        /// <summary>
+        /// Queues the element for unloading by the manager.
+        /// </summary>
+        /// <param name="component">The component to unload</param>
+        public void QueueUnload(ParentComponent component)
+        {
+            unloadList.AddLast(component);
+        }
 
 
         private ComponentManager()
@@ -56,6 +89,17 @@ namespace XNAInterfaceComponents.Managers
 
         public void OnMouseClick(MouseEvent m_event)
         {
+            // Message dialogs get top priority.
+            for (int i = this.componentList.Count - 1; i >= 0; i--)
+            {
+                ParentComponent pc = this.componentList.ElementAt(i);
+                if (pc is XNAMessageDialog)
+                {
+                    pc.RequestFocusAt(m_event.location);
+                    return;
+                }
+            }
+            // Otherwise, the rest comes
             foreach (ParentComponent pc in this.componentList)
             {
                 pc.RequestFocusAt(m_event.location);
@@ -73,8 +117,8 @@ namespace XNAInterfaceComponents.Managers
             foreach (ParentComponent pc in this.componentList)
             {
                 Component mouseOver = pc.GetComponentAt(e.location);
-                 
-                if( previousMouseOver != null && previousMouseOver != mouseOver ) FireMouseExitEvents(e);   
+
+                if (previousMouseOver != null && previousMouseOver != mouseOver) FireMouseExitEvents(e);
                 if (mouseOver != null)
                 {
                     if (!mouseOver.isMouseOver)
