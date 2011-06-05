@@ -29,8 +29,13 @@ namespace PathfindingTest.Buildings
         public double constructDuration { get; set; }
         public double constructProgress { get; set; }
 
+        public float currentHealth { get; set; }
+        public float maxHealth { get; set; }
+
         public Boolean selected { get; set; }
+        public Boolean mouseOver { get; set; }
         public Boolean canPlace { get; set; }
+        public Boolean constructionStarted { get; set; }
         public BuildState state { get; set; }
 
         public BuildingType type { get; set; }
@@ -39,6 +44,8 @@ namespace PathfindingTest.Buildings
         public BuildingMesh mesh { get; set; }
         public HealthBar healthBar { get; set; }
         public ProgressBar progressBar { get; set; }
+
+        public LinkedList<Unit> constructionQueue { get; set; }
 
         public enum BuildingType
         {
@@ -52,34 +59,82 @@ namespace PathfindingTest.Buildings
         {
             Preview,
             Constructing,
-            Finished
+            InterruptedConstruction,
+            Finished,
+            Producing
         }
 
-        public void Update(KeyboardState ks, MouseState ms)
+        public abstract void Update(KeyboardState ks, MouseState ms);
+
+        internal abstract void Draw(SpriteBatch sb);
+
+        public void DefaultUpdate(KeyboardState ks, MouseState ms)
         {
-            if (state == BuildState.Preview)
+            if (constructedBy != null && state != BuildState.Finished)
             {
-                canPlace = Game1.GetInstance().collision.CanPlace(this.DefineRectangle());
-                this.x = (ms.X - (texture.Width / 2));
-                this.y = (ms.Y - (texture.Height / 2));
+                if (constructedBy.waypoints.Count > 0 && constructionStarted)
+                {
+                    constructedBy = null;
+                    this.state = BuildState.InterruptedConstruction;
+                }
             }
-            else if (state == BuildState.Constructing && constructedBy.waypoints.Count == 0)
+
+            switch (state)
             {
-                if (this.constructC.A < 255)
-                {
-                    Color newColor = this.constructC;
-                    constructProgress += (1 / constructDuration);
-                    newColor.A = (byte) ((constructProgress / 100) * 255);
-                    this.constructC = newColor;
-                }
-                else
-                {
-                    state = BuildState.Finished;
-                }
+                case BuildState.Preview:
+                    canPlace = Game1.GetInstance().collision.CanPlace(this.DefineRectangle());
+                    this.x = (ms.X - (texture.Width / 2));
+                    this.y = (ms.Y - (texture.Height / 2));
+                    break;
+
+                case BuildState.Constructing:
+                    if (constructedBy.waypoints.Count == 0)
+                    {
+                        this.constructionStarted = true;
+
+                        if (this.constructC.A < 255)
+                        {
+                            Color newColor = this.constructC;
+                            constructProgress += (1 / constructDuration);
+                            newColor.A = (byte)((constructProgress / 100) * 255);
+
+                            float newHealth = (float) ((constructProgress / 100) * maxHealth);
+                            if (newHealth > maxHealth) newHealth = maxHealth;
+                            currentHealth = newHealth;
+
+                            this.constructC = newColor;
+                        }
+                        else
+                        {
+                            state = BuildState.Finished;
+                        }
+                    }
+                    break;
+
+                case BuildState.InterruptedConstruction:
+                    break;
+
+                case BuildState.Finished:
+                    break;
+
+                case BuildState.Producing:
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (this.DefineRectangle().Contains(ms.X, ms.Y))
+            {
+                this.mouseOver = true;
+            }
+            else
+            {
+                this.mouseOver = false;
             }
         }
 
-        internal void Draw(SpriteBatch sb)
+        internal void DefaultDraw(SpriteBatch sb)
         {
             switch (state)
             {
@@ -98,6 +153,10 @@ namespace PathfindingTest.Buildings
                     sb.Draw(texture, new Vector2(x, y), constructC);
                     break;
 
+                case BuildState.InterruptedConstruction:
+                    sb.Draw(texture, new Vector2(x, y), constructC);
+                    break;
+
                 case BuildState.Finished:
                     sb.Draw(texture, new Vector2(x, y), c);
                     break;
@@ -107,15 +166,26 @@ namespace PathfindingTest.Buildings
             }
 
             DrawProgressBar(sb);
+            if (selected || mouseOver)
+            {
+                DrawHealthBar(sb);
+            }
         }
 
         internal void DrawProgressBar(SpriteBatch sb)
         {
-            if (this.state == BuildState.Constructing)
+            if (this.state == BuildState.Constructing || this.state == BuildState.InterruptedConstruction)
             {
                 progressBar.progress = this.constructProgress;
                 progressBar.Draw(sb);
             }
+        }
+
+        internal void DrawHealthBar(SpriteBatch sb)
+        {
+            int healthPercent = (int) ((this.currentHealth / this.maxHealth) * 100.0);
+            healthBar.percentage = healthPercent;
+            healthBar.Draw(sb);
         }
 
         /// <summary>
@@ -137,6 +207,37 @@ namespace PathfindingTest.Buildings
             return (int)(Util.GetHypoteneuseLength(
                 new Point((int)this.x, (int)this.y), 
                 new Point(DefineRectangle().Left, DefineRectangle().Bottom)) / 2);
+        }
+
+        public void CreateUnit(Unit.UnitType type)
+        {
+            Unit newUnit;
+
+            switch (type)
+            {
+                case Unit.UnitType.Engineer:
+                    if (this.type == BuildingType.Fortress)
+                    {
+                        newUnit = new Engineer(this.p, (int)this.x - 70, (int)this.y - 70);
+                        p.units.AddLast(newUnit);
+                    }
+                    break;
+
+                case Unit.UnitType.Melee:
+                    break;
+
+                case Unit.UnitType.HeavyMelee:
+                    break;
+
+                case Unit.UnitType.Fast:
+                    break;
+
+                case Unit.UnitType.Ranged:
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         public Rectangle DefineRectangle()

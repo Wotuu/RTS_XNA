@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PathfindingTest.Players;
+using Microsoft.Xna.Framework.Input;
 
 namespace PathfindingTest.Buildings
 {
@@ -19,7 +20,20 @@ namespace PathfindingTest.Buildings
             this.type = BuildingType.Factory;
             this.constructDuration = 8;
 
+            this.maxHealth = 3000f;
+            this.currentHealth = 0f;
+
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Buildings/Factory");
+        }
+
+        public override void Update(KeyboardState ks, MouseState ms)
+        {
+            DefaultUpdate(ks, ms);
+        }
+
+        internal override void Draw(SpriteBatch sb)
+        {
+            DefaultDraw(sb);
         }
     }
 }

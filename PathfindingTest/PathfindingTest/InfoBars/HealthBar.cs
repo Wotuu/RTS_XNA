@@ -55,8 +55,8 @@ namespace PathfindingTest.Units
                 case Type.Building:
                     w = building.texture.Width;
                     h = 5;
-                    x = (int)building.x - (w / 2);
-                    y = (int)building.y - (building.texture.Height / 2) - h;
+                    x = (int)building.x - 1;
+                    y = (int)building.y - h * 2;
                     innerWidth = (int)((w / 100.0) * percentage);
                     break;
 

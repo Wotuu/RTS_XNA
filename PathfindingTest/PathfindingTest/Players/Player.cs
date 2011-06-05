@@ -14,6 +14,7 @@ using PathfindingTest.Selection.Patterns;
 using PathfindingTest.Pathfinding;
 using XNAInputHandler.MouseInput;
 using PathfindingTest.Units.Stores;
+using System.Diagnostics;
 
 namespace PathfindingTest.Players
 {
@@ -29,6 +30,7 @@ namespace PathfindingTest.Players
         public LinkedList<Unit> units { get; set; }
         public UnitSelection currentSelection { get; set; }
         public LinkedList<Building> buildings { get; set; }
+        public BuildingSelection buildingSelection { get; set; }
 
         public HUD hud { get; set; }
 
@@ -108,11 +110,34 @@ namespace PathfindingTest.Players
             return selection;
         }
 
+        public BuildingSelection GetSelectedBuildings()
+        {
+            BuildingSelection selection = new BuildingSelection();
+
+            foreach (Building b in this.buildings)
+            {
+                if (b.selected)
+                {
+                    selection.buildings.AddLast(b);
+                }
+            }
+
+            return selection;
+        }
+
         public void DeselectAllUnits()
         {
             foreach (Unit unit in this.units)
             {
                 unit.selected = false;
+            }
+        }
+
+        public void DeselectAllBuildings()
+        {
+            foreach (Building b in this.buildings)
+            {
+                b.selected = false;
             }
         }
 
@@ -221,6 +246,19 @@ namespace PathfindingTest.Players
             return null;
         }
 
+        public Building IsMouseOverFriendlyBuilding()
+        {
+            foreach (Building b in buildings)
+            {
+                if (b.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                {
+                    return b;
+                }
+            }
+
+            return null;
+        }
+
 
         public UnitSelection GetUnits()
         {
@@ -232,6 +270,21 @@ namespace PathfindingTest.Players
                     selection.units.AddLast(unit);
                 }
             }
+            return selection;
+        }
+
+        public BuildingSelection GetBuildings()
+        {
+            BuildingSelection selection = new BuildingSelection(new LinkedList<Building>());
+
+            foreach (Building b in this.buildings)
+            {
+                if (this.selectBox.GetRectangle().Contains((int)b.x, (int)b.y))
+                {
+                    selection.buildings.AddLast(b);
+                }
+            }
+
             return selection;
         }
 
@@ -272,6 +325,7 @@ namespace PathfindingTest.Players
                     else
                     {
                         this.DeselectAllUnits();
+                        this.DeselectAllBuildings();
                         // Performed a double click!
                         if (Game1.GetInstance().frames - lastBtn1ClickFrames < 20)
                         {
@@ -287,6 +341,42 @@ namespace PathfindingTest.Players
                             LinkedList<Unit> selectionUnits = new LinkedList<Unit>();
                             selectionUnits.AddLast(mouseOverUnit);
                             this.currentSelection = new UnitSelection(selectionUnits);
+                        }
+                    }
+
+                    Building mouseOverBuilding = this.IsMouseOverFriendlyBuilding();
+                    if (mouseOverBuilding == null)
+                    {
+                        if (this.buildingSelection != null && this.buildingSelection.buildings.Count != 0 &&
+                            !this.IsPreviewingBuilding())
+                        {
+                            this.DeselectAllBuildings();
+                            this.buildingSelection = null;
+                        }
+                    }
+                    else
+                    {
+                        this.DeselectAllUnits();
+                        this.DeselectAllBuildings();
+                        // Performed a double click!
+                        if (Game1.GetInstance().frames - lastBtn1ClickFrames < 20)
+                        {
+                            LinkedList<Building> selectionBuildings = new LinkedList<Building>();
+                            foreach (Building b in buildings)
+                            {
+                                if (mouseOverBuilding.type == b.type)
+                                {
+                                    selectionBuildings.AddLast(b);
+                                }
+                            }
+                            this.buildingSelection = new BuildingSelection(selectionBuildings);
+                        }
+                        else if (!mouseOverBuilding.selected)
+                        {
+                            LinkedList<Building> selectionBuildings = new LinkedList<Building>();
+                            selectionBuildings.AddLast(mouseOverBuilding);
+                            this.buildingSelection = new BuildingSelection(selectionBuildings);
+                            this.buildingSelection.SelectAll();
                         }
                     }
                 }
@@ -317,6 +407,12 @@ namespace PathfindingTest.Players
             {
                 this.currentSelection = this.GetUnits();
                 this.currentSelection.SelectAll();
+
+                if (currentSelection.units.Count == 0)
+                {
+                    this.buildingSelection = this.GetBuildings();
+                    this.buildingSelection.SelectAll();
+                }
             }
             selectBox = null;
 

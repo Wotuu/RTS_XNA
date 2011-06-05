@@ -13,7 +13,7 @@ namespace PathfindingTest.Buildings
     public class Barracks : Building
     {
 
-        public Barracks(Player p, Color c) 
+        public Barracks(Player p, Color c)
             : base(p)
         {
             this.c = c;
@@ -21,7 +21,22 @@ namespace PathfindingTest.Buildings
             this.type = BuildingType.Barracks;
             this.constructDuration = 5;
 
+            this.maxHealth = 2000f;
+            this.currentHealth = 0f;
+
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Buildings/Barracks");
+        }
+
+        public override void Update(KeyboardState ks, MouseState ms)
+        {
+            DefaultUpdate(ks, ms);
+
+
+        }
+
+        internal override void Draw(SpriteBatch sb)
+        {
+            DefaultDraw(sb);
         }
     }
 }

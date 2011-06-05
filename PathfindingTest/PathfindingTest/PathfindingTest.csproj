@@ -148,6 +148,7 @@
     <Compile Include="Players\Player.cs" />
     <Compile Include="QuadTree\Quad.cs" />
     <Compile Include="QuadTree\QuadRoot.cs" />
+    <Compile Include="Selection\BuildingSelection.cs" />
     <Compile Include="Selection\Patterns\CirclePattern.cs" />
     <Compile Include="Selection\Patterns\PatternPreviewObject.cs" />
     <Compile Include="Selection\Patterns\RectanglePattern.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Selection\UnitControlManager.cs" />
     <Compile Include="Selection\UnitSelection.cs" />
     <Compile Include="UI\HUD.cs" />
+    <Compile Include="UI\HUDObject.cs" />
     <Compile Include="Units\Ranged\Bowman.cs" />
     <Compile Include="Units\Stores\CombatUnit.cs" />
     <Compile Include="Units\Melee\Engineer.cs" />

@@ -33,12 +33,13 @@ namespace PathfindingTest.UI
         SpriteFont sf;
 
         public Boolean loadForEngineer { get; set; }
+        public Boolean loadForResources { get; set; }
+        public Boolean loadForBarracks { get; set; }
+        public Boolean loadForFactory { get; set; }
+        public Boolean loadForFortress { get; set; }
         public Boolean draw { get; set; }
 
-        Boolean drawResourcesText = false;
-        Boolean drawBarracksText = false;
-        Boolean drawFactoryText = false;
-        Boolean drawFortressText = false;
+        public LinkedList<HUDObject> objects { get; set; }
 
         /// <summary>
         /// HUD Constructor.
@@ -52,17 +53,18 @@ namespace PathfindingTest.UI
             this.color = c;
 
             hudTex = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUD");
-            hudResourcesTex = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDResources");
-            hudBarracksTex = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDBarracks");
-            hudFactoryTex = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFactory");
-            hudFortressTex = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFortress");
 
             hudItemDetails = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDItemDetails");
 
             sf = Game1.GetInstance().Content.Load<SpriteFont>("Fonts/SpriteFont1");
 
             loadForEngineer = false;
+            loadForBarracks = false;
+            loadForFactory = false;
+            loadForFortress = false;
             draw = false;
+
+            objects = new LinkedList<HUDObject>();
 
             MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += ((MouseClickListener)this).OnMouseRelease;
@@ -75,14 +77,35 @@ namespace PathfindingTest.UI
         /// <param name="ms"></param>
         public void Update(KeyboardState ks, MouseState ms)
         {
-            CheckDraw();
+            draw = CheckDraw();
             CountUnits();
 
-            Rectangle mr = new Rectangle(ms.X, ms.Y, 1, 1);
-            drawResourcesText = this.DefineResourcesRectangle().Contains(mr);
-            drawBarracksText = this.DefineBarracksRectangle().Contains(mr);
-            drawFactoryText = this.DefineFactoryRectangle().Contains(mr);
-            drawFortressText = this.DefineFortressRectangle().Contains(mr);
+            float startX = 278;
+            float startY = 688;
+
+            objects = new LinkedList<HUDObject>();
+
+            if (loadForEngineer)
+            {
+                HUDObject resourceObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDResources"), HUDObject.Type.Resources, startX, startY, color);
+                objects.AddLast(resourceObject);
+                startX += 38;
+                HUDObject barracksObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDBarracks"), HUDObject.Type.Barracks, startX, startY, color);
+                objects.AddLast(barracksObject);
+                startX += 38;
+                HUDObject factoryObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFactory"), HUDObject.Type.Factory, startX, startY, color);
+                objects.AddLast(factoryObject);
+                startX += 38;
+                HUDObject fortressObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFortress"), HUDObject.Type.Fortress, startX, startY, color);
+                objects.AddLast(fortressObject);
+                startX += 38;
+            }
+            if (loadForFortress)
+            {
+                HUDObject engineerObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDEngineer"), HUDObject.Type.Engineer, startX, startY, color);
+                objects.AddLast(engineerObject);
+                startX += 38;
+            }
         }
 
         /// <summary>
@@ -98,75 +121,60 @@ namespace PathfindingTest.UI
             }
             else return;
 
-            if (loadForEngineer)
+            foreach (HUDObject o in objects)
             {
-                sb.Draw(hudResourcesTex, new Rectangle(278, 688, 28, 28), color);
-                sb.Draw(hudBarracksTex, new Rectangle(316, 688, 28, 28), color);
-                sb.Draw(hudFactoryTex, new Rectangle(354, 688, 28, 28), color);
-                sb.Draw(hudFortressTex, new Rectangle(392, 688, 28, 28), color);
-            }
-
-            if (drawResourcesText)
-            {
-                Rectangle rect = DefineDetailsRectangle();
-                sb.Draw(hudItemDetails, rect, color);
-                sb.DrawString(sf, "Resources", new Vector2(rect.X + 5, rect.Y + 5), Color.White, 0f, new Vector2(0, 0), 0.75f, SpriteEffects.None, 0f);
-            }
-
-            if (drawBarracksText)
-            {
-                Rectangle rect = DefineDetailsRectangle();
-                sb.Draw(hudItemDetails, rect, color);
-                sb.DrawString(sf, "Barracks", new Vector2(rect.X + 5, rect.Y + 5), Color.White, 0f, new Vector2(0, 0), 0.75f, SpriteEffects.None, 0f);
-            }
-
-            if (drawFactoryText)
-            {
-                Rectangle rect = DefineDetailsRectangle();
-                sb.Draw(hudItemDetails, rect, color);
-                sb.DrawString(sf, "Factory", new Vector2(rect.X + 5, rect.Y + 5), Color.White, 0f, new Vector2(0, 0), 0.75f, SpriteEffects.None, 0f);
-            }
-
-            if (drawFortressText)
-            {
-                Rectangle rect = DefineDetailsRectangle();
-                sb.Draw(hudItemDetails, rect, color);
-                sb.DrawString(sf, "Fortress", new Vector2(rect.X + 5, rect.Y + 5), Color.White, 0f, new Vector2(0, 0), 0.75f, SpriteEffects.None, 0f);
+                o.Draw(sb);
             }
         }
 
         void MouseClickListener.OnMouseClick(MouseEvent me)
         {
-            if (me.button == MouseEvent.MOUSE_BUTTON_1 &&
-                player.currentSelection != null &&
+            if (me.button == MouseEvent.MOUSE_BUTTON_1)
+                //player.currentSelection != null
                 //player.currentSelection.units.Count == 1 &&
-                //player.currentSelection.units.ElementAt(0).type == Unit.UnitType.Engineer &&
-                loadForEngineer)
+                //player.currentSelection.units.ElementAt(0).type == Unit.UnitType.Engineer &&)
             {
-                if (drawResourcesText || drawBarracksText || drawFactoryText || drawFortressText)
+                foreach (HUDObject o in objects)
                 {
-                    Console.Out.WriteLine("Previewing a building!");
-                    player.RemovePreviewBuildings();
-                    Building b;
+                    if (o.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                    {
+                        Console.Out.WriteLine("Previewing a building!");
+                        player.RemovePreviewBuildings();
+                        Building b;
+                        Unit u;
 
-                    if (drawResourcesText)
-                    {
-                        b = new ResourceGather(this.player, this.color);
+                        switch (o.type)
+                        {
+                            case HUDObject.Type.Resources:
+                                b = new ResourceGather(this.player, this.color);
+                                break;
+
+                            case HUDObject.Type.Barracks:
+                                b = new Barracks(this.player, this.color);
+                                break;
+
+                            case HUDObject.Type.Factory:
+                                b = new Factory(this.player, this.color);
+                                break;
+
+                            case HUDObject.Type.Fortress:
+                                b = new Fortress(this.player, this.color);
+                                break;
+
+                            case HUDObject.Type.Engineer:
+                                foreach (Building building in player.buildingSelection.buildings)
+                                {
+                                    building.CreateUnit(Unit.UnitType.Engineer);
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        Console.Out.WriteLine("Creating a building");
+                        // player.buildings.AddLast(b);
                     }
-                    else if (drawBarracksText)
-                    {
-                        b = new Barracks(this.player, this.color);
-                    }
-                    else if (drawFactoryText)
-                    {
-                        b = new Factory(this.player, this.color);
-                    }
-                    else if (drawFortressText)
-                    {
-                        b = new Fortress(this.player, this.color);
-                    }
-                    Console.Out.WriteLine("Creating a building");
-                    // player.buildings.AddLast(b);
                 }
 
                 foreach (Building b in player.buildings)
@@ -229,9 +237,14 @@ namespace PathfindingTest.UI
             {
                 foreach (Unit u in player.currentSelection.units)
                 {
-                    if (u.type == Unit.UnitType.Engineer)
+                    switch (u.type)
                     {
-                        engineerCounter++;
+                        case Unit.UnitType.Engineer:
+                            engineerCounter++;
+                            break;
+
+                        default:
+                            break;
                     }
                 }
             }
@@ -244,24 +257,97 @@ namespace PathfindingTest.UI
             {
                 loadForEngineer = false;
             }
-        }
 
-        public void CheckDraw()
-        {
-            if (player.currentSelection == null)
+
+            int resourcesCounter = 0;
+            int barracksCounter = 0;
+            int factoryCounter = 0;
+            int fortressCounter = 0;
+
+            if (player.buildingSelection != null)
             {
-                draw = false;
-                return;
+                foreach (Building b in player.buildingSelection.buildings)
+                {
+                    switch (b.type)
+                    {
+                        case Building.BuildingType.Resources:
+                            resourcesCounter++;
+                            break;
+
+                        case Building.BuildingType.Barracks:
+                            barracksCounter++;
+                            break;
+
+                        case Building.BuildingType.Factory:
+                            factoryCounter++;
+                            break;
+
+                        case Building.BuildingType.Fortress:
+                            fortressCounter++;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
             }
 
-            if (player.currentSelection.units.Count > 0)
+            if (resourcesCounter > 0)
             {
-                draw = true;
+                loadForResources = true;
             }
             else
             {
-                draw = false;
+                loadForResources = false;
             }
+
+            if (barracksCounter > 0)
+            {
+                loadForBarracks = true;
+            }
+            else
+            {
+                loadForBarracks = false;
+            }
+
+            if (factoryCounter > 0)
+            {
+                loadForFactory = true;
+            }
+            else
+            {
+                loadForFactory = false;
+            }
+
+            if (fortressCounter > 0)
+            {
+                loadForFortress = true;
+            }
+            else
+            {
+                loadForFortress = false;
+            }
+        }
+
+        public Boolean CheckDraw()
+        {
+            if (player.currentSelection != null)
+            {
+                if (player.currentSelection.units.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            if (player.buildingSelection != null)
+            {
+                if (player.buildingSelection.buildings.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -270,8 +356,17 @@ namespace PathfindingTest.UI
         /// <returns>Yes or no.</returns>
         public Boolean IsMouseOverBuilding()
         {
-            // If either is true, return true
-            return drawResourcesText | drawFortressText | drawFactoryText | drawBarracksText;
+            Boolean check = false;
+
+            foreach (HUDObject o in objects)
+            {
+                if (o.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                {
+                    check = true;
+                }
+            }
+
+            return check;
         }
 
         public Rectangle DefineRectangle()
@@ -282,26 +377,6 @@ namespace PathfindingTest.UI
         public Rectangle DefineDetailsRectangle()
         {
             return new Rectangle(0, 652, 195, 116);
-        }
-
-        public Rectangle DefineResourcesRectangle()
-        {
-            return new Rectangle(278, 688, 28, 28);
-        }
-
-        public Rectangle DefineBarracksRectangle()
-        {
-            return new Rectangle(316, 688, 28, 28);
-        }
-
-        public Rectangle DefineFactoryRectangle()
-        {
-            return new Rectangle(354, 688, 28, 28);
-        }
-
-        public Rectangle DefineFortressRectangle()
-        {
-            return new Rectangle(392, 688, 28, 28);
         }
     }
 }

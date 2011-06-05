@@ -22,7 +22,20 @@ namespace PathfindingTest.Buildings
             this.type = BuildingType.Resources;
             this.constructDuration = 3;
 
+            this.maxHealth = 1000f;
+            this.currentHealth = 0f;
+
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Buildings/Resources");
+        }
+
+        public override void Update(KeyboardState ks, MouseState ms)
+        {
+            DefaultUpdate(ks, ms);
+        }
+
+        internal override void Draw(SpriteBatch sb)
+        {
+            DefaultDraw(sb);
         }
     }
 }
