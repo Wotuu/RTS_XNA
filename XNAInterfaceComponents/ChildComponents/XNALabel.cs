@@ -90,5 +90,11 @@ namespace XNAInterfaceComponents.ChildComponents
         {
             // throw new NotImplementedException();
         }
+
+
+        public override void Unload()
+        {
+
+        }
     }
 }

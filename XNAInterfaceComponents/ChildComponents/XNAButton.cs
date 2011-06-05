@@ -6,14 +6,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using XNAInterfaceComponents.Interfaces;
 using XNAInputHandler.MouseInput;
+using XNAInterfaceComponents.AbstractComponents;
 
-public delegate void OnClick();
+public delegate void OnButtonClick(XNAButton source);
 
 namespace XNAInterfaceComponents.AbstractComponents
 {
     public class XNAButton : ChildComponent, Focusable, MouseClickListener
     {
-        private OnClick onClickListeners { get; set; }
+        public OnButtonClick onClickListeners { get; set; }
 
         public XNAButton(ParentComponent parent, Rectangle bounds, String text)
             : base(parent, bounds)
@@ -60,14 +61,14 @@ namespace XNAInterfaceComponents.AbstractComponents
         {
             this.isFocussed = true;
 
-            Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " grabbed focus!");
+            // Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " grabbed focus!");
         }
 
         public void OnFocusLost()
         {
             this.isFocussed = false;
 
-            Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " lost focus!");
+            // Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " lost focus!");
         }
 
         public void OnMouseClick(MouseEvent m_event)
@@ -79,7 +80,7 @@ namespace XNAInterfaceComponents.AbstractComponents
                 if (screenRect.Contains(m_event.location))
                 {
                     Console.Out.WriteLine("Pressed on a button!");
-                    if (this.onClickListeners != null) onClickListeners();
+                    if (this.onClickListeners != null) onClickListeners(this);
                 }
             }
         }
@@ -92,13 +93,19 @@ namespace XNAInterfaceComponents.AbstractComponents
         public override void OnMouseEnter(MouseEvent m_event)
         {
             this.isMouseOver = true;
-            Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " mouse entered!");
+            // Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " mouse entered!");
         }
 
         public override void OnMouseExit(MouseEvent m_event)
         {
             this.isMouseOver = false;
-            Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " mouse exitted!");
+            // Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " mouse exitted!");
+        }
+
+        public override void Unload()
+        {
+            MouseManager.GetInstance().mouseClickedListeners -= OnMouseClick;
+            MouseManager.GetInstance().mouseReleasedListeners -= OnMouseRelease;
         }
     }
 }
