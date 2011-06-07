@@ -20,7 +20,7 @@ namespace PathfindingTest.Units
             this.player = p;
             this.x = x;
             this.y = y;
-            this.type = UnitType.Ranged;
+            this.type = Type.Ranged;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/bowman");
         }

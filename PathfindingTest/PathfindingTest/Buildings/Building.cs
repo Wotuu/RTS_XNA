@@ -36,9 +36,11 @@ namespace PathfindingTest.Buildings
         public Boolean mouseOver { get; set; }
         public Boolean canPlace { get; set; }
         public Boolean constructionStarted { get; set; }
-        public BuildState state { get; set; }
+        public State state { get; set; }
 
-        public BuildingType type { get; set; }
+        public LinkedList<Unit> productionQueue { get; set; }
+
+        public Type type { get; set; }
         public Texture2D texture { get; set; }
 
         public BuildingMesh mesh { get; set; }
@@ -46,8 +48,9 @@ namespace PathfindingTest.Buildings
         public ProgressBar progressBar { get; set; }
 
         public LinkedList<Unit> constructionQueue { get; set; }
+        public Point waypoint { get; set; }
 
-        public enum BuildingType
+        public enum Type
         {
             Resources,
             Barracks,
@@ -55,11 +58,11 @@ namespace PathfindingTest.Buildings
             Fortress
         }
 
-        public enum BuildState
+        public enum State
         {
             Preview,
             Constructing,
-            InterruptedConstruction,
+            Interrupted,
             Finished,
             Producing
         }
@@ -70,24 +73,24 @@ namespace PathfindingTest.Buildings
 
         public void DefaultUpdate(KeyboardState ks, MouseState ms)
         {
-            if (constructedBy != null && state != BuildState.Finished)
+            if (constructedBy != null && state == State.Constructing)
             {
                 if (constructedBy.waypoints.Count > 0 && constructionStarted)
                 {
                     constructedBy = null;
-                    this.state = BuildState.InterruptedConstruction;
+                    this.state = State.Interrupted;
                 }
             }
 
             switch (state)
             {
-                case BuildState.Preview:
+                case State.Preview:
                     canPlace = Game1.GetInstance().collision.CanPlace(this.DefineRectangle());
                     this.x = (ms.X - (texture.Width / 2));
                     this.y = (ms.Y - (texture.Height / 2));
                     break;
 
-                case BuildState.Constructing:
+                case State.Constructing:
                     if (constructedBy.waypoints.Count == 0)
                     {
                         this.constructionStarted = true;
@@ -98,7 +101,7 @@ namespace PathfindingTest.Buildings
                             constructProgress += (1 / constructDuration);
                             newColor.A = (byte)((constructProgress / 100) * 255);
 
-                            float newHealth = (float) ((constructProgress / 100) * maxHealth);
+                            float newHealth = (float)((constructProgress / 100) * maxHealth);
                             if (newHealth > maxHealth) newHealth = maxHealth;
                             currentHealth = newHealth;
 
@@ -106,18 +109,43 @@ namespace PathfindingTest.Buildings
                         }
                         else
                         {
-                            state = BuildState.Finished;
+                            state = State.Finished;
                         }
                     }
                     break;
 
-                case BuildState.InterruptedConstruction:
+                case State.Interrupted:
                     break;
 
-                case BuildState.Finished:
+                case State.Finished:
+                    if (productionQueue != null)
+                    {
+                        if (productionQueue.Count > 0)
+                        {
+                            this.state = State.Producing;
+                        }
+                    }
                     break;
 
-                case BuildState.Producing:
+                case State.Producing:
+                    if (productionQueue == null)
+                    {
+                        this.state = State.Finished;
+                        break;
+                    }
+
+                    if (productionQueue != null)
+                    {
+                        if (productionQueue.Count == 0)
+                        {
+                            this.state = State.Finished;
+                            break;
+                        }
+                        else if (productionQueue.Count > 0)
+                        {
+                            Produce();
+                        }
+                    }
                     break;
 
                 default:
@@ -138,7 +166,7 @@ namespace PathfindingTest.Buildings
         {
             switch (state)
             {
-                case BuildState.Preview:
+                case State.Preview:
                     if (canPlace)
                     {
                         sb.Draw(texture, new Vector2(x, y), previewC);
@@ -149,15 +177,19 @@ namespace PathfindingTest.Buildings
                     }
                     break;
 
-                case BuildState.Constructing:
+                case State.Constructing:
                     sb.Draw(texture, new Vector2(x, y), constructC);
                     break;
 
-                case BuildState.InterruptedConstruction:
+                case State.Interrupted:
                     sb.Draw(texture, new Vector2(x, y), constructC);
                     break;
 
-                case BuildState.Finished:
+                case State.Finished:
+                    sb.Draw(texture, new Vector2(x, y), c);
+                    break;
+
+                case State.Producing:
                     sb.Draw(texture, new Vector2(x, y), c);
                     break;
 
@@ -174,16 +206,22 @@ namespace PathfindingTest.Buildings
 
         internal void DrawProgressBar(SpriteBatch sb)
         {
-            if (this.state == BuildState.Constructing || this.state == BuildState.InterruptedConstruction)
+            if (this.state == State.Constructing || this.state == State.Interrupted)
             {
                 progressBar.progress = this.constructProgress;
+                progressBar.Draw(sb);
+            }
+            else if (this.state == State.Producing)
+            {
+                Unit produced = productionQueue.ElementAt(0);
+                progressBar.progress = produced.productionProgress;
                 progressBar.Draw(sb);
             }
         }
 
         internal void DrawHealthBar(SpriteBatch sb)
         {
-            int healthPercent = (int) ((this.currentHealth / this.maxHealth) * 100.0);
+            int healthPercent = (int)((this.currentHealth / this.maxHealth) * 100.0);
             healthBar.percentage = healthPercent;
             healthBar.Draw(sb);
         }
@@ -193,9 +231,10 @@ namespace PathfindingTest.Buildings
         /// </summary>
         public void PlaceBuilding(Engineer e)
         {
-            this.state = BuildState.Constructing;
+            this.state = State.Constructing;
             this.constructedBy = e;
             this.mesh = Game1.GetInstance().collision.PlaceBuilding(this.DefineSelectedRectangle());
+            this.waypoint = new Point((int)this.x + (this.texture.Width / 2), (int)this.y + this.texture.Height + 20);
         }
 
         /// <summary>
@@ -205,38 +244,56 @@ namespace PathfindingTest.Buildings
         public int GetCircleRadius()
         {
             return (int)(Util.GetHypoteneuseLength(
-                new Point((int)this.x, (int)this.y), 
+                new Point((int)this.x, (int)this.y),
                 new Point(DefineRectangle().Left, DefineRectangle().Bottom)) / 2);
         }
 
-        public void CreateUnit(Unit.UnitType type)
+        public void CreateUnit(Unit.Type type)
         {
-            Unit newUnit;
+            Unit newUnit = null;
 
             switch (type)
             {
-                case Unit.UnitType.Engineer:
-                    if (this.type == BuildingType.Fortress)
+                case Unit.Type.Engineer:
+                    if (this.type == Type.Fortress)
                     {
-                        newUnit = new Engineer(this.p, (int)this.x - 70, (int)this.y - 70);
-                        p.units.AddLast(newUnit);
+                        newUnit = new Engineer(this.p, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
+                        newUnit.state = Unit.State.Producing;
+                        productionQueue.AddLast(newUnit);
                     }
                     break;
 
-                case Unit.UnitType.Melee:
+                case Unit.Type.Melee:
                     break;
 
-                case Unit.UnitType.HeavyMelee:
+                case Unit.Type.HeavyMelee:
                     break;
 
-                case Unit.UnitType.Fast:
+                case Unit.Type.Fast:
                     break;
 
-                case Unit.UnitType.Ranged:
+                case Unit.Type.Ranged:
                     break;
 
                 default:
                     break;
+            }
+        }
+
+        public void Produce()
+        {
+            Unit produced = productionQueue.ElementAt(0);
+
+            produced.productionProgress += (1 / produced.productionDuration);
+
+            if (produced.productionProgress >= 100)
+            {
+                produced.currentHealth = produced.maxHealth;
+                produced.state = Unit.State.Finished;
+                produced.x = waypoint.X;
+                produced.y = waypoint.Y;
+                productionQueue.RemoveFirst();
+                this.state = State.Finished;
             }
         }
 
@@ -265,9 +322,11 @@ namespace PathfindingTest.Buildings
             this.p.buildings.AddLast(this);
             this.constructProgress = 0;
 
-            this.state = BuildState.Preview;
+            this.state = State.Preview;
             this.progressBar = new ProgressBar(this);
             this.healthBar = new HealthBar(this);
+
+            this.productionQueue = new LinkedList<Unit>();
         }
     }
 }

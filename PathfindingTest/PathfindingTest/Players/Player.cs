@@ -228,7 +228,7 @@ namespace PathfindingTest.Players
         {
             foreach (Building b in buildings)
             {
-                if (b.state == Building.BuildState.Preview) return true;
+                if (b.state == Building.State.Preview) return true;
             }
             return false;
         }
@@ -296,7 +296,7 @@ namespace PathfindingTest.Players
             for (int i = 0; i < this.buildings.Count; i++)
             {
                 Building build = this.buildings.ElementAt(i);
-                if (build.state == Building.BuildState.Preview)
+                if (build.state == Building.State.Preview)
                 {
                     build.Dispose();
                     i--;

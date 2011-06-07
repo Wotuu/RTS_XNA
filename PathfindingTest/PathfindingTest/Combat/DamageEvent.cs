@@ -30,8 +30,8 @@ namespace PathfindingTest.Combat
             else if (by.type == DamageType.Ranged) x = 2;
             else if (by.type == DamageType.Fast) x = 3;
 
-            if (target.type == Unit.UnitType.Ranged) return modifiers[x, 2];
-            else if (target.type == Unit.UnitType.Engineer) return modifiers[x, 0];
+            if (target.type == Unit.Type.Ranged) return modifiers[x, 2];
+            else if (target.type == Unit.Type.Engineer) return modifiers[x, 0];
             else return 1f;
         }
 

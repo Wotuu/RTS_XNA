@@ -28,11 +28,15 @@ namespace PathfindingTest.Units
         /// <param name="c"></param>
         public Engineer(Player p, int x, int y) : base(p, x, y, 1f)
         {
-            this.type = UnitType.Engineer;
+            this.type = Type.Engineer;
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/Engineer");
             this.collisionRadiusTexture = Game1.GetInstance().Content.Load<Texture2D>("Misc/patternPreview");
 
             this.collisionRadius = texture.Width / 2;
+
+            this.productionDuration = 3;
+            this.productionProgress = 0;
+            this.state = State.Finished;
         }
 
         /// <summary>
@@ -42,7 +46,10 @@ namespace PathfindingTest.Units
         /// <param name="ms"></param>
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            UpdateMovement();
+            if (state != State.Producing)
+            {
+                UpdateMovement();
+            }
         }
 
         /// <summary>
@@ -51,14 +58,17 @@ namespace PathfindingTest.Units
         /// <param name="sb"></param>
         internal override void Draw(SpriteBatch sb)
         {
-            //sb.Draw(this.collisionRadiusTexture,
-            //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
-            //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
-            sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-
-            if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+            if (state != State.Producing)
             {
-                this.DrawHealthBar(sb);
+                //sb.Draw(this.collisionRadiusTexture,
+                //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
+                //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
+                sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
+
+                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                {
+                    this.DrawHealthBar(sb);
+                }
             }
         }
 

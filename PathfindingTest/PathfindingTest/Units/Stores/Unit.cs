@@ -21,7 +21,7 @@ namespace PathfindingTest.Units
         public float x { get; set; }
         public float y { get; set; }
 
-        public UnitType type { get; set; }
+        public Type type { get; set; }
         public Color color { get; set; }
         public Texture2D texture { get; set; }
         public Boolean selected { get; set; }
@@ -35,6 +35,10 @@ namespace PathfindingTest.Units
         public float maxHealth { get; set; }
         private HealthBar healthBar { get; set; }
 
+        public State state { get; set; }
+        public double productionDuration { get; set; }
+        public double productionProgress { get; set; }
+
         #region Movement variables
         public LinkedList<Point> waypoints { get; set; }
         private Boolean hasToMove { get; set; }
@@ -42,13 +46,19 @@ namespace PathfindingTest.Units
         private float direction { get; set; }
         #endregion
 
-        public enum UnitType
+        public enum Type
         {
             Engineer,
             Melee,
             HeavyMelee,
             Fast,
             Ranged
+        }
+
+        public enum State
+        {
+            Producing,
+            Finished
         }
 
         public abstract void Update(KeyboardState ks, MouseState ms);

@@ -42,20 +42,19 @@ namespace PathfindingTest.UI
         public LinkedList<HUDObject> objects { get; set; }
 
         /// <summary>
-        /// HUD Constructor.
+        /// Sets the textures to use for the HUD.
+        /// Creates new instances of needed components.
+        /// Sets variables to their default values.
         /// </summary>
-        /// <param name="p"></param>
-        /// <param name="cm"></param>
-        /// <param name="c"></param>
+        /// <param name="p">The player this HUD belongs to</param>
+        /// <param name="c">The desired color for this HUD</param>
         public HUD(Player p, Color c)
         {
             this.player = p;
             this.color = c;
 
             hudTex = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUD");
-
             hudItemDetails = Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDItemDetails");
-
             sf = Game1.GetInstance().Content.Load<SpriteFont>("Fonts/SpriteFont1");
 
             loadForEngineer = false;
@@ -71,10 +70,11 @@ namespace PathfindingTest.UI
         }
 
         /// <summary>
-        /// Standard Update function.
+        /// Checks whether the HUD should be hidden or not.
+        /// Loads the objects to display according to selected units/buildings.
         /// </summary>
-        /// <param name="ks"></param>
-        /// <param name="ms"></param>
+        /// <param name="ks">Default KeyboardState</param>
+        /// <param name="ms">Default MouseState</param>
         public void Update(KeyboardState ks, MouseState ms)
         {
             draw = CheckDraw();
@@ -109,10 +109,9 @@ namespace PathfindingTest.UI
         }
 
         /// <summary>
-        /// Checks if the HUD should be drawn.
-        /// If an Engineer is selected, load contents for Engineer.
+        /// Draws the HUD and the objects required.
         /// </summary>
-        /// <param name="sb"></param>
+        /// <param name="sb">Default SpriteBatch</param>
         internal void Draw(SpriteBatch sb)
         {
             if (draw)
@@ -127,6 +126,10 @@ namespace PathfindingTest.UI
             }
         }
 
+        /// <summary>
+        /// Used for creating units and buildings respectively.
+        /// </summary>
+        /// <param name="me">The MouseEvent to use</param>
         void MouseClickListener.OnMouseClick(MouseEvent me)
         {
             if (me.button == MouseEvent.MOUSE_BUTTON_1)
@@ -138,7 +141,6 @@ namespace PathfindingTest.UI
                 {
                     if (o.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
                     {
-                        Console.Out.WriteLine("Previewing a building!");
                         player.RemovePreviewBuildings();
                         Building b;
                         Unit u;
@@ -164,22 +166,19 @@ namespace PathfindingTest.UI
                             case HUDObject.Type.Engineer:
                                 foreach (Building building in player.buildingSelection.buildings)
                                 {
-                                    building.CreateUnit(Unit.UnitType.Engineer);
+                                    building.CreateUnit(Unit.Type.Engineer);
                                 }
                                 break;
 
                             default:
                                 break;
                         }
-
-                        Console.Out.WriteLine("Creating a building");
-                        // player.buildings.AddLast(b);
                     }
                 }
 
                 foreach (Building b in player.buildings)
                 {
-                    if (b.state == Building.BuildState.Preview &&
+                    if (b.state == Building.State.Preview &&
                         !this.DefineRectangle().Contains(new Rectangle(me.location.X, me.location.Y, 1, 1)) &&
                         Game1.GetInstance().collision.CanPlace(b.DefineRectangle()))
                     {
@@ -187,7 +186,7 @@ namespace PathfindingTest.UI
 
                         foreach (Unit u in player.currentSelection.units)
                         {
-                            if (u.type == Unit.UnitType.Engineer)
+                            if (u.type == Unit.Type.Engineer)
                             {
                                 u.MoveToNow(new Point(me.location.X, me.location.Y));
                                 // Get the last point of the pathfinding result
@@ -221,13 +220,18 @@ namespace PathfindingTest.UI
             }
         }
 
+        /// <summary>
+        /// MouseRelease Listener.
+        /// </summary>
+        /// <param name="me">The MouseEvent to use</param>
         void MouseClickListener.OnMouseRelease(MouseEvent me)
         {
+            // Not Implemented
         }
 
         /// <summary>
-        /// Count the different unit types selected.
-        /// Determines how the HUD should be loaded.
+        /// Count the different unit/building types selected.
+        /// Checks what objects to load in the HUD.
         /// </summary>
         public void CountUnits()
         {
@@ -239,7 +243,7 @@ namespace PathfindingTest.UI
                 {
                     switch (u.type)
                     {
-                        case Unit.UnitType.Engineer:
+                        case Unit.Type.Engineer:
                             engineerCounter++;
                             break;
 
@@ -270,19 +274,19 @@ namespace PathfindingTest.UI
                 {
                     switch (b.type)
                     {
-                        case Building.BuildingType.Resources:
+                        case Building.Type.Resources:
                             resourcesCounter++;
                             break;
 
-                        case Building.BuildingType.Barracks:
+                        case Building.Type.Barracks:
                             barracksCounter++;
                             break;
 
-                        case Building.BuildingType.Factory:
+                        case Building.Type.Factory:
                             factoryCounter++;
                             break;
 
-                        case Building.BuildingType.Fortress:
+                        case Building.Type.Fortress:
                             fortressCounter++;
                             break;
 
@@ -329,6 +333,10 @@ namespace PathfindingTest.UI
             }
         }
 
+        /// <summary>
+        /// Checks whether the HUD should be drawn or not.
+        /// </summary>
+        /// <returns>Returns false if there are no selected units/buildings, else returns true</returns>
         public Boolean CheckDraw()
         {
             if (player.currentSelection != null)
@@ -351,9 +359,9 @@ namespace PathfindingTest.UI
         }
 
         /// <summary>
-        /// Whether the mouse is over a building preview text or not.
+        /// Checks whether the mouse is hovering over an object on the HUD.
         /// </summary>
-        /// <returns>Yes or no.</returns>
+        /// <returns>Returns false if not true, else returns true</returns>
         public Boolean IsMouseOverBuilding()
         {
             Boolean check = false;
@@ -369,11 +377,19 @@ namespace PathfindingTest.UI
             return check;
         }
 
+        /// <summary>
+        /// Defines the space the HUD is using.
+        /// </summary>
+        /// <returns>Returns a Rectangle with the right size</returns>
         public Rectangle DefineRectangle()
         {
             return new Rectangle(195, 652, 634, 116);
         }
 
+        /// <summary>
+        /// Defines the space the Details section of the HUD is using.
+        /// </summary>
+        /// <returns>Returns a Rectangle with the right size</returns>
         public Rectangle DefineDetailsRectangle()
         {
             return new Rectangle(0, 652, 195, 116);

@@ -19,7 +19,7 @@ namespace PathfindingTest.Buildings
         {
             this.c = c;
             this.constructC = new Color(this.c.R, this.c.G, this.c.B, 0);
-            this.type = BuildingType.Resources;
+            this.type = Type.Resources;
             this.constructDuration = 3;
 
             this.maxHealth = 1000f;
