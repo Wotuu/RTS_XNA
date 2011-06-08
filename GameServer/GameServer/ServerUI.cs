@@ -140,10 +140,7 @@ namespace GameServer
         private void ServerUI_Disposed(object sender, EventArgs e)
         {
             RemoveDisposedConnections();
-            foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
-            {
-                clientListener.client.SendPacket(new Packet(Headers.SERVER_DISCONNECT));
-            }
+            ChatServerManager.GetInstance().Stop();
         }
     }
 }

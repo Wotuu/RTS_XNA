@@ -11,13 +11,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNAInterfaceComponents.ParentComponents
 {
-    public class XNAMessageDialog : XNAPanel
+    public class XNAMessageDialog : XNADialog
     {
         private XNALabel label { get; set; }
         private String message { get; set; }
-
-        public static int CLIENT_WINDOW_WIDTH { get; set; }
-        public static int CLIENT_WINDOW_HEIGHT { get; set; }
 
 
         public XNAButton button1 { get; set; }
@@ -27,8 +24,6 @@ namespace XNAInterfaceComponents.ParentComponents
         private int buttonSpacing { get; set; }
 
 
-        public Padding padding { get; set; }
-        public SpriteFont font { get; set; }
         public DialogType type { get; set; }
 
         public enum DialogType
@@ -43,7 +38,7 @@ namespace XNAInterfaceComponents.ParentComponents
         /// Re-does the layout for this Message Dialog. Should be called when the user specifies a custom font
         /// rather than the the default font, or when the client window size changes.
         /// </summary>
-        public void DoLayout()
+        public override void DoLayout()
         {
             Vector2 messageDimensions = this.font.MeasureString(message);
             int windowHeight = (int)messageDimensions.Y + this.padding.top + this.padding.bottom + 50;
@@ -119,14 +114,9 @@ namespace XNAInterfaceComponents.ParentComponents
         }
 
         private XNAMessageDialog(String message, DialogType type)
-            : base(null,
-                new Rectangle())
         {
             this.message = message;
-            this.font = ChildComponent.DEFAULT_FONT;
-            this.padding = new Padding(5, 5, 5, 5);
             this.type = type;
-            this.border = new Border(this, 3, Color.Black);
             this.buttonWidth = 100;
             this.buttonSpacing = 30;
 
@@ -134,26 +124,8 @@ namespace XNAInterfaceComponents.ParentComponents
         }
 
         /// <summary>
-        /// Every button calls this, as in .. on click, remove!
-        /// </summary>
-        /// <param name="source">The button that clicked it (irrelevant schmuck)</param>
-        private void Dispose(XNAButton source)
-        {
-            this.Dispose();
-        }
-
-        /// <summary>
-        /// Disposes the message dialog. Does the same as calling Unload();.
-        /// </summary>
-        public void Dispose()
-        {
-            this.Unload();
-        }
-
-        /// <summary>
         /// Creates a new message dialog. Note that you have to add your button listeners to this pane for it to do something.
         /// </summary>
-        /// <param name="game">The current game.</param>
         /// <param name="message">The message of the pane.</param>
         /// <param name="type">The type of the pane</param>
         /// <returns></returns>

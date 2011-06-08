@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using SocketLibrary;
 using System.Threading;
+using SocketLibrary.Packets;
+using SocketLibrary.Protocol;
 
 namespace GameServer.ChatServer
 {
@@ -20,11 +22,16 @@ namespace GameServer.ChatServer
             return instance;
         }
 
-        private ChatServerManager() {
+        private ChatServerManager()
+        {
             clients = new LinkedList<ChatClientListener>();
         }
 
-        public void Start() {
+        /// <summary>
+        /// Starts the server
+        /// </summary>
+        public void Start()
+        {
             Console.Out.WriteLine("Chat server started on port " + this.port);
             SocketServer socket = new SocketServer(port, false, "rts_xna_chatserver");
             this.serverSocket = socket;
@@ -38,8 +45,18 @@ namespace GameServer.ChatServer
 
         }
 
+        /// <summary>
+        /// Stops the server, and notifies all clients of it's stopping.
+        /// </summary>
         public void Stop()
         {
+            foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
+            {
+                clientListener.safeShutDown = true;
+                clientListener.client.SendPacket(new Packet(Headers.SERVER_DISCONNECT));
+                clientListener.OnDisconnect();
+            }
+
             this.serverSocket.Disable();
             ServerUI.GetInstance().ChatServerStatusLbl.Text = "Server offline";
             ServerUI.GetInstance().StartChatServer.Enabled = true;

@@ -11,6 +11,8 @@ using PathfindingTest.UI.Menus;
 using PathfindingTest.UI.Menus.Multiplayer;
 using XNAInterfaceComponents.AbstractComponents;
 using XNAInterfaceComponents.ParentComponents;
+using SocketLibrary.Users;
+using SocketLibrary.Multiplayer;
 
 namespace PathfindingTest.Multiplayer.SocketConnection
 {
@@ -18,8 +20,10 @@ namespace PathfindingTest.Multiplayer.SocketConnection
     {
         private static ChatServerConnectionManager instance { get; set; }
         public SocketClient socket { get; set; }
-        private String serverLocation = "localhost";
+
+        public String serverLocation = "localhost";
         private int serverPort = 14051;
+
         public User user { get; set; }
         public Boolean safeShutdown { get; set; }
 
@@ -33,6 +37,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
         /// </summary>
         public void OnDisconnect()
         {
+            MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLogin);
             if (!safeShutdown)
             {
                 XNAMessageDialog.CreateDialog(
@@ -83,7 +88,11 @@ namespace PathfindingTest.Multiplayer.SocketConnection
 
             this.socket = new SocketClient(sock.Client, "rts_client");
             new Thread(this.socket.Enable).Start();
-            this.socket.onPacketReceivedListeners += this.DataReceived;
+
+            // Give the above thread some time to start running! 
+            // Else we'll get a nullpointer right here.
+            Thread.Sleep(50);
+            this.socket.packetProcessor.onProcessPacket += this.DataReceived;
             this.socket.onDisconnectListeners += this.OnDisconnect;
 
             SetLoginStatus("Handshaking..");
@@ -140,8 +149,13 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                     {
                         // Set the received user ID.
                         this.user.id = PacketUtil.DecodePacketInt(p, 0);
-                        this.user.channel = 1;
-                        Console.Out.WriteLine("Received user ID from the server: " + this.user.id);
+                        // Console.Out.WriteLine("Received user ID from the server: " + this.user.id);
+                        break;
+                    }
+                case Headers.CLIENT_CHANNEL:
+                    {
+                        this.user.channelID = PacketUtil.DecodePacketInt(p, 0);
+                        Console.Out.WriteLine("Switched channel to: " + this.user.channelID);
                         break;
                     }
                 case Headers.CHAT_MESSAGE:
@@ -164,7 +178,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                         String username = PacketUtil.DecodePacketString(p, 4);
                         User user = new User(username);
                         user.id = userID;
-                        user.channel = this.user.channel;
+                        user.channelID = this.user.channelID;
                         ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
                         if (menu is MultiplayerLobby)
                         {
@@ -177,17 +191,33 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                 case Headers.USER_LEFT:
                     {
                         int userID = PacketUtil.DecodePacketInt(p, 0);
-                        String username = PacketUtil.DecodePacketString(p, 4);
-                        User user = new User(username);
-                        user.id = userID;
-                        user.channel = this.user.channel;
-                        ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
-                        if (menu is MultiplayerLobby)
+                        User user = UserManager.GetInstance().GetUserByID(userID);
+                        if (user != null)
                         {
-                            MultiplayerLobby lobby = ((MultiplayerLobby)menu);
-                            lobby.RemoveUser(user);
+                            ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
+                            if (menu is MultiplayerLobby)
+                            {
+                                MultiplayerLobby lobby = ((MultiplayerLobby)menu);
+                                lobby.RemoveUser(user);
+                            }
                         }
 
+                        break;
+                    }
+                    // Cliente received an ID for creating a game.
+                case Headers.GAME_ID:
+                    {
+                        int gameID = PacketUtil.DecodePacketInt(p, 0);
+                        Console.Out.WriteLine("Received game ID: " + gameID);
+                        
+                        MultiplayerLobby lobby = ((MultiplayerLobby)MenuManager.GetInstance().GetCurrentlyDisplayedMenu());
+                        String gameName = lobby.gameNameInput.textfield.text;
+
+                        MenuManager.GetInstance().ShowMenu(MenuManager.Menu.GameLobby);
+                        GameLobby gameLobby = (GameLobby)MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
+
+                        gameLobby.multiplayerGame = new MultiplayerGame(gameID, ChatServerConnectionManager.GetInstance().user,
+                            gameName, "");
                         break;
                     }
                 default:

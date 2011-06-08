@@ -142,10 +142,7 @@
     <Compile Include="Combat\Damageable.cs" />
     <Compile Include="InfoBars\HealthBar.cs" />
     <Compile Include="InfoBars\ProgressBar.cs" />
-    <Compile Include="Multiplayer\MultiplayerGame.cs" />
     <Compile Include="Multiplayer\SocketConnection\ChatServerConnectionManager.cs" />
-    <Compile Include="Multiplayer\Users\User.cs" />
-    <Compile Include="Multiplayer\Users\UserManager.cs" />
     <Compile Include="Pathfinding\Node.cs" />
     <Compile Include="Pathfinding\NodeConnection.cs" />
     <Compile Include="Pathfinding\PathfindingProcessor.cs" />
@@ -166,6 +163,7 @@
     <Compile Include="UI\HUDObject.cs" />
     <Compile Include="UI\Menus\MainMenu.cs" />
     <Compile Include="UI\Menus\MenuManager.cs" />
+    <Compile Include="UI\Menus\Multiplayer\GameLobby.cs" />
     <Compile Include="UI\Menus\Multiplayer\MultiplayerLobby.cs" />
     <Compile Include="UI\Menus\Multiplayer\LoginScreen.cs" />
     <Compile Include="Units\Ranged\Bowman.cs" />

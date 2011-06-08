@@ -36,6 +36,17 @@ namespace SocketLibrary.Protocol
         // Server sent the client a message that a user left the cannel.
         // <byte header> <Int32 userID> <String username>
         public const byte USER_LEFT = 0x0B;
+        // Client wants to create creates a game
+        // <byte header> <Int32 userID> <String gamename>
+        public const byte CLIENT_CREATE_GAME = 0x0C;
+        // Server notifies clients that there is a game created.
+        // <byte header> <Int32 gameID> <Int32 userID> <String gamename>
+        public const byte SERVER_CREATE_GAME = 0x0D;
+        // Server sent the user a game ID
+        public const byte GAME_ID = 0x0E;
+        // Client notifies the server of a map change
+        // <byte header> <Int32 gameID> <String mapname>
+        public const byte GAME_MAP_CHANGED = 0x0F;
 
 
 

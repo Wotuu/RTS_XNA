@@ -5,7 +5,6 @@ using System.Collections;
 using SocketLibrary.Protocol;
 
 
-public delegate void OnPacketReceivedListeners(Packet p);
 public delegate void OnDisconnectListeners();
 namespace SocketLibrary
 {
@@ -17,9 +16,10 @@ namespace SocketLibrary
         public bool Receiving = true;
         private readonly object SyncRecv;
         private readonly object SyncSend;
-        public OnPacketReceivedListeners onPacketReceivedListeners { get; set; }
         public OnDisconnectListeners onDisconnectListeners { get; set; }
         public ArrayList messageLog = new ArrayList();
+
+        public PacketProcessor packetProcessor { get; set; }
 
         public SocketClient(Socket _sock, string _socketname)
         {
@@ -30,8 +30,15 @@ namespace SocketLibrary
             SyncSend = new object();
         }
 
+        /// <summary>
+        /// Enables the socket to accept packets
+        /// </summary>
         public void Enable()
         {
+            if( this.packetProcessor == null ) packetProcessor = new PacketProcessor();
+            packetProcessor.onProcessPacket += this.OnProcessPacket;
+            packetProcessor.StartProcessing();
+
             lock (SyncRecv)
             {
                 Console.Out.WriteLine("Starting receiving packets..");
@@ -61,20 +68,15 @@ namespace SocketLibrary
                             byte[] data = new byte[size];
                             Array.Copy(buff, data, size);
                             //TODO: Should go to a SocketProcessor here.
+
+
                             byte[] headerlessData = new byte[data.Length - 1];
-                            for( int i = 1; i < data.Length; i++ ){
+                            for (int i = 1; i < data.Length; i++)
+                            {
                                 headerlessData[i - 1] = data[i];
                             }
                             Packet p = new Packet(data[0], headerlessData);
-
-                            if (this.onPacketReceivedListeners != null)
-                            {
-                                Console.Out.WriteLine("Received a packet with header " + data[0]);
-                                onPacketReceivedListeners(p);
-                            }
-                            else Console.Out.WriteLine("Received a packet, but noone's listening to it!");
-                            Log(p, true);
-                            
+                            this.packetProcessor.QueuePacket(p);
                         }
                         else
                         {
@@ -88,6 +90,16 @@ namespace SocketLibrary
                 if (onDisconnectListeners != null) onDisconnectListeners();
                 Console.Out.WriteLine("Ending receiving packets..");
             }
+            packetProcessor.StopProcessing();
+        }
+
+        /// <summary>
+        /// Packet processor has determined that the packet needed processing.
+        /// </summary>
+        /// <param name="p">The packet that needed processing</param>
+        public void OnProcessPacket(Packet p)
+        {
+            Log(p, true);
         }
 
         /// <summary>
@@ -126,10 +138,12 @@ namespace SocketLibrary
         public String GetRemoteHostIP()
         {
             String result = "";
-            try {
+            try
+            {
                 result = this.Sock.RemoteEndPoint.ToString();
             }
-            catch (ObjectDisposedException e) {
+            catch (ObjectDisposedException e)
+            {
                 result = "SOCKET DISPOSED";
             }
             return result;
@@ -141,41 +155,39 @@ namespace SocketLibrary
         /// <param name="data"></param>
         public void Log(Packet p, Boolean isReceived)
         {
-            String remoteHostIP = this.GetRemoteHostIP();
             String currTime = System.DateTime.Now.ToLongTimeString();
             switch (p.GetHeader())
             {
                 case Headers.HANDSHAKE_1:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " Received handshake request (1) from " + remoteHostIP);
-                        else this.messageLog.Add(currTime + " Sent handshake request (1) to " + remoteHostIP);
+                        if (isReceived) this.messageLog.Add(currTime + " Received handshake request (1)");
+                        else this.messageLog.Add(currTime + " Sent handshake request (1)");
                         break;
                     }
                 case Headers.HANDSHAKE_2:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " Received handshake acknowledge (2) from " + remoteHostIP);
-                        else this.messageLog.Add(currTime + " Sent handshake acknowledge (2) to " + remoteHostIP);
+                        if (isReceived) this.messageLog.Add(currTime + " Received handshake acknowledge (2)");
+                        else this.messageLog.Add(currTime + " Sent handshake acknowledge (2)");
                         break;
                     }
                 case Headers.HANDSHAKE_3:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " Received handshake confirmation (3) from " + remoteHostIP);
-                        else this.messageLog.Add(currTime + " Sent handshake confirmation (3) to " + remoteHostIP);
+                        if (isReceived) this.messageLog.Add(currTime + " Received handshake confirmation (3)");
+                        else this.messageLog.Add(currTime + " Sent handshake confirmation (3)");
                         break;
                     }
                 case Headers.KEEP_ALIVE:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " " + remoteHostIP + " is still connected (keep alive)");
-                        else this.messageLog.Add(currTime + " Sent alive pulse to " + remoteHostIP);
+                        if (isReceived) this.messageLog.Add(currTime + " User is still connected (still alive)");
+                        else this.messageLog.Add(currTime + " Asking client if he's still alive ");
                         break;
                     }
                 case Headers.CHAT_MESSAGE:
                     {
-                        if (isReceived) 
-                            this.messageLog.Add(currTime + " " + remoteHostIP +
-                                " has sent a chat message in channel " + PacketUtil.DecodePacketInt(p, 0) + 
+                        if (isReceived)
+                            this.messageLog.Add(currTime + " Received sent a chat message in channel " + PacketUtil.DecodePacketInt(p, 0) +
                                 ": " + PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " Sent chat message in channel " + PacketUtil.DecodePacketInt(p, 0) +
+                        else this.messageLog.Add(currTime + " Sent chat message to all in channel " + PacketUtil.DecodePacketInt(p, 0) +
                                 ": " + PacketUtil.DecodePacketString(p, 4));
                         break;
                     }
@@ -193,38 +205,95 @@ namespace SocketLibrary
                     }
                 case Headers.CLIENT_USERNAME:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " " + remoteHostIP + " sent a username: " + 
+                        if (isReceived) this.messageLog.Add(currTime + " Requested a username: " +
                             PacketUtil.DecodePacketString(p, 0));
-                        else this.messageLog.Add(currTime + " " + remoteHostIP + " requested username: " + PacketUtil.DecodePacketString(p, 0));
+                        else this.messageLog.Add(currTime + " Confirming requested username: " + PacketUtil.DecodePacketString(p, 0));
                         break;
                     }
                 case Headers.CLIENT_USER_ID:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " " + remoteHostIP + " received a userid: " +
+                        if (isReceived) this.messageLog.Add(currTime + " Requested a userid: " +
                             PacketUtil.DecodePacketInt(p, 0));
-                        else this.messageLog.Add(currTime + " " + remoteHostIP + " sent userid: " + PacketUtil.DecodePacketInt(p, 0));
+                        else this.messageLog.Add(currTime + " Confirming requested userid: " + PacketUtil.DecodePacketInt(p, 0));
+                        break;
+                    }
+                case Headers.CLIENT_CHANNEL:
+                    {
+                        if (isReceived) this.messageLog.Add(currTime + " Received change channel request to " +
+                            PacketUtil.DecodePacketInt(p, 0));
+                        else this.messageLog.Add(currTime + " Sent change channel to " +
+                            PacketUtil.DecodePacketInt(p, 0));
                         break;
                     }
                 case Headers.NEW_USER:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " " + remoteHostIP + " new user: " +
+                        if (isReceived) this.messageLog.Add(currTime + " Received new user: " +
                             PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " " + remoteHostIP + " broadcasted new user: " +
+                        else this.messageLog.Add(currTime + " Sent new user: " +
                             PacketUtil.DecodePacketString(p, 4));
                         break;
                     }
                 case Headers.USER_LEFT:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " " + remoteHostIP + " user left: " +
+                        if (isReceived) this.messageLog.Add(currTime + " Received user has left: " +
                             PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " " + remoteHostIP + " broadcasted user left: " +
+                        else this.messageLog.Add(currTime + " Sent user has left: " +
                             PacketUtil.DecodePacketString(p, 4));
                         break;
                     }
+                case Headers.CLIENT_CREATE_GAME:
+                    {
+                        if (isReceived) this.messageLog.Add(currTime + " Received game creation request: userid = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " + 
+                            PacketUtil.DecodePacketString(p, 4));
+                        else this.messageLog.Add(currTime + " Sent game creation request: userid = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " + 
+                            PacketUtil.DecodePacketString(p, 4));
+                        break;
+                    }
+                case Headers.SERVER_CREATE_GAME:
+                    {
+                        if (isReceived) this.messageLog.Add(currTime + " Received server game creation request: " +
+                            "gameid = " + PacketUtil.DecodePacketInt(p, 0) + 
+                            "userid = " + PacketUtil.DecodePacketInt(p, 4) + 
+                            ", gamename = " + PacketUtil.DecodePacketString(p, 8));
+                        else this.messageLog.Add(currTime + " Sent server game creation request: " +
+                            "gameid = " + PacketUtil.DecodePacketInt(p, 0) +
+                            "userid = " + PacketUtil.DecodePacketInt(p, 4) +
+                            ", gamename = " + PacketUtil.DecodePacketString(p, 8));
+                        break;
+                    }
+                case Headers.GAME_ID:
+                    {
+                        if (isReceived) this.messageLog.Add(currTime + " Received a game ID: " + 
+                            PacketUtil.DecodePacketInt(p, 0));
+                        else this.messageLog.Add(currTime + " Sent a game ID to use: " +
+                           PacketUtil.DecodePacketInt(p, 0));
+                        break;
+                    }
+                case Headers.GAME_MAP_CHANGED:
+                    {
+                        if (isReceived) this.messageLog.Add(currTime + " Received game map of game id = " +
+                            PacketUtil.DecodePacketInt(p, 0) + " has changed to -> " +
+                            PacketUtil.DecodePacketString(p, 4));
+                        else this.messageLog.Add(currTime + " Sent that game map of game id = " +
+                           PacketUtil.DecodePacketInt(p, 0) + " has changed to -> " +
+                           PacketUtil.DecodePacketString(p, 4));
+                        break;
+                    }
+
+                    /*
+                     * 
+                        if (isReceived) this.messageLog.Add(currTime + " ");
+                        else this.messageLog.Add(currTime + " ");
+                     *
+                     */ 
                 default:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " " + remoteHostIP + " sent an unknown request (" + p.GetHeader() + ")");
-                        else this.messageLog.Add(currTime + " Sent unknown header to " + remoteHostIP + " (" + p.GetHeader() + ")");
+                        if (isReceived) this.messageLog.Add(currTime + " Received an unknown request (" + p.GetHeader() + ") "
+                            + "(or have you forgotten to add the header to the log?)");
+                        else this.messageLog.Add(currTime + " Sent unknown request (" + p.GetHeader() + ") "
+                            + "(or have you forgotten to add the header to the log?)");
                         break;
                     }
             }

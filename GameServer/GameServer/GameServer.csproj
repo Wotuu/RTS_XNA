@@ -52,6 +52,7 @@
     <Compile Include="ChatServer\Channels\Channel.cs" />
     <Compile Include="ChatServer\Channels\ChannelManager.cs" />
     <Compile Include="ChatServer\ChatClientListener.cs" />
+    <Compile Include="ChatServer\Games\MultiplayerGameManager.cs" />
     <Compile Include="GameServer\GameServerManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,8 +63,8 @@
       <DependentUpon>ServerUI.cs</DependentUpon>
     </Compile>
     <Compile Include="ChatServer\ChatServerManager.cs" />
-    <Compile Include="Users\User.cs" />
-    <Compile Include="Users\UserManager.cs" />
+    <Compile Include="Users\ServerUser.cs" />
+    <Compile Include="Users\ServerUserManager.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

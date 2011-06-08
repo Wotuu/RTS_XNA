@@ -9,6 +9,7 @@ using XNAInterfaceComponents.ChildComponents;
 using PathfindingTest.Multiplayer.SocketConnection;
 using XNAInterfaceComponents.ParentComponents;
 using SocketLibrary.Packets;
+using SocketLibrary.Users;
 
 namespace PathfindingTest.UI.Menus.Multiplayer
 {
@@ -16,6 +17,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
     {
         private XNALabel connectingLbl { get; set; }
         private XNATextField usernameTF { get; set; }
+        private XNATextField ipTF { get; set; }
 
         public LoginScreen()
             : base(null, new Rectangle(
@@ -23,8 +25,19 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 Game1.GetInstance().graphics.PreferredBackBufferHeight / 2 - 200,
                 400, 400))
         {
+            XNALabel ipLbl = new XNALabel(this, new Rectangle(70, 70, 100, 30), "IP");
+            ipLbl.border = null;
+            ipLbl.textAlign = XNALabel.TextAlign.RIGHT;
+            ipLbl.font = MenuManager.BIG_TEXTFIELD_FONT;
+
+            ipTF = new XNATextField(this, new Rectangle(190, 70, 100, 35), 1);
+            ipTF.border = new Border(ipTF, 1, Color.Blue);
+            ipTF.font = MenuManager.BIG_TEXTFIELD_FONT;
+            ipTF.text = "localhost";
+
             XNALabel usernameLbl = new XNALabel(this, new Rectangle(70, 110, 100, 30), "Username");
             usernameLbl.border = null;
+            usernameLbl.textAlign = XNALabel.TextAlign.RIGHT;
             usernameLbl.font = MenuManager.BIG_TEXTFIELD_FONT;
 
             usernameTF = new XNATextField(this, new Rectangle(190, 110, 100, 35), 1);
@@ -68,6 +81,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             }
             else
             {
+                ChatServerConnectionManager.GetInstance().serverLocation = ipTF.text;
                 ChatServerConnectionManager.GetInstance().user = new User(usernameTF.text);
                 ChatServerConnectionManager.GetInstance().ConnectToServer();
             }

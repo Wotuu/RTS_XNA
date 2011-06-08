@@ -51,6 +51,7 @@ namespace GameServer.GameServer
         public void OnClientConnected(SocketClient client)
         {
             clients.AddLast(client);
+            client.SocketName = "Client nr " + clients.Count;
         }
     }
 }

@@ -2,21 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SocketLibrary.Users;
 
 namespace GameServer.Users
 {
-    public class UserManager
+    public class ServerUserManager : UserManager
     {
-        public LinkedList<User> users = new LinkedList<User>();
-
-        private static UserManager instance;
-
-        private UserManager() { }
-
-        public static UserManager GetInstance()
+        private ServerUserManager() {  }
+        
+        public static new ServerUserManager GetInstance()
         {
-            if (instance == null) instance = new UserManager();
-            return instance;
+            if (instance == null) instance = new ServerUserManager();
+            return (ServerUserManager) instance;
         }
 
         /// <summary>

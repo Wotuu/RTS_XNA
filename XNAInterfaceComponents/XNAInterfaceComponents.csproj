@@ -110,6 +110,8 @@
     <Compile Include="Interfaces\MouseOverable.cs" />
     <Compile Include="Misc\Caret.cs" />
     <Compile Include="Misc\Padding.cs" />
+    <Compile Include="ParentComponents\XNADialog.cs" />
+    <Compile Include="ParentComponents\XNAInputDialog.cs" />
     <Compile Include="ParentComponents\XNAMessageDialog.cs" />
     <Compile Include="ParentComponents\XNAPanel.cs" />
     <Compile Include="ChildComponents\XNAButton.cs" />

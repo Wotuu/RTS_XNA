@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using SocketLibrary;
+using SocketLibrary.Packets;
 
 public delegate void OnClientConnected(SocketClient client);
 
@@ -56,8 +57,8 @@ namespace SocketLibrary
                     if (onClientConnectedListeners != null)
                     {
                         SocketClient sock = new SocketClient(Connection, SocketName);
-                        onClientConnectedListeners(sock);
                         new Thread(sock.Enable).Start();
+                        onClientConnectedListeners(sock);
                     }
                 }
                 else

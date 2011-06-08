@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CQSharp - SocketLibrary")]
-[assembly: AssemblyDescription("A SocketLibrary. Full credits go to Basser.")]
+[assembly: AssemblyTitle("C# SocketLibrary")]
+[assembly: AssemblyDescription("Thanks to Basser for the initial library, heavily modified so it could actually be used by Wouter Koppenol")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("CqSharp")]
-[assembly: AssemblyProduct("SocketLibrary")]
-[assembly: AssemblyCopyright("Copyright © CqSharp 2010")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

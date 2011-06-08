@@ -10,6 +10,8 @@ using XNAInputLibrary.KeyboardInput;
 using PathfindingTest.Multiplayer.SocketConnection;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
+using XNAInterfaceComponents.ParentComponents;
+using SocketLibrary.Users;
 
 namespace PathfindingTest.UI.Menus.Multiplayer
 {
@@ -18,6 +20,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         private XNATextField messagesTextField { get; set; }
         private XNATextField messageTextField { get; set; }
         private XNATextField usersField { get; set; }
+        public XNAInputDialog gameNameInput { get; set; }
 
 
         public MultiplayerLobby()
@@ -28,6 +31,8 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         {
             XNAPanel gamesPanel = new XNAPanel(this, new Rectangle(5, 5, 590, 330));
             gamesPanel.border = new Border(gamesPanel, 1, Color.Blue);
+
+
 
             XNAPanel usersPanel = new XNAPanel(this, new Rectangle(600, 5, 195, 330));
             usersPanel.border = new Border(usersPanel, 1, Color.Blue);
@@ -55,6 +60,38 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             XNAButton disconnectButton = new XNAButton(this,
                 new Rectangle(this.bounds.Width - 105, this.bounds.Height - 45, 100, 40), "Disconnect");
             disconnectButton.onClickListeners += DisconnectBtnClicked;
+
+            XNAButton createGameButton = new XNAButton(this,
+                new Rectangle(5, this.bounds.Height - 45, 100, 40), "Create Game");
+            createGameButton.onClickListeners += CreateGameBtnClicked;
+
+        }
+
+        /// <summary>
+        /// User wants to create a game.
+        /// </summary>
+        /// <param name="source">Bla</param>
+        public void CreateGameBtnClicked(XNAButton source)
+        {
+            gameNameInput = XNAInputDialog.CreateDialog("Please enter the game name: ", XNAInputDialog.DialogType.OK_CANCEL);
+            gameNameInput.button1.onClickListeners += CreateGame;
+        }
+
+        /// <summary>
+        /// User entered a game name and pressed OK
+        /// </summary>
+        /// <param name="source">The source</param>
+        public void CreateGame(XNAButton source)
+        {
+            if (gameNameInput.textfield.text.Length < 4)
+            {
+                XNAMessageDialog.CreateDialog("Please enter a game name that is 4 characters or longer.", XNAMessageDialog.DialogType.OK);
+                return;
+            }
+            Packet p = new Packet(Headers.CLIENT_CREATE_GAME);
+            p.AddInt(ChatServerConnectionManager.GetInstance().user.id);
+            p.AddString(gameNameInput.textfield.text);
+            ChatServerConnectionManager.GetInstance().SendPacket(p);
         }
 
         /// <summary>
@@ -89,29 +126,43 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// Adds a user to the user log.
         /// </summary>
         /// <param name="user">The user to add</param>
-        public void AddUser(User user)
+        public void AddUser(User toAdd)
         {
-            String result = "(" + user.id + ") " + user.username;
-            // If it isn't the first one ..
-            if (usersField.text.Length != 0)
+            UserManager.GetInstance().users.AddLast(toAdd);
+            String result = "(" + UserManager.GetInstance().users.First.Value.id + ") " + UserManager.GetInstance().users.First.Value.username;
+            for (int i = 1; i < UserManager.GetInstance().users.Count; i++)
             {
-                if (!user.username.StartsWith("\n"))
-                {
-                    result = "\n" + "(" + user.id + ") " + user.username;
-                }
+                User user = UserManager.GetInstance().users.ElementAt(i);
+                result += "\n" + "(" + user.id + ") " + user.username;
             }
-            usersField.text += result;
+            usersField.text = result;
         }
 
         /// <summary>
         /// Removes a user from the list.
         /// </summary>
         /// <param name="user">The user to remove.</param>
-        public void RemoveUser(User user)
+        public void RemoveUser(User toRemove)
         {
-            usersField.text.Replace("\n" + "(" + user.id + ") " + user.username, "");
+            UserManager.GetInstance().users.Remove(toRemove);
+            if (UserManager.GetInstance().users.Count == 0)
+            {
+                usersField.text = "No users for some odd reason.";
+                return;
+            }
+            String result = "(" + UserManager.GetInstance().users.First.Value.id + ") " + UserManager.GetInstance().users.First.Value.username;
+            for (int i = 1; i < UserManager.GetInstance().users.Count; i++)
+            {
+                User user = UserManager.GetInstance().users.ElementAt(i);
+                result += "\n" + "(" + user.id + ") " + user.username;
+            }
+            usersField.text = result;
         }
 
+        /// <summary>
+        /// User pressed a key in the message textfield.
+        /// </summary>
+        /// <param name="e">The event</param>
         public void OnKeyPressed(KeyEvent e)
         {
             if (e.key.ToString() == "Enter")
@@ -123,10 +174,16 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 Packet packet = new Packet();
 
                 packet.SetHeader(Headers.CHAT_MESSAGE);
-                packet.AddInt(chat.user.channel);
+                packet.AddInt(chat.user.channelID);
                 packet.AddString(message);
                 chat.SendPacket(packet);
             }
+        }
+
+        public override void Unload()
+        {
+            base.Unload();
+            gameNameInput.Unload();
         }
     }
 }

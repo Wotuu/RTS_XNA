@@ -225,14 +225,14 @@ namespace XNAInterfaceComponents.ChildComponents
             if (this.isEditable)
             {
                 this.isFocussed = true;
-                Console.Out.WriteLine("TextField received focus");
+                // Console.Out.WriteLine("TextField received focus");
             }
         }
 
         public void OnFocusLost()
         {
             this.isFocussed = false;
-            Console.Out.WriteLine("TextField lost focus");
+            // Console.Out.WriteLine("TextField lost focus");
         }
 
         #region Insert & Delete character
@@ -273,7 +273,7 @@ namespace XNAInterfaceComponents.ChildComponents
 
             if (isBackspace)
             {
-                for (int i = 0; i < index - 1; i++)
+                for (int i = 0; i < index - 1 && i < array.Length; i++)
                 {
                     newString += "" + array[i];
                 }
@@ -583,13 +583,13 @@ namespace XNAInterfaceComponents.ChildComponents
                         else break;
                     }
                 }
-                Console.Out.WriteLine(currentIndex);
+                // Console.Out.WriteLine(currentIndex);
                 this.caret.index = currentIndex;
                 this.caret.row = (int)Math.Min(
                     ((e.location.Y - drawLocation.Y) / this.font.MeasureString("I").Y),
                     this.text.Split(new char[] { '\n' }).Length - 1);
-                Console.Out.WriteLine(((e.location.Y - drawLocation.Y) + " / " + this.font.MeasureString("I").Y));
-                Console.Out.WriteLine("New row: " + this.caret.row);
+                // Console.Out.WriteLine(((e.location.Y - drawLocation.Y) + " / " + this.font.MeasureString("I").Y));
+                // Console.Out.WriteLine("New row: " + this.caret.row);
             }
 
             // previousMouseEvent = e;

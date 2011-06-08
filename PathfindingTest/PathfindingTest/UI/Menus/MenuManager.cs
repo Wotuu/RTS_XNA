@@ -26,6 +26,7 @@ namespace PathfindingTest.UI.Menus
 
             MultiplayerLogin,
             MultiplayerLobby,
+            GameLobby,
 
 
             NoMenu
@@ -62,6 +63,10 @@ namespace PathfindingTest.UI.Menus
             else if (menu == Menu.MultiplayerLobby)
             {
                 this.addedComponents.AddLast(new MultiplayerLobby());
+            }
+            else if (menu == Menu.GameLobby)
+            {
+                this.addedComponents.AddLast(new GameLobby());
             }
             else if (menu == Menu.NoMenu)
             {
