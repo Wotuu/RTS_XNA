@@ -89,23 +89,71 @@ namespace PathfindingTest.UI
             {
                 HUDObject resourceObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDResources"), HUDObject.Type.Resources, startX, startY, color);
                 objects.AddLast(resourceObject);
-                startX += 38;
+                startY = SetStartY(startX, startY);
+                startX = SetStartX(startX);
+
                 HUDObject barracksObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDBarracks"), HUDObject.Type.Barracks, startX, startY, color);
                 objects.AddLast(barracksObject);
-                startX += 38;
+                startY = SetStartY(startX, startY);
+                startX = SetStartX(startX);
+
                 HUDObject factoryObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFactory"), HUDObject.Type.Factory, startX, startY, color);
                 objects.AddLast(factoryObject);
-                startX += 38;
+                startY = SetStartY(startX, startY);
+                startX = SetStartX(startX);
+
                 HUDObject fortressObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFortress"), HUDObject.Type.Fortress, startX, startY, color);
                 objects.AddLast(fortressObject);
-                startX += 38;
+                startY = SetStartY(startX, startY);
+                startX = SetStartX(startX);
+            }
+            if (loadForBarracks)
+            {
+                HUDObject meleeObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDMelee"), HUDObject.Type.Melee, startX, startY, color);
+                objects.AddLast(meleeObject);
+                startY = SetStartY(startX, startY);
+                startX = SetStartX(startX);
+
+                HUDObject rangedObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDRanged"), HUDObject.Type.Ranged, startX, startY, color);
+                objects.AddLast(rangedObject);
+                startY = SetStartY(startX, startY);
+                startX = SetStartX(startX);
             }
             if (loadForFortress)
             {
                 HUDObject engineerObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDEngineer"), HUDObject.Type.Engineer, startX, startY, color);
                 objects.AddLast(engineerObject);
-                startX += 38;
+                startY = SetStartY(startX, startY);
+                startX = SetStartX(startX);
             }
+        }
+
+        public float SetStartY(float startX, float startY)
+        {
+            float newStartY = startY;
+
+            if (startX == 658)
+            {
+                newStartY = 726;
+            }
+
+            return newStartY;
+        }
+
+        public float SetStartX(float startX)
+        {
+            float newStartX = startX;
+
+            if (newStartX == 658)
+            {
+                newStartX = 278;
+            }
+            else
+            {
+                newStartX += 38;
+            }
+
+            return newStartX;
         }
 
         /// <summary>
@@ -164,9 +212,23 @@ namespace PathfindingTest.UI
                                 break;
 
                             case HUDObject.Type.Engineer:
-                                foreach (Building building in player.buildingSelection.buildings)
+                                foreach (Fortress building in player.buildingSelection.buildings)
                                 {
                                     building.CreateUnit(Unit.Type.Engineer);
+                                }
+                                break;
+
+                            case HUDObject.Type.Ranged:
+                                foreach (Barracks building in player.buildingSelection.buildings)
+                                {
+                                    building.CreateUnit(Unit.Type.Ranged);
+                                }
+                                break;
+
+                            case HUDObject.Type.Melee:
+                                foreach (Barracks building in player.buildingSelection.buildings)
+                                {
+                                    building.CreateUnit(Unit.Type.Melee);
                                 }
                                 break;
 

@@ -58,7 +58,8 @@ namespace PathfindingTest.Units
             Melee,
             HeavyMelee,
             Fast,
-            Ranged
+            Ranged,
+            HeavyRanged
         }
 
         public enum State
@@ -339,6 +340,8 @@ namespace PathfindingTest.Units
 
             this.currentHealth = 100;
             this.maxHealth = 100;
+
+            this.state = State.Finished;
         }
 
         internal void DrawHealthBar(SpriteBatch sb)

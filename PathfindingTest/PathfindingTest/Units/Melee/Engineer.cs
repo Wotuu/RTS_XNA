@@ -35,6 +35,9 @@ namespace PathfindingTest.Units
             this.collisionRadiusTexture = Game1.GetInstance().Content.Load<Texture2D>("Misc/patternPreview");
 
             this.collisionRadius = texture.Width / 2;
+
+            this.productionDuration = 5;
+            this.productionProgress = 0;
         }
 
         /// <summary>
@@ -44,7 +47,10 @@ namespace PathfindingTest.Units
         /// <param name="ms"></param>
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            UpdateMovement();
+            if (this.state == State.Finished)
+            {
+                UpdateMovement();
+            }
         }
 
         /// <summary>
@@ -53,14 +59,17 @@ namespace PathfindingTest.Units
         /// <param name="sb"></param>
         internal override void Draw(SpriteBatch sb)
         {
-            //sb.Draw(this.collisionRadiusTexture,
-            //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
-            //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
-            sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-
-            if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+            if (this.state == State.Finished)
             {
-                this.DrawHealthBar(sb);
+                //sb.Draw(this.collisionRadiusTexture,
+                //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
+                //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
+                sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
+
+                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                {
+                    this.DrawHealthBar(sb);
+                }
             }
         }
 

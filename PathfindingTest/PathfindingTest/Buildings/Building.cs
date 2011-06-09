@@ -12,6 +12,7 @@ using PathfindingTest.Pathfinding;
 using PathfindingTest.Collision;
 using PathfindingTest.Units;
 using System.Diagnostics;
+using PathfindingTest.Units.Stores;
 
 namespace PathfindingTest.Buildings
 {
@@ -49,6 +50,9 @@ namespace PathfindingTest.Buildings
 
         public LinkedList<Unit> constructionQueue { get; set; }
         public Point waypoint { get; set; }
+
+        public UnitStore meleeStore { get; set; }
+        public UnitStore rangedStore { get; set; }
 
         public enum Type
         {
@@ -257,22 +261,55 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Engineer:
                     if (this.type == Type.Fortress)
                     {
-                        newUnit = p.meleeStore.getUnit(Unit.Type.Engineer, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }
                     break;
 
                 case Unit.Type.Melee:
+                    if (this.type == Type.Barracks)
+                    {
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 5);
+                        newUnit.state = Unit.State.Producing;
+                        productionQueue.AddLast(newUnit);
+                    }
                     break;
 
                 case Unit.Type.HeavyMelee:
+                    if (this.type == Type.Factory)
+                    {
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit.state = Unit.State.Producing;
+                        productionQueue.AddLast(newUnit);
+                    }
                     break;
 
                 case Unit.Type.Fast:
+                    if (this.type == Type.Barracks)
+                    {
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit.state = Unit.State.Producing;
+                        productionQueue.AddLast(newUnit);
+                    }
                     break;
 
                 case Unit.Type.Ranged:
+                    if (this.type == Type.Barracks)
+                    {
+                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 5);
+                        newUnit.state = Unit.State.Producing;
+                        productionQueue.AddLast(newUnit);
+                    }
+                    break;
+
+                case Unit.Type.HeavyRanged:
+                    if (this.type == Type.Factory)
+                    {
+                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit.state = Unit.State.Producing;
+                        productionQueue.AddLast(newUnit);
+                    }
                     break;
 
                 default:
@@ -325,6 +362,9 @@ namespace PathfindingTest.Buildings
             this.state = State.Preview;
             this.progressBar = new ProgressBar(this);
             this.healthBar = new HealthBar(this);
+
+            meleeStore = new MeleeStore(this.p);
+            rangedStore = new RangedStore(this.p);
 
             this.productionQueue = new LinkedList<Unit>();
         }

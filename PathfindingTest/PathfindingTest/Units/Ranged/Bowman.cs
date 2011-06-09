@@ -24,38 +24,47 @@ namespace PathfindingTest.Units
             this.type = Type.Ranged;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/bowman");
+
+            this.productionDuration = 5;
+            this.productionProgress = 0;
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            UpdateMovement();
-            AttemptReload();
-
-            // Don't do this that often, not really needed.
-            if (Game1.GetInstance().frames % 4 == 0)
+            if (this.state == State.Finished)
             {
-                // CheckCollision();
-                Swing();
-            }
+                UpdateMovement();
+                AttemptReload();
 
-            for (int i = 0; i < projectiles.Count; i++)
-            {
-                projectiles.ElementAt(i).Update(ks, ms);
+                // Don't do this that often, not really needed.
+                if (Game1.GetInstance().frames % 4 == 0)
+                {
+                    // CheckCollision();
+                    Swing();
+                }
+
+                for (int i = 0; i < projectiles.Count; i++)
+                {
+                    projectiles.ElementAt(i).Update(ks, ms);
+                }
             }
         }
 
         internal override void Draw(SpriteBatch sb)
         {
-            sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-
-            if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+            if (this.state == State.Finished)
             {
-                this.DrawHealthBar(sb);
-            }
+                sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
 
-            for (int i = 0; i < projectiles.Count; i++)
-            {
-                projectiles.ElementAt(i).Draw(sb);
+                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                {
+                    this.DrawHealthBar(sb);
+                }
+
+                for (int i = 0; i < projectiles.Count; i++)
+                {
+                    projectiles.ElementAt(i).Draw(sb);
+                }
             }
         }
 

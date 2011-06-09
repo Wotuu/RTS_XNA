@@ -21,30 +21,39 @@ namespace PathfindingTest.Units.Melee
             this.player = p;
             this.x = x;
             this.y = y;
-            this.type = Type.Ranged;
+            this.type = Type.Melee;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/melee");
+
+            this.productionDuration = 5;
+            this.productionProgress = 0;
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            UpdateMovement();
-
-            // Don't do this that often, not really needed.
-            if (Game1.GetInstance().frames % 4 == 0)
+            if (this.state == State.Finished)
             {
-                // CheckCollision();
-                Swing();
+                UpdateMovement();
+
+                // Don't do this that often, not really needed.
+                if (Game1.GetInstance().frames % 4 == 0)
+                {
+                    // CheckCollision();
+                    Swing();
+                }
             }
         }
 
         internal override void Draw(SpriteBatch sb)
         {
-            sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-
-            if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+            if (this.state == State.Finished)
             {
-                this.DrawHealthBar(sb);
+                sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
+
+                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                {
+                    this.DrawHealthBar(sb);
+                }
             }
         }
 

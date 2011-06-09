@@ -89,6 +89,9 @@ namespace PathfindingTest.Players
                     temp_units.AddLast(rangedStore.getUnit(Unit.Type.Ranged, 0, 0, 5));
                 }
             }
+
+            temp_units.AddLast(meleeStore.getUnit(Unit.Type.Engineer, 0, 0, 1));
+
             UnitSelection selection = new UnitSelection(temp_units);
 
             UnitGroupPattern pattern = new CirclePattern(location, selection, 90, 0);
