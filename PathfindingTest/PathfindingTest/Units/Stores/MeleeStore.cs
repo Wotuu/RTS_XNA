@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using PathfindingTest.Units.Stores;
 using PathfindingTest.Players;
+using PathfindingTest.Units.Melee;
 
 namespace PathfindingTest.Units
 {
@@ -15,21 +16,15 @@ namespace PathfindingTest.Units
             this.player = player;
         }
 
-        protected override Unit createUnit(String type, int x, int y)
+        protected override Unit createUnit(Unit.Type type, int x, int y, int baseDamage)
         {
-            if (type.Equals("normal"))
-            {
-                return null;
+            switch(type) {
+                case Unit.Type.Engineer:  
+                    return new Engineer(player, x, y, baseDamage);
+                case Unit.Type.Melee:
+                     return new Swordman(player, x, y, baseDamage);
+                default: Console.WriteLine("Null Returned"); return null; 
             }
-            else if (type.Equals("heavy"))
-            {
-                return null;
-            }
-            else if (type.Equals("engineer"))
-            {
-                return new Engineer(player, x, y);
-            }
-            return null;
         }
     }
 }

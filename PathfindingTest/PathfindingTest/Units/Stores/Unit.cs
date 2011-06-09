@@ -12,6 +12,7 @@ using PathfindingTest.QuadTree;
 using PathfindingTest.Combat;
 using AStarCollisionMap.Pathfinding;
 using AStarCollisionMap.Collision;
+using XNAInputHandler.MouseInput;
 
 namespace PathfindingTest.Units
 {
@@ -34,6 +35,8 @@ namespace PathfindingTest.Units
         public float currentHealth { get; set; }
         public float maxHealth { get; set; }
         private HealthBar healthBar { get; set; }
+        public LinkedList<Unit> enemiesInRange { get; set; }
+        public int baseDamage { get; set; }
 
         public State state { get; set; }
         public double productionDuration { get; set; }
@@ -44,6 +47,9 @@ namespace PathfindingTest.Units
         private Boolean hasToMove { get; set; }
         public float movementSpeed { get; set; }
         private float direction { get; set; }
+
+        public Unit unitToStalk { get; set; }
+        public float range { get; set; }
         #endregion
 
         public enum Type
@@ -128,11 +134,19 @@ namespace PathfindingTest.Units
         }
 
         /// <summary>
-        /// Updates the drawing position of this Engineer.
+        /// Updates the drawing position of this Unit.
         /// </summary>
         private void Move()
         {
             if (!hasToMove) return;
+            if (unitToStalk != null)
+            {
+                CheckForEnemiesInRange();
+                if (!enemiesInRange.Contains(unitToStalk))
+                {
+                    Point moveTo = new Point((int)unitToStalk.x, (int)unitToStalk.y);
+                }
+            }
             Point waypoint = this.waypoints.ElementAt(0);
             SetMoveToTarget(waypoint.X, waypoint.Y);
 
@@ -209,6 +223,37 @@ namespace PathfindingTest.Units
         }
 
         /// <summary>
+        /// Updates the enemiesInRange variable, to contain all the enemies within the range of this unit.
+        /// </summary>
+        public void CheckForEnemiesInRange()
+        {
+            if (enemiesInRange != null)
+            {
+                enemiesInRange.Clear();
+            }
+            else
+            {
+                enemiesInRange = new LinkedList<Unit>();
+                CheckForEnemiesInRange();
+            }
+            foreach (Player player in Game1.GetInstance().players)
+            {
+                // Don't check for units on our alliance
+                if (player.alliance.members.Contains(this.player)) continue;
+                else
+                {
+                    foreach (Unit unit in player.units)
+                    {
+                        if (Util.GetHypoteneuseLength(unit.GetLocation(), this.GetLocation()) < this.range)
+                        {
+                            enemiesInRange.AddLast(unit);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Moves to a point in a while, by placing this unit and the point in a queue. When the time is there, process the pathfind
         /// This method is preferred to MoveToNow(Point p), as it doesn't cause a performance peek, but it may take a few frames before
         /// your path is ready.
@@ -274,12 +319,13 @@ namespace PathfindingTest.Units
             // Console.Out.WriteLine("Found path in " + ((DateTime.UtcNow.Ticks - ticks) / 10000) + "ms");
         }
 
-        public Unit(Player p, int x, int y, float movementSpeed)
+        public Unit(Player p, int x, int y, float movementSpeed, float range)
         {
             this.player = p;
             this.x = x;
             this.y = y;
             this.movementSpeed = movementSpeed;
+            this.range = range;
             (this.quad = Game1.GetInstance().quadTree.GetQuadByPoint(this.GetLocation())).highlighted = true;
 
             this.color = player.color;
@@ -303,7 +349,10 @@ namespace PathfindingTest.Units
 
         void OnCollisionChangedListener.OnCollisionChanged(CollisionChangedEvent collisionEvent)
         {
-            if (waypoints.Count > 0) this.MoveToNow(this.waypoints.ElementAt(this.waypoints.Count - 1));
+            if (waypoints.Count > 0) 
+            { 
+                this.MoveToNow(this.waypoints.ElementAt(this.waypoints.Count - 1)); 
+            }
         }
 
         /// <summary>
@@ -325,6 +374,13 @@ namespace PathfindingTest.Units
             if (this.currentHealth <= 0) this.Dispose();
         }
 
+        public void Attack(Unit unitToAttack)
+        {
+            this.unitToStalk = unitToAttack;
+            Point p = new Point((int) unitToAttack.x, (int) unitToAttack.y);
+            this.MoveToQueue(p);
+        }
+
         /// <summary>
         /// Dispose of this unit.
         /// </summary>
@@ -333,5 +389,13 @@ namespace PathfindingTest.Units
             this.player.units.Remove(this);
             if (this.player.currentSelection != null) this.player.currentSelection.units.Remove(this);
         }
+
+
+        /// <summary>
+        /// This unit will attempt to fire/swing/kill/cast!
+        /// </summary>
+        public abstract void Swing();
+
+        public abstract void Swing(Unit unitToAttack);
     }
 }

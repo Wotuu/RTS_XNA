@@ -156,67 +156,64 @@ namespace PathfindingTest
             // Update input
             MouseManager.GetInstance().Update(this);
             KeyboardManager.GetInstance().Update(Keyboard.GetState());
-
-            if (sm.gameState == StateManager.State.MainMenu)
+            switch (sm.gameState)
             {
-                // Updates all interface components
-                ComponentManager.GetInstance().Update();
-            }
-            else if (sm.gameState == StateManager.State.GameInit)
-            {
+                case StateManager.State.MainMenu:
+                    // Updates all interface componentss
+                    ComponentManager.GetInstance().Update();
+                    break;
+                case StateManager.State.GameInit:
+                    break;
+                case StateManager.State.GameRunning:
+                    // TODO: Add your update logic here
 
-            }
-            else if (sm.gameState == StateManager.State.GameRunning)
-            {
-                // TODO: Add your update logic here
-
-                // Update units
-                foreach (Player p in players)
-                {
-                    p.Update(Keyboard.GetState(), Mouse.GetState());
-                }
-
-                // Update other random stuff?
-                KeyboardState keyboardState = Keyboard.GetState();
-                MouseState mouseState = Mouse.GetState();
-                if ((keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
-                    && mouseState.LeftButton == ButtonState.Pressed)
-                {
-                    PathfindingNodeManager manager = PathfindingNodeManager.GetInstance();
-                    if (manager.selectedNode != null)
+                    // Update units
+                    foreach (Player p in players)
                     {
-                        manager.selectedNode.x = mouseState.X;
-                        manager.selectedNode.y = mouseState.Y;
+                        p.Update(Keyboard.GetState(), Mouse.GetState());
                     }
-                }
 
-                /*
-                 * The NodeProcessor has a stack of Nodes. When popping a node, it calculates the connections.
-                 * This is done to save a massive lagspike when updating the collision mesh!
-                 */
-                //if (frames % 2 == 0) 
-                PathfindingNodeProcessor.GetInstance().Process();
-                PathfindingProcessor.GetInstance().Process();
+                    // Update other random stuff?
+                    KeyboardState keyboardState = Keyboard.GetState();
+                    MouseState mouseState = Mouse.GetState();
+                    if ((keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
+                        && mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        PathfindingNodeManager manager = PathfindingNodeManager.GetInstance();
+                        if (manager.selectedNode != null)
+                        {
+                            manager.selectedNode.x = mouseState.X;
+                            manager.selectedNode.y = mouseState.Y;
+                        }
+                    }
 
-                DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
-                DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
-                long timeStamp = (UtcNow - baseTime).Ticks / 10000;
-                if (timeStamp - previousFrameUpdateTime > 1000)
-                {
-                    // Console.Out.WriteLine("Updates this second: " + (frames - previousFrameUpdateFrames) + ", slowly: " + gameTime.IsRunningSlowly);
-                    previousFrameUpdateTime = timeStamp;
-                    previousFrameUpdateFrames = frames;
-                }
+                    /*
+                     * The NodeProcessor has a stack of Nodes. When popping a node, it calculates the connections.
+                     * This is done to save a massive lagspike when updating the collision mesh!
+                     */
+                    //if (frames % 2 == 0) 
+                    PathfindingNodeProcessor.GetInstance().Process();
+                    PathfindingProcessor.GetInstance().Process();
 
-                frames++;
-            }
-            else if (sm.gameState == StateManager.State.GamePaused)
-            {
+                    DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
+                    DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
+                    long timeStamp = (UtcNow - baseTime).Ticks / 10000;
+                    if (timeStamp - previousFrameUpdateTime > 1000)
+                    {
+                        // Console.Out.WriteLine("Updates this second: " + (frames - previousFrameUpdateFrames) + ", slowly: " + gameTime.IsRunningSlowly);
+                        previousFrameUpdateTime = timeStamp;
+                        previousFrameUpdateFrames = frames;
+                    }
 
-            }
-            else if (sm.gameState == StateManager.State.GameShutdown)
-            {
+                    frames++;
+                    break;
 
+                case StateManager.State.GamePaused:
+                    break;
+                case StateManager.State.GameShutdown:
+                    break;
+
+                default: break;
             }
             base.Update(gameTime);
         }
@@ -244,6 +241,7 @@ namespace PathfindingTest
             }
             else if (sm.gameState == StateManager.State.GameRunning)
             {
+                //quadTree.Draw(spriteBatch);
                 collision.DrawMap(spriteBatch);
 
                 LinkedList<PathfindingNode> list = PathfindingNodeManager.GetInstance().nodeList;
@@ -265,9 +263,6 @@ namespace PathfindingTest
             {
 
             }
-
-            // quadTree.Draw(spriteBatch);
-
 
 
 

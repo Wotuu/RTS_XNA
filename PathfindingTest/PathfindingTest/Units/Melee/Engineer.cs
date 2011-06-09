@@ -26,17 +26,15 @@ namespace PathfindingTest.Units
         /// <param name="cm"></param>
         /// <param name="startLocation"></param>
         /// <param name="c"></param>
-        public Engineer(Player p, int x, int y) : base(p, x, y, 1f)
+        public Engineer(Player p, int x, int y, int baseDamage)
+            : base(p, x, y, 1f, 1f)
         {
+            this.baseDamage = baseDamage;
             this.type = Type.Engineer;
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/Engineer");
             this.collisionRadiusTexture = Game1.GetInstance().Content.Load<Texture2D>("Misc/patternPreview");
 
             this.collisionRadius = texture.Width / 2;
-
-            this.productionDuration = 3;
-            this.productionProgress = 0;
-            this.state = State.Finished;
         }
 
         /// <summary>
@@ -46,10 +44,7 @@ namespace PathfindingTest.Units
         /// <param name="ms"></param>
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            if (state != State.Producing)
-            {
-                UpdateMovement();
-            }
+            UpdateMovement();
         }
 
         /// <summary>
@@ -58,17 +53,14 @@ namespace PathfindingTest.Units
         /// <param name="sb"></param>
         internal override void Draw(SpriteBatch sb)
         {
-            if (state != State.Producing)
-            {
-                //sb.Draw(this.collisionRadiusTexture,
-                //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
-                //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
-                sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
+            //sb.Draw(this.collisionRadiusTexture,
+            //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
+            //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
+            sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
 
-                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
-                {
-                    this.DrawHealthBar(sb);
-                }
+            if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+            {
+                this.DrawHealthBar(sb);
             }
         }
 
@@ -80,6 +72,14 @@ namespace PathfindingTest.Units
         public override void OnAggro(AggroEvent e)
         {
             // Console.Out.WriteLine("Aggroing something, *grins*");
+        }
+
+        public override void Swing()
+        {
+        }
+
+        public override void Swing(Unit unitToAttack)
+        {
         }
     }
 }

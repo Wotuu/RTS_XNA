@@ -6,21 +6,16 @@ using PathfindingTest.Players;
 
 namespace PathfindingTest.Units.Stores
 {
-    class RangedStore : UnitStore
+    class FastStore : UnitStore
     {
-        public RangedStore(Player player)
+        public FastStore(Player player)
         {
             this.player = player;
         }
 
         protected override Unit createUnit(Unit.Type type, int x, int y, int baseDamage)
         {
-            switch (type)
-            {
-                case Unit.Type.Ranged:
-                    return new Bowman(player, x, y, baseDamage);
-                default: return null; 
-            }
+            return null;
         }
     }
 }

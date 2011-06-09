@@ -257,7 +257,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Engineer:
                     if (this.type == Type.Fortress)
                     {
-                        newUnit = new Engineer(this.p, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
+                        newUnit = p.meleeStore.getUnit(Unit.Type.Engineer, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }

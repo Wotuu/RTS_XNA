@@ -23,11 +23,11 @@ namespace PathfindingTest.Units.Stores
             this.player = p;
         }
 
-        public Unit getUnit(String type, int x, int y)
+        public Unit getUnit(Unit.Type type, int x, int y, int baseDamage)
         {
-            return createUnit(type, x, y);
+            return createUnit(type, x, y, baseDamage);
         }
 
-        protected abstract Unit createUnit(String type, int x, int y);
+        protected abstract Unit createUnit(Unit.Type type, int x, int y, int baseDamage);
     }
 }

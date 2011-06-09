@@ -11,16 +11,13 @@ using PathfindingTest.Combat;
 
 namespace PathfindingTest.Units.Projectiles
 {
-    public abstract class Projectile
+    public abstract class Projectile : DamageSource
     {
         private float startX { get; set; }
         private float startY { get; set; }
         public float x { get; set; }
         public float y { get; set; }
         public Texture2D texture { get; set; }
-
-        public DamageEvent.DamageType type { get; set; }
-        public float baseDamage { get; set; }
 
         private Boolean hasToMove { get; set; }
         public float movementSpeed { get; set; }
@@ -30,7 +27,6 @@ namespace PathfindingTest.Units.Projectiles
         protected Point waypoint { get; set; }
 
         private CombatUnit parent { get; set; }
-        private Unit target { get; set; }
 
 
         public Projectile(CombatUnit parent, Unit target, DamageEvent.DamageType type, float movementSpeed, int maxRange, int baseDamage)
@@ -101,25 +97,44 @@ namespace PathfindingTest.Units.Projectiles
             if (!hasToMove) return;
             // lkllllllllthis.SetMoveToTarget((int)this.target.x, (int)this.target.y);
 
+            float xSpeedDirection = movementSpeed * (float)Math.Sin(direction);
+            float ySpeedDirection = movementSpeed * (float)Math.Cos(direction);
+
             if (x < waypoint.X && y < waypoint.Y)
             {
-                x += movementSpeed * (float)Math.Sin(direction);
-                y += movementSpeed * (float)Math.Cos(direction);
+                x += xSpeedDirection;
+                y += ySpeedDirection;
             }
             else if (x < waypoint.X && y > waypoint.Y)
             {
-                x += movementSpeed * (float)Math.Sin(direction);
-                y -= movementSpeed * (float)Math.Cos(direction);
+                x += xSpeedDirection;
+                y -= ySpeedDirection;
+            }
+            else if (x < waypoint.X && y == waypoint.Y)
+            {
+                x += xSpeedDirection;
             }
             else if (x > waypoint.X && y < waypoint.Y)
             {
-                x -= movementSpeed * (float)Math.Sin(direction);
-                y += movementSpeed * (float)Math.Cos(direction);
+                x -= xSpeedDirection;
+                y += ySpeedDirection;
             }
             else if (x > waypoint.X && y > waypoint.Y)
             {
-                x -= movementSpeed * (float)Math.Sin(direction);
-                y -= movementSpeed * (float)Math.Cos(direction);
+                x -= xSpeedDirection;
+                y -= ySpeedDirection;
+            }
+            else if (x > waypoint.X && y == waypoint.Y)
+            {
+                x -= xSpeedDirection;
+            }
+            else if (x == waypoint.X && y < waypoint.Y)
+            {
+                y += ySpeedDirection;
+            }
+            else if (x == waypoint.X && y > waypoint.Y)
+            {
+                y -= ySpeedDirection;
             }
 
 

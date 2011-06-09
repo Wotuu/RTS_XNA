@@ -41,8 +41,9 @@ namespace PathfindingTest.Players
 
         private int lastBtn1ClickFrames { get; set; }
 
-        private UnitStore meleeStore;
-        private UnitStore rangedStore;
+        public UnitStore meleeStore;
+        public UnitStore rangedStore;
+        public UnitStore fastStore;
 
         /// <summary>
         /// Player constructor.
@@ -63,6 +64,7 @@ namespace PathfindingTest.Players
 
             meleeStore = new MeleeStore(this);
             rangedStore = new RangedStore(this);
+            fastStore = new FastStore(this);
 
             MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += ((MouseClickListener)this).OnMouseRelease;
@@ -77,12 +79,14 @@ namespace PathfindingTest.Players
         public void SpawnStartUnits(Point location)
         {
             LinkedList<Unit> temp_units = new LinkedList<Unit>();
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < 15; i++)
             {
-                if (i % 2 == 0) { temp_units.AddLast(meleeStore.getUnit("engineer", 0, 0)); }
-                else
+                if (i % 2 == 0)
                 {
-                    temp_units.AddLast(rangedStore.getUnit("bowman", 0, 0));
+                    temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, 0, 0, 5));
+                } else
+                {
+                    temp_units.AddLast(rangedStore.getUnit(Unit.Type.Ranged, 0, 0, 5));
                 }
             }
             UnitSelection selection = new UnitSelection(temp_units);
@@ -104,6 +108,7 @@ namespace PathfindingTest.Players
 
             foreach (Unit unit in this.units)
             {
+                Console.WriteLine("Unit added");
                 if (unit.selected) selection.units.AddLast(unit);
             }
 
@@ -234,10 +239,11 @@ namespace PathfindingTest.Players
         }
 
         /// <summary>
-        /// Whether the mouse is over a unit or not.
+        /// Whether the mouse is over a unit or not
+        /// if it is, it'll return it. =D
         /// </summary>
         /// <returns>The unit, or null if there was no unit!</returns>
-        public Unit IsMouseOverFriendlyUnit()
+        public Unit getMouseOverUnit(LinkedList<Unit> units)
         {
             foreach (Unit u in units)
             {
@@ -307,12 +313,29 @@ namespace PathfindingTest.Players
         public void OnMouseClick(MouseEvent m)
         {
             // Bots dont use the mouse, or shouldn't
-            if (Game1.CURRENT_PLAYER != this) return;
+            if (Game1.CURRENT_PLAYER != this)
+            {
+                return;
+            }
+
+            if ((m.button == MouseEvent.MOUSE_BUTTON_3))
+            {
+                if (IsPreviewingBuilding())
+                {
+                    this.RemovePreviewBuildings();
+                }
+                else
+                {
+                    previewPatternClick = m.location;
+                }
+            }
+
+
             if (!hud.DefineRectangle().Contains(new Rectangle(m.location.X, m.location.Y, 1, 1)))
             {
                 if (m.button == MouseEvent.MOUSE_BUTTON_1)
                 {
-                    Unit mouseOverUnit = this.IsMouseOverFriendlyUnit();
+                    Unit mouseOverUnit = this.getMouseOverUnit(this.units);
                     if (mouseOverUnit == null)
                     {
                         if (this.currentSelection != null && this.currentSelection.units.Count != 0 &&
@@ -381,22 +404,12 @@ namespace PathfindingTest.Players
                     }
                 }
             }
-            if (m.button == MouseEvent.MOUSE_BUTTON_3)
-            {
-                if (IsPreviewingBuilding())
-                {
-                    this.RemovePreviewBuildings();
-                }
-                else
-                {
-                    previewPatternClick = m.location;
-                }
-            }
 
             if (m.button == MouseEvent.MOUSE_BUTTON_1)
             {
                 lastBtn1ClickFrames = Game1.GetInstance().frames;
             }
+
         }
 
         public void OnMouseRelease(MouseEvent m)
@@ -415,17 +428,45 @@ namespace PathfindingTest.Players
                 }
             }
             selectBox = null;
-
-            if (m.button == MouseEvent.MOUSE_BUTTON_3 && this.currentSelection != null)
+            ///unitz
+            if (this.currentSelection != null && this.currentSelection.units.Count != 0
+                && (m.button == MouseEvent.MOUSE_BUTTON_3))
             {
-                if (previewPattern != null)
+                foreach (Player player in Game1.GetInstance().players)
                 {
-                    this.currentSelection.MoveTo(previewPattern);
+                    if (player.alliance.members.Contains(this))
+                    {
+                        Unit selectedFriendly = getMouseOverUnit(player.units);
+                        if (selectedFriendly != null)
+                        {
+                            Console.WriteLine("PROTECT");
+                            //@todo start protect.
+                        }
+                    }
+                    else
+                    {
+                        Unit selectedEnemy = getMouseOverUnit(player.units);
+                        if (selectedEnemy != null)
+                        {
+                            foreach (Unit unit in currentSelection.units)
+                            {
+                                unit.Attack(selectedEnemy);
+                            }
+                        }
+                        else
+                        {
+                            if (previewPattern != null)
+                            {
+                                this.currentSelection.MoveTo(previewPattern);
+                            }
+                            // If we're suppose to move in the first place
+                            else this.currentSelection.MoveTo(GetNewPreviewPattern(m.location, 0));
+                        }
+                        previewPattern = null;
+
+                    }
                 }
-                // If we're suppose to move in the first place
-                else this.currentSelection.MoveTo(GetNewPreviewPattern(m.location, 0));
             }
-            previewPattern = null;
         }
 
         public void OnMouseMotion(MouseEvent m)
