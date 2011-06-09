@@ -35,7 +35,7 @@ namespace SocketLibrary
         /// </summary>
         public void Enable()
         {
-            if( this.packetProcessor == null ) packetProcessor = new PacketProcessor();
+            if (this.packetProcessor == null) packetProcessor = new PacketProcessor();
             packetProcessor.onProcessPacket += this.OnProcessPacket;
             packetProcessor.StartProcessing();
 
@@ -244,18 +244,18 @@ namespace SocketLibrary
                 case Headers.CLIENT_CREATE_GAME:
                     {
                         if (isReceived) this.messageLog.Add(currTime + " Received game creation request: userid = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " + 
+                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " +
                             PacketUtil.DecodePacketString(p, 4));
                         else this.messageLog.Add(currTime + " Sent game creation request: userid = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " + 
+                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " +
                             PacketUtil.DecodePacketString(p, 4));
                         break;
                     }
                 case Headers.SERVER_CREATE_GAME:
                     {
                         if (isReceived) this.messageLog.Add(currTime + " Received server game creation request: " +
-                            "gameid = " + PacketUtil.DecodePacketInt(p, 0) + 
-                            "userid = " + PacketUtil.DecodePacketInt(p, 4) + 
+                            "gameid = " + PacketUtil.DecodePacketInt(p, 0) +
+                            "userid = " + PacketUtil.DecodePacketInt(p, 4) +
                             ", gamename = " + PacketUtil.DecodePacketString(p, 8));
                         else this.messageLog.Add(currTime + " Sent server game creation request: " +
                             "gameid = " + PacketUtil.DecodePacketInt(p, 0) +
@@ -265,7 +265,7 @@ namespace SocketLibrary
                     }
                 case Headers.GAME_ID:
                     {
-                        if (isReceived) this.messageLog.Add(currTime + " Received a game ID: " + 
+                        if (isReceived) this.messageLog.Add(currTime + " Received a game ID: " +
                             PacketUtil.DecodePacketInt(p, 0));
                         else this.messageLog.Add(currTime + " Sent a game ID to use: " +
                            PacketUtil.DecodePacketInt(p, 0));
@@ -281,13 +281,26 @@ namespace SocketLibrary
                            PacketUtil.DecodePacketString(p, 4));
                         break;
                     }
-
-                    /*
-                     * 
-                        if (isReceived) this.messageLog.Add(currTime + " ");
-                        else this.messageLog.Add(currTime + " ");
-                     *
-                     */ 
+                case Headers.CLIENT_DESTROY_GAME:
+                    {
+                        if (isReceived) this.messageLog.Add(currTime + " Received destroy game request by client!");
+                        else this.messageLog.Add(currTime + " Sent destroy game request.");
+                        break;
+                    }
+                case Headers.SERVER_DESTROY_GAME:
+                    {
+                        if (isReceived) this.messageLog.Add(currTime + " Received destroy game request of game " +
+                           PacketUtil.DecodePacketInt(p, 0));
+                        else this.messageLog.Add(currTime + " Sent destroy game request of game " +
+                           PacketUtil.DecodePacketInt(p, 0) + " to all clients.");
+                        break;
+                    }
+                /*
+                 * 
+                    if (isReceived) this.messageLog.Add(currTime + " ");
+                    else this.messageLog.Add(currTime + " ");
+                 *
+                 */
                 default:
                     {
                         if (isReceived) this.messageLog.Add(currTime + " Received an unknown request (" + p.GetHeader() + ") "

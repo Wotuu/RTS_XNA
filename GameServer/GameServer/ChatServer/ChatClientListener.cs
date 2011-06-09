@@ -34,7 +34,6 @@ namespace GameServer.ChatServer
         /// </summary>
         public void OnDisconnect()
         {
-            if (ChatServerManager.GetInstance().clients == null) Console.Out.WriteLine("Clients was null :O");
             Console.Out.Write("Client destroyed! -> " + ChatServerManager.GetInstance().clients.Count);
             if (!safeShutDown)
             {
@@ -80,6 +79,12 @@ namespace GameServer.ChatServer
 
                         break;
                     }
+                case Headers.CLIENT_CHANNEL:
+                    {
+                        int newChannel = PacketUtil.DecodePacketInt(p, 0);
+                        this.user.ChangeChannel(newChannel);
+                        break;
+                    }
                 case Headers.CHAT_MESSAGE:
                     {
                         // Get the channel
@@ -123,6 +128,22 @@ namespace GameServer.ChatServer
                 case Headers.GAME_MAP_CHANGED:
                     {
 
+                        break;
+                    }
+                case Headers.CLIENT_DESTROY_GAME:
+                    {
+                        MultiplayerGame game = MultiplayerGameManager.GetInstance().GetGameByHost(this.user);
+                        if (game == null)
+                        {
+                            Console.Error.WriteLine("Client " + user.id + " tried to destroy a game that is not his!");
+                        }
+                        else
+                        {
+                            // Tell everyone in the lobby that the game was destroyed.
+                            ChannelManager.GetInstance().GetChannelByID(1).DestroyGame(game);
+                            // Tell everyone in the game itsself that the game was destroyed.
+                            ChannelManager.GetInstance().GetChannelByID(user.channelID).DestroyGame(game);
+                        }
                         break;
                     }
                 default:

@@ -14,10 +14,9 @@ namespace SocketLibrary.Multiplayer
         public User host { get; set; }
         private LinkedList<User> users = new LinkedList<User>();
 
-        public MultiplayerGame(int gameID, User host, String gamename, String mapname)
+        public MultiplayerGame(int gameID, String gamename, String mapname)
         {
             this.id = gameID;
-            this.host = host;
             this.gamename = gamename;
             this.mapname = mapname;
         }

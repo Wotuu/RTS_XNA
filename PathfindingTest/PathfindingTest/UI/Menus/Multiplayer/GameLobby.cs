@@ -34,7 +34,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
 
             XNAPanel mapPreviewPanel = new XNAPanel(this, new Rectangle(510, 5, 790, 200));
             mapPreviewPanel.border = new Border(gameOptionsPanel, 1, Color.Blue);
- 
+
 
             XNAPanel messagesPanel = new XNAPanel(this, new Rectangle(5, 340, 790, 210));
             messagesPanel.border = new Border(messagesPanel, 1, Color.Blue);
@@ -69,12 +69,26 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         }
 
         /// <summary>
-        /// Leave the game
+        /// Leave the game.
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="source">The button source</param>
         public void LeaveGame(XNAButton source)
         {
+            // If I was the host..
+            if (this.multiplayerGame.host != null)
+            {
+                // Destroy the game
+                Packet destroyGame = new Packet(Headers.CLIENT_DESTROY_GAME);
+                ChatServerConnectionManager.GetInstance().SendPacket(destroyGame);
+            }
 
+            // Change channel
+            Packet channelPacket = new Packet(Headers.CLIENT_CHANNEL);
+            channelPacket.AddInt(1);
+            ChatServerConnectionManager.GetInstance().SendPacket(channelPacket);
+
+            // Show the menu
+            MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLobby);
         }
 
         /// <summary>

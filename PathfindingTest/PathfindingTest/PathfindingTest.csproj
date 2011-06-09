@@ -167,17 +167,6 @@
     <Compile Include="UI\Menus\Multiplayer\GameLobby.cs" />
     <Compile Include="UI\Menus\Multiplayer\MultiplayerLobby.cs" />
     <Compile Include="UI\Menus\Multiplayer\LoginScreen.cs" />
-    <Compile Include="Units\Damage\Arrow.cs" />
-    <Compile Include="Units\Damage\MeleeSwing.cs" />
-    <Compile Include="Units\Damage\Projectile.cs" />
-    <Compile Include="Units\Melee\Swordman.cs" />
-    <Compile Include="Units\Ranged\Bowman.cs" />
-    <Compile Include="Units\Stores\CombatUnit.cs" />
-    <Compile Include="Units\Melee\Engineer.cs" />
-    <Compile Include="Units\Stores\FastStore.cs" />
-    <Compile Include="Units\Stores\MeleeStore.cs" />
-    <Compile Include="Units\Stores\RangedStore.cs" />
-    <Compile Include="Units\Stores\UnitStore.cs" />
     <Compile Include="XML\XMLAble.cs" />
     <Compile Include="XML\SaveManager.cs" />
     <Compile Include="Units\Stores\Unit.cs" />

@@ -42,13 +42,13 @@ namespace GameServer.ChatServer.Channels
                 Packet p = new Packet(Headers.NEW_USER);
                 p.AddInt(user.id);
                 p.AddString(user.username);
-                toAdd.client.client.SendPacket(p);
+                toAdd.listener.client.SendPacket(p);
             }
             // User joins the channel
             users.AddLast(toAdd);
             Packet newChannelPacket = new Packet(Headers.CLIENT_CHANNEL);
             newChannelPacket.AddInt(this.id);
-            toAdd.client.client.SendPacket(newChannelPacket);
+            toAdd.listener.client.SendPacket(newChannelPacket);
 
             // Notify everyone that this user has joined (including our new user)
             for (int i = 0; i < users.Count; i++)
@@ -57,7 +57,7 @@ namespace GameServer.ChatServer.Channels
                 Packet p = new Packet(Headers.NEW_USER);
                 p.AddInt(toAdd.id);
                 p.AddString(toAdd.username);
-                user.client.client.SendPacket(p);
+                user.listener.client.SendPacket(p);
             }
         }
 
@@ -75,7 +75,7 @@ namespace GameServer.ChatServer.Channels
                 Packet p = new Packet(Headers.USER_LEFT);
                 p.AddInt(toRemove.id);
                 p.AddString(toRemove.username);
-                user.client.client.SendPacket(p);
+                user.listener.client.SendPacket(p);
             }
             Console.Out.WriteLine(", new count: " + users.Count);
         }
@@ -92,7 +92,7 @@ namespace GameServer.ChatServer.Channels
                 Packet p = new Packet(Headers.CHAT_MESSAGE);
                 p.AddInt(id);
                 p.AddString(message);
-                user.client.client.SendPacket(p);
+                user.listener.client.SendPacket(p);
             }
         }
 
@@ -114,9 +114,23 @@ namespace GameServer.ChatServer.Channels
                 ServerUser user = users.ElementAt(i);
                 Packet p = new Packet(Headers.SERVER_CREATE_GAME);
                 p.AddInt(game.id);
-                p.AddInt(game.host.id);
                 p.AddString(game.gamename);
-                user.client.client.SendPacket(p);
+                user.listener.client.SendPacket(p);
+            }
+        }
+
+        /// <summary>
+        /// Notifies all users in this channel that the game has been destroyed. Sorry :c
+        /// All users in the lobby will also be notified.
+        /// </summary>
+        /// <param name="game">The game to destroy.</param>
+        public void DestroyGame(MultiplayerGame game)
+        {
+            foreach (ServerUser user in this.users)
+            {
+                Packet p = new Packet(Headers.SERVER_DESTROY_GAME);
+                p.AddInt(game.id);
+                user.listener.client.SendPacket(p);
             }
         }
 
@@ -128,7 +142,7 @@ namespace GameServer.ChatServer.Channels
         {
             for (int i = 0; i < users.Count; i++)
             {
-                users.ElementAt(i).client.client.SendPacket(p);
+                users.ElementAt(i).listener.client.SendPacket(p);
             }
         }
     }

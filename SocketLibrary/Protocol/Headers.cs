@@ -25,10 +25,13 @@ namespace SocketLibrary.Protocol
         // Server terminated the connection
         public const byte SERVER_DISCONNECT = 0x06;
         // Client sent the server its username
+        // <byte header> <String username>
         public const byte CLIENT_USERNAME = 0x07;
         // Server sent the client a user ID
+        // <byte header> <Int32 userID>
         public const byte CLIENT_USER_ID = 0x08;
         // Server sent the client the chat channel to be in
+        // <byte header> <Int32 channelID>
         public const byte CLIENT_CHANNEL = 0x09;
         // Server sent the client a message that there is a new user
         // <byte header> <Int32 userID> <String username>
@@ -40,13 +43,19 @@ namespace SocketLibrary.Protocol
         // <byte header> <Int32 userID> <String gamename>
         public const byte CLIENT_CREATE_GAME = 0x0C;
         // Server notifies clients that there is a game created.
-        // <byte header> <Int32 gameID> <Int32 userID> <String gamename>
+        // <byte header> <Int32 gameID> <String gamename>
         public const byte SERVER_CREATE_GAME = 0x0D;
         // Server sent the user a game ID
         public const byte GAME_ID = 0x0E;
         // Client notifies the server of a map change
         // <byte header> <Int32 gameID> <String mapname>
         public const byte GAME_MAP_CHANGED = 0x0F;
+        // Client notifies the server that his game is destroyed.
+        // <byte header> (only the current user can destroy the game)
+        public const byte CLIENT_DESTROY_GAME = 0x10;
+        // Server notifies clients that this game has been destroyed.
+        // <byte header> <Int32 gameID>
+        public const byte SERVER_DESTROY_GAME = 0x11;
 
 
 

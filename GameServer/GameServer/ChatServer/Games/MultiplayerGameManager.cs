@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SocketLibrary.Multiplayer;
 using GameServer.ChatServer.Channels;
+using SocketLibrary.Users;
 
 namespace GameServer.ChatServer.Games
 {
@@ -27,6 +28,20 @@ namespace GameServer.ChatServer.Games
         public int RequestGameID()
         {
             return ChannelManager.GetInstance().RequestChannelID();
+        }
+
+        /// <summary>
+        /// Gets the game by a user 
+        /// </summary>
+        /// <param name="host">The host that has a game</param>
+        /// <returns>Null if that user does not have a game, the MultiplayerGame otherwise.</returns>
+        public MultiplayerGame GetGameByHost(User host)
+        {
+            foreach (MultiplayerGame game in this.games)
+            {
+                if (game.host == host) return game;
+            }
+            return null;
         }
     }
 }
