@@ -12,15 +12,21 @@ using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 using XNAInterfaceComponents.ParentComponents;
 using SocketLibrary.Users;
+using SocketLibrary.Multiplayer;
+using PathfindingTest.UI.Menus.Multiplayer.Panels;
 
 namespace PathfindingTest.UI.Menus.Multiplayer
 {
     public class MultiplayerLobby : XNAPanel
     {
         private XNATextField messagesTextField { get; set; }
+        private LinkedList<Message> messageLog = new LinkedList<Message>();
         private XNATextField messageTextField { get; set; }
         private XNATextField usersField { get; set; }
         public XNAInputDialog gameNameInput { get; set; }
+
+        public XNAPanel gamesPanel { get; set; }
+        private LinkedList<GameDisplayPanel> gameList = new LinkedList<GameDisplayPanel>();
 
 
         public MultiplayerLobby()
@@ -29,7 +35,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 Game1.GetInstance().graphics.PreferredBackBufferHeight / 2 - 300,
                 800, 600))
         {
-            XNAPanel gamesPanel = new XNAPanel(this, new Rectangle(5, 5, 590, 330));
+            gamesPanel = new XNAPanel(this, new Rectangle(5, 5, 590, 330));
             gamesPanel.border = new Border(gamesPanel, 1, Color.Blue);
 
 
@@ -67,16 +73,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
 
         }
 
-        /// <summary>
-        /// User wants to create a game.
-        /// </summary>
-        /// <param name="source">Bla</param>
-        public void CreateGameBtnClicked(XNAButton source)
-        {
-            gameNameInput = XNAInputDialog.CreateDialog("Please enter the game name: ", XNAInputDialog.DialogType.OK_CANCEL);
-            gameNameInput.button1.onClickListeners += CreateGame;
-        }
-
+        #region Game Management
         /// <summary>
         /// User entered a game name and pressed OK
         /// </summary>
@@ -95,6 +92,63 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         }
 
         /// <summary>
+        /// Removes a game by game ID.
+        /// </summary>
+        /// <param name="id">The game ID to remove.</param>
+        public void RemoveGameByID(int id)
+        {
+            for (int i = 0; i < this.gameList.Count; i++)
+            {
+                GameDisplayPanel panel = this.gameList.ElementAt(i);
+                if (panel.multiplayerGame.id == id) this.RemoveGame(panel.multiplayerGame); 
+            }
+        }
+
+        /// <summary>
+        /// Removes a game from the game list.
+        /// </summary>
+        /// <param name="toRemove">What game to remove!</param>
+        public void RemoveGame(MultiplayerGame toRemove)
+        {
+            // Remove the panel.
+            for (int i = 0; i < this.gameList.Count; i++)
+            {
+                GameDisplayPanel panel = this.gameList.ElementAt(i);
+                if (panel.multiplayerGame == toRemove)
+                {
+                    this.gameList.Remove(panel);
+                    panel.Unload();
+                }
+            }
+
+            // Re-arrange the panels.
+            for (int i = 0; i < this.gameList.Count; i++)
+            {
+                this.gameList.ElementAt(i).index = i;
+            }
+        }
+
+        /// <summary>
+        /// Adds a game to the lobby list
+        /// </summary>
+        /// <param name="toAdd">The game to add</param>
+        public void AddGame(MultiplayerGame toAdd)
+        {
+            this.gameList.AddLast(new GameDisplayPanel(this, this.gameList.Count, toAdd));
+        }
+        #endregion
+
+        /// <summary>
+        /// User wants to create a game.
+        /// </summary>
+        /// <param name="source">Bla</param>
+        public void CreateGameBtnClicked(XNAButton source)
+        {
+            gameNameInput = XNAInputDialog.CreateDialog("Please enter the game name: ", XNAInputDialog.DialogType.OK_CANCEL);
+            gameNameInput.button1.onClickListeners += CreateGame;
+        }
+
+        /// <summary>
         /// The user wants to disconnect.
         /// </summary>
         /// <param name="source"></param>
@@ -104,24 +158,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLogin);
         }
 
-        /// <summary>
-        /// Adds a message to the log.
-        /// </summary>
-        /// <param name="message">The message to add</param>
-        public void AddMessageToLog(String message)
-        {
-            String result = "";
-            // If it isn't the first one..
-            if (messagesTextField.text.Length != 0)
-            {
-                if (!message.StartsWith("\n"))
-                {
-                    result += "\n";
-                }
-            }
-            messagesTextField.text += result + "[" + System.DateTime.UtcNow.ToLongTimeString() + "] " + message;
-        }
-
+        #region User Management
         /// <summary>
         /// Adds a user to the user log.
         /// </summary>
@@ -158,6 +195,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             }
             usersField.text = result;
         }
+        #endregion
 
         /// <summary>
         /// User pressed a key in the message textfield.
@@ -183,7 +221,47 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         public override void Unload()
         {
             base.Unload();
-            gameNameInput.Unload();
+            if (gameNameInput != null) gameNameInput.Unload();
         }
+
+        #region Messages
+        /// <summary>
+        /// Adds a message to the log.
+        /// </summary>
+        /// <param name="message">The message to add</param>
+        public void AddMessageToLog(String message)
+        {
+            messageLog.AddLast(new Message(message));
+            String result = "";
+            // If it isn't the first one..
+            for (int i = 0; i < messageLog.Count; i++)
+            {
+                if (i != 0) result += "\n";
+                result += messageLog.ElementAt(i).GetComposedMessage();
+            }
+            messagesTextField.text = result;
+        }
+
+        public class Message
+        {
+            private String timestamp { get; set; }
+            private String message { get; set; }
+
+            public Message(String message)
+            {
+                this.message = message;
+                this.timestamp = DateTime.UtcNow.ToLongTimeString();
+            }
+
+            /// <summary>
+            /// Gets the message with a timestamp.
+            /// </summary>
+            /// <returns>The string to display</returns>
+            public String GetComposedMessage()
+            {
+                return "[" + timestamp + "] " + this.message;
+            }
+        }
+        #endregion
     }
 }

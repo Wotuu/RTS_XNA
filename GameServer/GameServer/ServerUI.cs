@@ -107,7 +107,7 @@ namespace GameServer
             {
                 foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
                 {
-                    Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
+                    // Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
                     if (e.Item.Text == clientListener.client.GetRemoteHostIP())
                     {
                         foreach (String s in clientListener.client.messageLog)

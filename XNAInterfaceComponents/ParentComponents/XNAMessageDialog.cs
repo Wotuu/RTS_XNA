@@ -29,6 +29,7 @@ namespace XNAInterfaceComponents.ParentComponents
         public enum DialogType
         {
             OK,
+            OK_CANCEL,
             YES_CANCEL,
             YES_NO,
             YES_NO_CANCEL
@@ -63,32 +64,35 @@ namespace XNAInterfaceComponents.ParentComponents
                     this.buttonWidth, 40), "OK");
                 this.button1.onClickListeners += this.Dispose;
             }
-            else if (type == DialogType.YES_CANCEL)
+            else if (type == DialogType.YES_CANCEL || type == DialogType.YES_NO
+                || type == DialogType.OK_CANCEL)
             {
-                this.button1 = new XNAButton(this, new Rectangle(
+                String[] buttonText = new String[2];
+                if (type == DialogType.YES_CANCEL)
+                {
+                    buttonText[0] = "Yes";
+                    buttonText[1] = "Cancel";
+                }
+                else if (type == DialogType.OK_CANCEL)
+                {
+                    buttonText[0] = "OK";
+                    buttonText[1] = "Cancel";
+                }
+                else if (type == DialogType.YES_NO)
+                {
+                    buttonText[0] = "Yes";
+                    buttonText[1] = "No";
+                }
+                button1 = new XNAButton(this, new Rectangle(
                     (this.bounds.Width / 2) - (this.buttonWidth) - (this.buttonSpacing / 2),
                     this.label.bounds.Bottom + 10,
-                    this.buttonWidth, 40), "Yes");
+                    this.buttonWidth, 40), buttonText[0]);
                 this.button1.onClickListeners += this.Dispose;
 
                 this.button2 = new XNAButton(this, new Rectangle(
                     (this.bounds.Width / 2) + (this.buttonSpacing / 2),
                     this.label.bounds.Bottom + 10,
-                    this.buttonWidth, 40), "Cancel");
-                this.button2.onClickListeners += this.Dispose;
-            }
-            else if (type == DialogType.YES_NO)
-            {
-                this.button1 = new XNAButton(this, new Rectangle(
-                    (this.bounds.Width / 2) - (this.buttonWidth) - (this.buttonSpacing / 2),
-                    this.label.bounds.Bottom + 10,
-                    this.buttonWidth, 40), "Yes");
-                this.button1.onClickListeners += this.Dispose;
-
-                this.button2 = new XNAButton(this, new Rectangle(
-                    (this.bounds.Width / 2) + (this.buttonSpacing / 2),
-                    this.label.bounds.Bottom + 10,
-                    this.buttonWidth, 40), "No");
+                    this.buttonWidth, 40), buttonText[1]);
                 this.button2.onClickListeners += this.Dispose;
             }
             else if (type == DialogType.YES_NO_CANCEL)
@@ -100,7 +104,7 @@ namespace XNAInterfaceComponents.ParentComponents
                 this.button1.onClickListeners += this.Dispose;
 
                 this.button2 = new XNAButton(this, new Rectangle(
-                    (this.bounds.Width / 2) - (this.buttonWidth / 2), 
+                    (this.bounds.Width / 2) - (this.buttonWidth / 2),
                     this.label.bounds.Bottom + 10,
                     this.buttonWidth, 40), "No");
                 this.button2.onClickListeners += this.Dispose;

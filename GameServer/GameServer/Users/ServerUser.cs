@@ -12,13 +12,13 @@ namespace GameServer.Users
 {
     public class ServerUser : User
     {
-        public ChatClientListener client { get; set; }
+        public ChatClientListener listener { get; set; }
 
-        public ServerUser(String username, ChatClientListener client ) : base(username)
+        public ServerUser(String username, ChatClientListener listener ) : base(username)
         {
             this.id = ServerUserManager.GetInstance().RequestUserID();
-            this.client = client;
-            this.client.client.onDisconnectListeners += this.OnDisconnect;
+            this.listener = listener;
+            this.listener.client.onDisconnectListeners += this.OnDisconnect;
 
             ServerUserManager.GetInstance().users.AddLast(this);
         }

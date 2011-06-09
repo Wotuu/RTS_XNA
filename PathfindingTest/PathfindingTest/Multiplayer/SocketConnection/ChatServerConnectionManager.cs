@@ -19,7 +19,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
     public class ChatServerConnectionManager
     {
         private static ChatServerConnectionManager instance { get; set; }
-        public SocketClient socket { get; set; }
+        public SocketClient connection { get; set; }
 
         public String serverLocation = "localhost";
         private int serverPort = 14051;
@@ -86,14 +86,14 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                 return;
             }
 
-            this.socket = new SocketClient(sock.Client, "rts_client");
-            new Thread(this.socket.Enable).Start();
+            this.connection = new SocketClient(sock.Client, "rts_client");
+            new Thread(this.connection.Enable).Start();
 
             // Give the above thread some time to start running! 
             // Else we'll get a nullpointer right here.
             Thread.Sleep(50);
-            this.socket.packetProcessor.onProcessPacket += this.DataReceived;
-            this.socket.onDisconnectListeners += this.OnDisconnect;
+            this.connection.packetProcessor.onProcessPacket += this.DataReceived;
+            this.connection.onDisconnectListeners += this.OnDisconnect;
 
             SetLoginStatus("Handshaking..");
             this.SendPacket(new Packet(Headers.HANDSHAKE_1));
@@ -105,9 +105,9 @@ namespace PathfindingTest.Multiplayer.SocketConnection
         /// </summary>
         public void DisconnectFromServer()
         {
-            if (this.socket != null && !this.socket.Receiving) return;
+            if (this.connection != null && !this.connection.Receiving) return;
             this.SendPacket(new Packet(Headers.CLIENT_DISCONNECT));
-            this.socket.Disable();
+            this.connection.Disable();
             this.safeShutdown = true;
         }
 
@@ -180,6 +180,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                         user.id = userID;
                         user.channelID = this.user.channelID;
                         ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
+
                         if (menu is MultiplayerLobby)
                         {
                             MultiplayerLobby lobby = ((MultiplayerLobby)menu);
@@ -204,20 +205,67 @@ namespace PathfindingTest.Multiplayer.SocketConnection
 
                         break;
                     }
-                    // Cliente received an ID for creating a game.
+                // Cliente received an ID for creating a game.
                 case Headers.GAME_ID:
                     {
                         int gameID = PacketUtil.DecodePacketInt(p, 0);
                         Console.Out.WriteLine("Received game ID: " + gameID);
-                        
+
                         MultiplayerLobby lobby = ((MultiplayerLobby)MenuManager.GetInstance().GetCurrentlyDisplayedMenu());
                         String gameName = lobby.gameNameInput.textfield.text;
 
                         MenuManager.GetInstance().ShowMenu(MenuManager.Menu.GameLobby);
                         GameLobby gameLobby = (GameLobby)MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
 
-                        gameLobby.multiplayerGame = new MultiplayerGame(gameID, ChatServerConnectionManager.GetInstance().user,
+                        gameLobby.multiplayerGame = new MultiplayerGame(gameID,
                             gameName, "");
+                        gameLobby.multiplayerGame.host = ChatServerConnectionManager.GetInstance().user;
+                        break;
+                    }
+                case Headers.SERVER_CREATE_GAME:
+                    {
+                        ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
+                        if (menu is GameLobby)
+                        {
+                            // Confirmation that the game was created? idk
+                        }
+                        else if (menu is MultiplayerLobby)
+                        {
+                            Console.Out.WriteLine("Host is: " + user);
+                            MultiplayerGame game = new MultiplayerGame(
+                                PacketUtil.DecodePacketInt(p, 0),
+                                PacketUtil.DecodePacketString(p, 4),
+                                "<No map selected yet>");
+                            MultiplayerLobby lobby = (MultiplayerLobby)menu;
+                            lobby.AddGame(game);
+                        }
+                        break;
+                    }
+                case Headers.SERVER_DESTROY_GAME:
+                    {
+                        int gameID = PacketUtil.DecodePacketInt(p, 0);
+
+                        ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
+                        if (menu is GameLobby)
+                        {
+                            XNAMessageDialog dialog =
+                                XNAMessageDialog.CreateDialog("The host has disconnected.", XNAMessageDialog.DialogType.OK);
+                            // When OK is pressed .. get back to the lobby.
+                            dialog.button1.onClickListeners +=
+                                delegate(XNAButton source)
+                                {
+                                    MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLobby);
+                                    Packet newChannel = new Packet(Headers.CLIENT_CHANNEL);
+                                    newChannel.AddInt(1);
+                                    this.connection.SendPacket(newChannel);
+                                };
+
+                        }
+                        else if (menu is MultiplayerLobby)
+                        {
+                            MultiplayerLobby lobby = (MultiplayerLobby)menu;
+                            lobby.RemoveGameByID(gameID);
+                        }
                         break;
                     }
                 default:
@@ -249,7 +297,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                 Console.Error.WriteLine("Cannot send a packet with length = 0");
                 return false;
             }
-            this.socket.SendPacket(packet);
+            this.connection.SendPacket(packet);
             return true;
         }
     }
