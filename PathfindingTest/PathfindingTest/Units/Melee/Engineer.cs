@@ -12,12 +12,15 @@ using PathfindingTest.Players;
 using PathfindingTest.UI;
 using PathfindingTest.Pathfinding;
 using PathfindingTest.Combat;
+using PathfindingTest.Buildings;
 
 namespace PathfindingTest.Units
 {
     public class Engineer : Unit
     {
         private Texture2D collisionRadiusTexture { get; set; }
+
+        public Building constructing { get; set; }
 
         /// <summary>
         /// Engineer Constructor.
@@ -89,6 +92,33 @@ namespace PathfindingTest.Units
 
         public override void Swing(Unit unitToAttack)
         {
+        }
+
+        public void Repair(Building b)
+        {
+            Point p = new Point((int)(b.x + (b.texture.Width / 2)), (int)(b.y + (b.texture.Height / 2)));
+
+            // Add a point that is on the circle near the building, not inside the building!
+            Point targetPoint = new Point(0, 0);
+            if (this.waypoints.Count == 0) targetPoint = new Point((int)this.x, (int)this.y);
+            else targetPoint = this.waypoints.ElementAt(this.waypoints.Count - 1);
+            // Move to the point around the circle of the building, but increase the radius a bit
+            // so we're not standing on the exact top of the building
+            this.MoveToNow(
+                Util.GetPointOnCircle(p, b.GetCircleRadius() + this.texture.Width / 2,
+                Util.GetHypoteneuseAngleDegrees(p, targetPoint)));
+
+            b.constructedBy = this;
+            this.constructing = b;
+
+            if (b.state == Building.State.Interrupted)
+            {
+                b.state = Building.State.Constructing;
+            }
+            else if (b.state == Building.State.Finished || b.state == Building.State.Producing)
+            {
+                b.state = Building.State.Repairing;
+            }
         }
     }
 }

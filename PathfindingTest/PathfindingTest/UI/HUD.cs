@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
-using PathfindingTest;
-using System.Diagnostics;
 using PathfindingTest.Buildings;
 using PathfindingTest.Players;
 using PathfindingTest.Units;
 using PathfindingTest.Pathfinding;
 using XNAInputHandler.MouseInput;
+using PathfindingTest.UI.Commands;
 
 namespace PathfindingTest.UI
 {
@@ -40,6 +37,12 @@ namespace PathfindingTest.UI
         public Boolean draw { get; set; }
 
         public LinkedList<HUDObject> objects { get; set; }
+        public LinkedList<HUDCommandObject> commandObjects { get; set; }
+
+        private float startObjectX = 278;
+        private float startObjectY = 688;
+        private float startCommandX = 673;
+        private float startCommandY = 688;
 
         /// <summary>
         /// Sets the textures to use for the HUD.
@@ -65,8 +68,21 @@ namespace PathfindingTest.UI
 
             objects = new LinkedList<HUDObject>();
 
+            LoadCommands();
+
             MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += ((MouseClickListener)this).OnMouseRelease;
+        }
+
+        public void LoadCommands()
+        {
+            commandObjects = new LinkedList<HUDCommandObject>();
+            startCommandX = 673;
+            startCommandY = 688;
+
+            HUDCommandObject repairCommand = new HUDCommandObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/Commands/HUDRepair"), HUDCommandObject.Type.Repair, startCommandX, startCommandY, new Color(255, 187, 0, 255));
+            commandObjects.AddLast(repairCommand);
+            IncrementStartCommandXY(startCommandX);
         }
 
         /// <summary>
@@ -80,80 +96,92 @@ namespace PathfindingTest.UI
             draw = CheckDraw();
             CountUnits();
 
-            float startX = 278;
-            float startY = 688;
-
             objects = new LinkedList<HUDObject>();
+
+            foreach (HUDCommandObject co in commandObjects)
+            {
+                co.disabled = true;
+            }
 
             if (loadForEngineer)
             {
-                HUDObject resourceObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDResources"), HUDObject.Type.Resources, startX, startY, color);
+                HUDObject resourceObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDResources"), HUDObject.Type.Resources, startObjectX, startObjectY, color);
                 objects.AddLast(resourceObject);
-                startY = SetStartY(startX, startY);
-                startX = SetStartX(startX);
+                IncrementStartObjectXY(startObjectX);
 
-                HUDObject barracksObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDBarracks"), HUDObject.Type.Barracks, startX, startY, color);
+                HUDObject barracksObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDBarracks"), HUDObject.Type.Barracks, startObjectX, startObjectY, color);
                 objects.AddLast(barracksObject);
-                startY = SetStartY(startX, startY);
-                startX = SetStartX(startX);
+                IncrementStartObjectXY(startObjectX);
 
-                HUDObject factoryObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFactory"), HUDObject.Type.Factory, startX, startY, color);
+                HUDObject factoryObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFactory"), HUDObject.Type.Factory, startObjectX, startObjectY, color);
                 objects.AddLast(factoryObject);
-                startY = SetStartY(startX, startY);
-                startX = SetStartX(startX);
+                IncrementStartObjectXY(startObjectX);
 
-                HUDObject fortressObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFortress"), HUDObject.Type.Fortress, startX, startY, color);
+                HUDObject fortressObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDFortress"), HUDObject.Type.Fortress, startObjectX, startObjectY, color);
                 objects.AddLast(fortressObject);
-                startY = SetStartY(startX, startY);
-                startX = SetStartX(startX);
+                IncrementStartObjectXY(startObjectX);
+
+                foreach (HUDCommandObject co in commandObjects)
+                {
+                    if (co.type == HUDCommandObject.Type.Repair)
+                    {
+                        co.disabled = false;
+                    }
+                }
             }
             if (loadForBarracks)
             {
-                HUDObject meleeObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDMelee"), HUDObject.Type.Melee, startX, startY, color);
+                HUDObject meleeObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDMelee"), HUDObject.Type.Melee, startObjectX, startObjectY, color);
                 objects.AddLast(meleeObject);
-                startY = SetStartY(startX, startY);
-                startX = SetStartX(startX);
+                IncrementStartObjectXY(startObjectX);
 
-                HUDObject rangedObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDRanged"), HUDObject.Type.Ranged, startX, startY, color);
+                HUDObject rangedObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDRanged"), HUDObject.Type.Ranged, startObjectX, startObjectY, color);
                 objects.AddLast(rangedObject);
-                startY = SetStartY(startX, startY);
-                startX = SetStartX(startX);
+                IncrementStartObjectXY(startObjectX);
             }
             if (loadForFortress)
             {
-                HUDObject engineerObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDEngineer"), HUDObject.Type.Engineer, startX, startY, color);
+                HUDObject engineerObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDEngineer"), HUDObject.Type.Engineer, startObjectX, startObjectY, color);
                 objects.AddLast(engineerObject);
-                startY = SetStartY(startX, startY);
-                startX = SetStartX(startX);
+                IncrementStartObjectXY(startObjectX);
             }
+
+            startObjectX = 278;
+            startObjectY = 688;
         }
 
-        public float SetStartY(float startX, float startY)
+        public void IncrementStartObjectXY(float startX)
         {
-            float newStartY = startY;
+            if (startX == 658)
+            {
+                startObjectY += 38;
+            }
 
             if (startX == 658)
             {
-                newStartY = 726;
-            }
-
-            return newStartY;
-        }
-
-        public float SetStartX(float startX)
-        {
-            float newStartX = startX;
-
-            if (newStartX == 658)
-            {
-                newStartX = 278;
+                startObjectX = 278;
             }
             else
             {
-                newStartX += 38;
+                startObjectX += 38;
+            }
+        }
+
+        public void IncrementStartCommandXY(float startX)
+        {
+            if (startX == 825)
+            {
+                startCommandY += 38;
             }
 
-            return newStartX;
+            if (startX == 825)
+            {
+                startCommandX = 688;
+            }
+            else
+            {
+                startCommandX += 38;
+            }
         }
 
         /// <summary>
@@ -171,6 +199,11 @@ namespace PathfindingTest.UI
             foreach (HUDObject o in objects)
             {
                 o.Draw(sb);
+            }
+
+            foreach (HUDCommandObject co in commandObjects)
+            {
+                co.Draw(sb);
             }
         }
 
@@ -197,18 +230,22 @@ namespace PathfindingTest.UI
                         {
                             case HUDObject.Type.Resources:
                                 b = new ResourceGather(this.player, this.color);
+                                Game1.GetInstance().IsMouseVisible = false;
                                 break;
 
                             case HUDObject.Type.Barracks:
                                 b = new Barracks(this.player, this.color);
+                                Game1.GetInstance().IsMouseVisible = false;
                                 break;
 
                             case HUDObject.Type.Factory:
                                 b = new Factory(this.player, this.color);
+                                Game1.GetInstance().IsMouseVisible = false;
                                 break;
 
                             case HUDObject.Type.Fortress:
                                 b = new Fortress(this.player, this.color);
+                                Game1.GetInstance().IsMouseVisible = false;
                                 break;
 
                             case HUDObject.Type.Engineer:
@@ -229,6 +266,25 @@ namespace PathfindingTest.UI
                                 foreach (Barracks building in player.buildingSelection.buildings)
                                 {
                                     building.CreateUnit(Unit.Type.Melee);
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                foreach (HUDCommandObject co in commandObjects)
+                {
+                    if (co.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                    {
+                        switch (co.type)
+                        {
+                            case HUDCommandObject.Type.Repair:
+                                if (!co.disabled)
+                                {
+                                    player.command = new Command(Game1.GetInstance().Content.Load<Texture2D>("HUD/Commands/HUDRepair"), this.player, Command.Type.Repair, Mouse.GetState().X, Mouse.GetState().Y, new Color(224, 187, 0, 255));
                                 }
                                 break;
 
@@ -265,8 +321,7 @@ namespace PathfindingTest.UI
                                     Util.GetPointOnCircle(lastPoint, b.GetCircleRadius() + u.texture.Width / 2,
                                     Util.GetHypoteneuseAngleDegrees(lastPoint, targetPoint)));
 
-                                // Set the Engineer to link with the Building
-                                // so construction won't start without an Engineer
+                                // Set the Engineer to link with the Building so construction won't start without an Engineer
                                 // Since only one Engineer is needed, break aftwards
                                 if (temp == null)
                                 {

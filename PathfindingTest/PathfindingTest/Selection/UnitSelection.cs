@@ -7,6 +7,7 @@ using PathfindingTest.Selection.Patterns;
 using Microsoft.Xna.Framework;
 using PathfindingTest.Pathfinding;
 using PathfindingTest.UI;
+using PathfindingTest.Buildings;
 
 namespace PathfindingTest.Selection
 {
@@ -70,6 +71,28 @@ namespace PathfindingTest.Selection
             int count = 0;
             foreach (Unit unit in units)
             {
+                // This part is used for checking whether an Engineer should stop constructing or not.
+                if (unit.type == Unit.Type.Engineer)
+                {
+                    Engineer temp = (Engineer)unit;
+
+                    if (temp.constructing != null)
+                    {
+                        if (temp.constructing.state == Building.State.Constructing)
+                        {
+                            temp.constructing.state = Building.State.Interrupted;
+                        }
+                        else if (temp.constructing.state == Building.State.Repairing)
+                        {
+                            temp.constructing.state = Building.State.Finished;
+                        }
+
+                        temp.constructing.constructedBy = null;
+                        temp.constructing = null;
+                    }
+                }
+                // </check>
+
                 Point farthestPoint = GetClosestPoint(unit, points);
                 unit.MoveToQueue(farthestPoint);
                 points.Remove(farthestPoint);

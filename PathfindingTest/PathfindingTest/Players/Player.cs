@@ -15,6 +15,7 @@ using PathfindingTest.Pathfinding;
 using XNAInputHandler.MouseInput;
 using PathfindingTest.Units.Stores;
 using System.Diagnostics;
+using PathfindingTest.UI.Commands;
 
 namespace PathfindingTest.Players
 {
@@ -31,6 +32,8 @@ namespace PathfindingTest.Players
         public UnitSelection currentSelection { get; set; }
         public LinkedList<Building> buildings { get; set; }
         public BuildingSelection buildingSelection { get; set; }
+
+        public Command command { get; set; }
 
         public HUD hud { get; set; }
 
@@ -166,6 +169,11 @@ namespace PathfindingTest.Players
                 b.Update(ks, ms);
             }
 
+            if (command != null)
+            {
+                command.Update(ks, ms);
+            }
+
             // Show healthbar over units that mouse is hovering over
             Boolean selectedAUnit = false;
             foreach (Player p in Game1.GetInstance().players)
@@ -225,6 +233,11 @@ namespace PathfindingTest.Players
                 b.Draw(sb);
             }
 
+            if (command != null)
+            {
+                command.Draw(sb);
+            }
+
             hud.Draw(sb);
         }
 
@@ -274,7 +287,7 @@ namespace PathfindingTest.Players
             UnitSelection selection = new UnitSelection(new LinkedList<Unit>());
             foreach (Unit unit in units)
             {
-                if (this.selectBox.GetRectangle().Contains((int)unit.x, (int)unit.y))
+                if (unit.state != Unit.State.Producing && this.selectBox.GetRectangle().Contains((int)unit.x, (int)unit.y))
                 {
                     selection.units.AddLast(unit);
                 }
@@ -362,7 +375,7 @@ namespace PathfindingTest.Players
                             }
                             this.currentSelection = new UnitSelection(selectionUnits);
                         }
-                        else if (!mouseOverUnit.selected)
+                        else if (!mouseOverUnit.selected && mouseOverUnit.state != Unit.State.Producing)
                         {
                             LinkedList<Unit> selectionUnits = new LinkedList<Unit>();
                             selectionUnits.AddLast(mouseOverUnit);
