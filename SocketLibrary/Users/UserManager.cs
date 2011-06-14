@@ -32,5 +32,18 @@ namespace SocketLibrary.Users
             }
             return null;
         }
+
+        /// <summary>
+        /// Removes a user by ID.
+        /// </summary>
+        /// <param name="userID"></param>
+        public void RemoveUserByID(int userID)
+        {
+            for (int i = 0; i < users.Count; i++)
+            {
+                User user = users.ElementAt(i);
+                if (user.id == userID) users.Remove(user);
+            }
+        }
     }
 }

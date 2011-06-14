@@ -18,16 +18,20 @@ namespace XNAInterfaceComponents.Managers
         private LinkedList<ParentComponent> loadList = new LinkedList<ParentComponent>();
         private static ComponentManager instance = null;
 
+        public int draws { get; set; }
+
         /// <summary>
         /// Draws all panels
         /// </summary>
         /// <param name="sb">The spritebatch to draw on.</param>
         public void Draw(SpriteBatch sb)
         {
+            if (draws == 0) ComponentUtil.lineTexture = ComponentUtil.GetClearTexture2D(sb);
             foreach (ParentComponent c in componentList)
             {
                 c.Draw(sb);
             }
+            draws++;
         }
 
         /// <summary>
@@ -45,7 +49,8 @@ namespace XNAInterfaceComponents.Managers
             }
             unloadList.Clear();
 
-            if( loadList.Count > 0 ) {
+            if (loadList.Count > 0)
+            {
                 foreach (ParentComponent pc in loadList)
                 {
                     componentList.AddLast(pc);
@@ -118,7 +123,7 @@ namespace XNAInterfaceComponents.Managers
             {
                 Component mouseOver = pc.GetComponentAt(e.location);
 
-                if (previousMouseOver != null && previousMouseOver != mouseOver) FireMouseExitEvents(e);
+                if (previousMouseOver != null && previousMouseOver != mouseOver) previousMouseOver.OnMouseExit(e);//FireMouseExitEvents(e);
                 if (mouseOver != null)
                 {
                     if (!mouseOver.isMouseOver)
@@ -127,7 +132,6 @@ namespace XNAInterfaceComponents.Managers
                     }
                     previousMouseOver = mouseOver;
                 }
-
             }
         }
 

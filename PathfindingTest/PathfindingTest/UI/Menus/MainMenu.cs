@@ -9,6 +9,9 @@ using XNAInterfaceComponents.AbstractComponents;
 using Microsoft.Xna.Framework.Graphics;
 using PathfindingTest.State;
 using PathfindingTest.UI.Menus;
+using XNAInterfaceComponents.ParentComponents;
+using PathfindingTest.UI.Menus.Multiplayer.Panels;
+using SocketLibrary.Users;
 
 namespace PathfindingTest.UI
 {
@@ -18,7 +21,8 @@ namespace PathfindingTest.UI
         private int buttonHeight = 50;
         private int buttonSpacing = 40;
 
-        public MainMenu() : base(null, new Rectangle(
+        public MainMenu()
+            : base(null, new Rectangle(
                 Game1.GetInstance().graphics.PreferredBackBufferWidth / 2 - 200,
                 Game1.GetInstance().graphics.PreferredBackBufferHeight / 2 - 200,
                 400, 400))

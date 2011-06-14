@@ -57,6 +57,33 @@ namespace SocketLibrary.Protocol
         // <byte header> <Int32 gameID>
         public const byte SERVER_DESTROY_GAME = 0x11;
 
+        /// <summary>
+        /// Client asks the server if he can join this game.
+        /// <byte>header</byte>
+        /// <Int32>gameID</Int32>
+        /// <Int32>userID</Int32>
+        /// </summary>
+        public const byte CLIENT_REQUEST_JOIN = 0x12;
+        // Server asks the host if a user can join this game
+        // <byte header> <Int32>gameID</Int32> <Int32 userID>
+        public const byte SERVER_REQUEST_JOIN = 0x13;
+        
+        // Host replies that it is OK to join the server.
+        // Also, is used by the server to send the requesting
+        // user that it is OK to join.
+        // <byte header> <Int32>gameID</Int32> <Int32 userID>
+        public const byte CLIENT_OK_JOIN = 0x14;
+        // Host replies that the game is full
+        // Also, is used by the server to send the requesting
+        // user that it is not OK to join.
+        // <byte header> <Int32>gameID</Int32> <Int32 userID>
+        public const byte CLIENT_GAME_FULL = 0x15;
+
+        /// <summary>
+        /// Client notifies the server that he's left the game.
+        /// </summary>
+        public const byte CLIENT_LEFT_GAME = 0x16;
+
 
 
         // 16 - 255 Yours to take

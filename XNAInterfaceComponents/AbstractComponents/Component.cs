@@ -17,7 +17,6 @@ namespace XNAInterfaceComponents.Components
         public ParentComponent parent { get; set; }
         public Color backgroundColor { get; set; }
 
-
         public Border border { get; set; }
         protected Texture2D clearTexture { get; set; }
 
@@ -38,7 +37,7 @@ namespace XNAInterfaceComponents.Components
         /// Gets the location on the screen of this component.
         /// </summary>
         /// <returns>The location relative to the window.</returns>
-        public Rectangle GetScreenLocation()
+        public Rectangle GetScreenBounds()
         {
             if (this.parent != null)
             {

@@ -10,6 +10,8 @@ namespace XNAInterfaceComponents
     public class ComponentUtil
     {
 
+        public static Texture2D lineTexture;
+
         /// <summary>
         /// Gets the length of the hypoteneuse between two points.
         /// </summary>
@@ -67,7 +69,6 @@ namespace XNAInterfaceComponents
         /// <param name="c">The color of the line</param>
         public static void DrawLine(SpriteBatch batch, Point start, Point end, Color c, int width)
         {
-            Texture2D lineTexture = ComponentUtil.GetClearTexture2D(batch);
             if (c.A == 0) return;
             if (end.X < start.X)
             {

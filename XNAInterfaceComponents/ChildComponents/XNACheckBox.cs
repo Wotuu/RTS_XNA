@@ -51,7 +51,7 @@ namespace XNAInterfaceComponents.ChildComponents
             if (this.isMouseOver) drawColor = this.mouseOverColor;
             else drawColor = this.backgroundColor;
 
-            Rectangle drawLocation = this.GetScreenLocation();
+            Rectangle drawLocation = this.GetScreenBounds();
 
             // Draw the background
             sb.Draw(this.clearTexture, drawLocation, drawColor);
@@ -114,13 +114,13 @@ namespace XNAInterfaceComponents.ChildComponents
         public override void OnMouseEnter(MouseEvent e)
         {
             this.isMouseOver = true;
-            Console.Out.WriteLine("Mouse enter on checkbox!");
+            // Console.Out.WriteLine("Mouse enter on checkbox!");
         }
 
         public override void OnMouseExit(MouseEvent e)
         {
             this.isMouseOver = false;
-            Console.Out.WriteLine("Mouse out on checkbox!");
+            // Console.Out.WriteLine("Mouse out on checkbox!");
         }
 
         public void OnMouseClick(MouseEvent m_event)
@@ -131,7 +131,7 @@ namespace XNAInterfaceComponents.ChildComponents
                 Rectangle screenRect = new Rectangle(screenLocation.X, screenLocation.Y, this.bounds.Width, this.bounds.Height);
                 if (screenRect.Contains(m_event.location))
                 {
-                    Console.Out.WriteLine("Pressed on a checkbox!");
+                    // Console.Out.WriteLine("Pressed on a checkbox!");
                     this.selected = !this.selected;
                     if (this.onClickListeners != null) onClickListeners(this);
                 }

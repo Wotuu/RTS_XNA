@@ -39,9 +39,9 @@ namespace GameServer.Users
         /// <param name="newChannel"></param>
         public void ChangeChannel(int newChannel)
         {
-            Console.Out.WriteLine("Leaving channel " + this.channelID);
+            Console.Out.WriteLine(this + " leaving channel " + this.channelID);
             ChannelManager.GetInstance().GetChannelByID(this.channelID).UserLeft(this);
-            Console.Out.WriteLine("Joining channel channel " + newChannel);
+            Console.Out.WriteLine(this + " joining channel " + newChannel);
             ChannelManager.GetInstance().GetChannelByID(newChannel).AddUser(this);
         }
     }

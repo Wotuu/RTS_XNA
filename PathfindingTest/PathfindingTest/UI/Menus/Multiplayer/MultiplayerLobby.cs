@@ -14,6 +14,7 @@ using XNAInterfaceComponents.ParentComponents;
 using SocketLibrary.Users;
 using SocketLibrary.Multiplayer;
 using PathfindingTest.UI.Menus.Multiplayer.Panels;
+using PathfindingTest.UI.Menus.Multiplayer.Misc;
 
 namespace PathfindingTest.UI.Menus.Multiplayer
 {
@@ -75,6 +76,20 @@ namespace PathfindingTest.UI.Menus.Multiplayer
 
         #region Game Management
         /// <summary>
+        /// Gets a game by ID.
+        /// </summary>
+        /// <param name="gameID">The game ID.</param>
+        /// <returns>The game or null</returns>
+        public MultiplayerGame GetGameByID(int gameID)
+        {
+            foreach (GameDisplayPanel game in this.gameList)
+            {
+                if (game.multiplayerGame.id == gameID) return game.multiplayerGame;
+            }
+            return null;
+        }
+
+        /// <summary>
         /// User entered a game name and pressed OK
         /// </summary>
         /// <param name="source">The source</param>
@@ -100,7 +115,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             for (int i = 0; i < this.gameList.Count; i++)
             {
                 GameDisplayPanel panel = this.gameList.ElementAt(i);
-                if (panel.multiplayerGame.id == id) this.RemoveGame(panel.multiplayerGame); 
+                if (panel.multiplayerGame.id == id) this.RemoveGame(panel.multiplayerGame);
             }
         }
 
@@ -134,7 +149,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="toAdd">The game to add</param>
         public void AddGame(MultiplayerGame toAdd)
         {
-            this.gameList.AddLast(new GameDisplayPanel(this, this.gameList.Count, toAdd));
+            this.gameList.AddLast(new GameDisplayPanel(gamesPanel, this.gameList.Count, toAdd));
         }
         #endregion
 
@@ -165,7 +180,6 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="user">The user to add</param>
         public void AddUser(User toAdd)
         {
-            UserManager.GetInstance().users.AddLast(toAdd);
             String result = "(" + UserManager.GetInstance().users.First.Value.id + ") " + UserManager.GetInstance().users.First.Value.username;
             for (int i = 1; i < UserManager.GetInstance().users.Count; i++)
             {
@@ -224,7 +238,6 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             if (gameNameInput != null) gameNameInput.Unload();
         }
 
-        #region Messages
         /// <summary>
         /// Adds a message to the log.
         /// </summary>
@@ -241,27 +254,5 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             }
             messagesTextField.text = result;
         }
-
-        public class Message
-        {
-            private String timestamp { get; set; }
-            private String message { get; set; }
-
-            public Message(String message)
-            {
-                this.message = message;
-                this.timestamp = DateTime.UtcNow.ToLongTimeString();
-            }
-
-            /// <summary>
-            /// Gets the message with a timestamp.
-            /// </summary>
-            /// <returns>The string to display</returns>
-            public String GetComposedMessage()
-            {
-                return "[" + timestamp + "] " + this.message;
-            }
-        }
-        #endregion
     }
 }

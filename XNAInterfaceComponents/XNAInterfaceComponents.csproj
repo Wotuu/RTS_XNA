@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChildComponents\XNACheckBox.cs" />
+    <Compile Include="ParentComponents\XNADropdown.cs" />
     <Compile Include="ChildComponents\XNATextField.cs" />
     <Compile Include="Misc\Border.cs" />
     <Compile Include="AbstractComponents\ChildComponent.cs" />

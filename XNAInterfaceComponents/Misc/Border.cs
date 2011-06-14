@@ -24,7 +24,7 @@ namespace XNAInterfaceComponents.AbstractComponents
 
         public void Draw(SpriteBatch sb)
         {
-            ComponentUtil.DrawClearRectangle(sb, this.parent.GetScreenLocation(), this.width, this.color);
+            ComponentUtil.DrawClearRectangle(sb, this.parent.GetScreenBounds(), this.width, this.color);
         }
     }
 }

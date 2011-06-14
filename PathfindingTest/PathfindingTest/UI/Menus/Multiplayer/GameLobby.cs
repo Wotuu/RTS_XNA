@@ -12,15 +12,23 @@ using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 using PathfindingTest.Multiplayer;
 using SocketLibrary.Multiplayer;
+using PathfindingTest.UI.Menus.Multiplayer.Panels;
+using SocketLibrary.Users;
+using PathfindingTest.UI.Menus.Multiplayer.Misc;
 
 namespace PathfindingTest.UI.Menus.Multiplayer
 {
     public class GameLobby : XNAPanel
     {
 
+        private LinkedList<Message> messageLog = new LinkedList<Message>();
+
         private XNATextField messagesTextField { get; set; }
         private XNATextField messageTextField { get; set; }
         public MultiplayerGame multiplayerGame { get; set; }
+
+        private XNAPanel gameOptionsPanel { get; set; }
+        private LinkedList<UserDisplayPanel> userDisplayPanels = new LinkedList<UserDisplayPanel>();
 
         public GameLobby()
             : base(null,
@@ -29,10 +37,10 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 Game1.GetInstance().graphics.PreferredBackBufferHeight / 2 - 300,
                 800, 600))
         {
-            XNAPanel gameOptionsPanel = new XNAPanel(this, new Rectangle(5, 5, 500, 330));
+            gameOptionsPanel = new XNAPanel(this, new Rectangle(5, 5, 500, 330));
             gameOptionsPanel.border = new Border(gameOptionsPanel, 1, Color.Blue);
 
-            XNAPanel mapPreviewPanel = new XNAPanel(this, new Rectangle(510, 5, 790, 200));
+            XNAPanel mapPreviewPanel = new XNAPanel(this, new Rectangle(510, 5, 200, 200));
             mapPreviewPanel.border = new Border(gameOptionsPanel, 1, Color.Blue);
 
 
@@ -58,6 +66,79 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             leaveGameButton.onClickListeners += LeaveGame;
         }
 
+        /// <summary>
+        /// Checks whether the user exists in this lobby.
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public Boolean UserExists(int userID)
+        {
+            return UserExists(UserManager.GetInstance().GetUserByID(userID));
+        }
+
+        /// <summary>
+        /// Checks whether the user exists in this lobby.
+        /// </summary>
+        /// <param name="user">The user to check</param>
+        /// <returns></returns>
+        public Boolean UserExists(User user)
+        {
+            foreach (UserDisplayPanel p in userDisplayPanels)
+            {
+                if (p.user == user) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// When a player joined, call this one.
+        /// </summary>
+        /// <param name="user">The user that joined.</param>
+        public void UserJoined(User user)
+        {
+            // I prefer the ID function ..
+            if (!UserExists(user.id))
+            {
+                Console.Out.WriteLine(user + " has joined the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
+                userDisplayPanels.AddLast(new UserDisplayPanel(gameOptionsPanel, user, this.userDisplayPanels.Count));
+            }
+        }
+
+        /// <summary>
+        /// Call this when a player left.
+        /// </summary>
+        /// <param name="user">The user that left.</param>
+        public void UserLeft(User user)
+        {
+            Console.Out.WriteLine(user + " has left the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
+            Boolean removed = false;
+            for (int i = 0; i < userDisplayPanels.Count; i++)
+            {
+                UserDisplayPanel p = userDisplayPanels.ElementAt(i);
+                if (removed)
+                {
+                    p.UpdateBounds(i);
+                }
+                else if (p.user.id == user.id)
+                {
+                    userDisplayPanels.Remove(p);
+                    p.Unload();
+                    i--;
+                    removed = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether the game is full or not.
+        /// </summary>
+        /// <returns></returns>
+        public Boolean IsFull()
+        {
+            // TO-DO
+            return false;
+        }
+
 
         /// <summary>
         /// Pressed the start game button!
@@ -75,7 +156,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         public void LeaveGame(XNAButton source)
         {
             // If I was the host..
-            if (this.multiplayerGame.host != null)
+            if (this.multiplayerGame != null)
             {
                 // Destroy the game
                 Packet destroyGame = new Packet(Headers.CLIENT_DESTROY_GAME);
@@ -83,9 +164,8 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             }
 
             // Change channel
-            Packet channelPacket = new Packet(Headers.CLIENT_CHANNEL);
-            channelPacket.AddInt(1);
-            ChatServerConnectionManager.GetInstance().SendPacket(channelPacket);
+            Packet leftGamePacket = new Packet(Headers.CLIENT_LEFT_GAME);
+            ChatServerConnectionManager.GetInstance().SendPacket(leftGamePacket);
 
             // Show the menu
             MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLobby);
@@ -110,6 +190,23 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 packet.AddString(message);
                 chat.SendPacket(packet);
             }
+        }
+
+        /// <summary>
+        /// Adds a message to the log.
+        /// </summary>
+        /// <param name="message">The message to add</param>
+        public void AddMessageToLog(String message)
+        {
+            messageLog.AddLast(new Message(message));
+            String result = "";
+            // If it isn't the first one..
+            for (int i = 0; i < messageLog.Count; i++)
+            {
+                if (i != 0) result += "\n";
+                result += messageLog.ElementAt(i).GetComposedMessage();
+            }
+            messagesTextField.text = result;
         }
     }
 }

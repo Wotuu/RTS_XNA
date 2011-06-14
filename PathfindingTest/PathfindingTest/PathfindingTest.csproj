@@ -143,7 +143,9 @@
     <Compile Include="Combat\DamageSource.cs" />
     <Compile Include="InfoBars\HealthBar.cs" />
     <Compile Include="InfoBars\ProgressBar.cs" />
+    <Compile Include="Multiplayer\SocketConnection\ChatPacketProcessor.cs" />
     <Compile Include="Multiplayer\SocketConnection\ChatServerConnectionManager.cs" />
+    <Compile Include="Multiplayer\SocketConnection\GameLobbyPacketProcessor.cs" />
     <Compile Include="Pathfinding\Node.cs" />
     <Compile Include="Pathfinding\NodeConnection.cs" />
     <Compile Include="Pathfinding\PathfindingProcessor.cs" />
@@ -165,18 +167,27 @@
     <Compile Include="UI\Menus\MainMenu.cs" />
     <Compile Include="UI\Menus\MenuManager.cs" />
     <Compile Include="UI\Menus\Multiplayer\GameLobby.cs" />
+    <Compile Include="UI\Menus\Multiplayer\Misc\Message.cs" />
     <Compile Include="UI\Menus\Multiplayer\MultiplayerLobby.cs" />
     <Compile Include="UI\Menus\Multiplayer\LoginScreen.cs" />
     <Compile Include="UI\Menus\Multiplayer\Panels\GameDisplayPanel.cs" />
+    <Compile Include="UI\Menus\Multiplayer\Panels\UserDisplayPanel.cs" />
     <Compile Include="Units\Damage\Arrow.cs" />
     <Compile Include="Units\Damage\MeleeSwing.cs" />
     <Compile Include="Units\Damage\Projectile.cs" />
     <Compile Include="Units\Melee\Engineer.cs" />
     <Compile Include="Units\Melee\Swordman.cs" />
     <Compile Include="Units\Ranged\Bowman.cs" />
+    <Compile Include="Units\Stores\CombatUnit.cs" />
+    <Compile Include="Units\Stores\FastStore.cs" />
+    <Compile Include="Units\Stores\MeleeStore.cs" />
+    <Compile Include="Units\Stores\RangedStore.cs" />
+    <Compile Include="Units\Stores\Unit.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Units\Stores\UnitStore.cs" />
     <Compile Include="XML\XMLAble.cs" />
     <Compile Include="XML\SaveManager.cs" />
-    <Compile Include="Units\Stores\Unit.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

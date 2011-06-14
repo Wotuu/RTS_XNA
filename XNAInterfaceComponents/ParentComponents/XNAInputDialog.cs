@@ -75,7 +75,7 @@ namespace XNAInterfaceComponents.ParentComponents
                 this.button1 = new XNAButton(this, new Rectangle(
                     (this.bounds.Width / 2) - (this.buttonWidth) - (this.buttonSpacing / 2),
                     this.bounds.Height - 50,
-                    this.buttonWidth, 40), "Yes");
+                    this.buttonWidth, 40), "OK");
                 this.button1.onClickListeners += this.Dispose;
 
                 this.button2 = new XNAButton(this, new Rectangle(

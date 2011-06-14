@@ -27,9 +27,11 @@ namespace PathfindingTest.Multiplayer.SocketConnection
         public User user { get; set; }
         public Boolean safeShutdown { get; set; }
 
+        private ChatPacketProcessor chatPacketProcessor = new ChatPacketProcessor();
+        private GameLobbyPacketProcessor gameLobbyPacketProcessor = new GameLobbyPacketProcessor();
+
         private ChatServerConnectionManager()
         {
-
         }
 
         /// <summary>
@@ -92,7 +94,8 @@ namespace PathfindingTest.Multiplayer.SocketConnection
             // Give the above thread some time to start running! 
             // Else we'll get a nullpointer right here.
             Thread.Sleep(50);
-            this.connection.packetProcessor.onProcessPacket += this.DataReceived;
+            this.connection.packetProcessor.onProcessPacket += chatPacketProcessor.DataReceived;
+            this.connection.packetProcessor.onProcessPacket += gameLobbyPacketProcessor.DataReceived;
             this.connection.onDisconnectListeners += this.OnDisconnect;
 
             SetLoginStatus("Handshaking..");
@@ -115,7 +118,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
         /// Called when the client received data from the server.
         /// </summary>
         /// <param name="p">The packet that was received</param>
-        public void DataReceived(Packet p)
+        /*public void DataReceived(Packet p)
         {
             switch (p.GetHeader())
             {
@@ -170,6 +173,11 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                             MultiplayerLobby lobby = ((MultiplayerLobby)menu);
                             lobby.AddMessageToLog(message);
                         }
+                        else if (menu is GameLobby)
+                        {
+                            GameLobby lobby = ((GameLobby)menu);
+                            lobby.AddMessageToLog(message);
+                        }
                         break;
                     }
                 case Headers.NEW_USER:
@@ -186,6 +194,12 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                             MultiplayerLobby lobby = ((MultiplayerLobby)menu);
                             lobby.AddUser(user);
                         }
+                        else if (menu is GameLobby)
+                        {
+                            GameLobby lobby = ((GameLobby)menu);
+                            lobby.UserJoined(user);
+                            Console.Out.WriteLine("User has joined the game lobby!");
+                        }
 
                         break;
                     }
@@ -201,80 +215,19 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                                 MultiplayerLobby lobby = ((MultiplayerLobby)menu);
                                 lobby.RemoveUser(user);
                             }
+                            else if (menu is GameLobby)
+                            {
+                                GameLobby lobby = ((GameLobby)menu);
+                                lobby.UserLeft(user);
+                                Console.Out.WriteLine("User has left the game lobby!");
+                            }
                         }
 
                         break;
                     }
-                // Cliente received an ID for creating a game.
-                case Headers.GAME_ID:
-                    {
-                        int gameID = PacketUtil.DecodePacketInt(p, 0);
-                        Console.Out.WriteLine("Received game ID: " + gameID);
-
-                        MultiplayerLobby lobby = ((MultiplayerLobby)MenuManager.GetInstance().GetCurrentlyDisplayedMenu());
-                        String gameName = lobby.gameNameInput.textfield.text;
-
-                        MenuManager.GetInstance().ShowMenu(MenuManager.Menu.GameLobby);
-                        GameLobby gameLobby = (GameLobby)MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
-
-                        gameLobby.multiplayerGame = new MultiplayerGame(gameID,
-                            gameName, "");
-                        gameLobby.multiplayerGame.host = ChatServerConnectionManager.GetInstance().user;
-                        break;
-                    }
-                case Headers.SERVER_CREATE_GAME:
-                    {
-                        ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
-                        if (menu is GameLobby)
-                        {
-                            // Confirmation that the game was created? idk
-                        }
-                        else if (menu is MultiplayerLobby)
-                        {
-                            Console.Out.WriteLine("Host is: " + user);
-                            MultiplayerGame game = new MultiplayerGame(
-                                PacketUtil.DecodePacketInt(p, 0),
-                                PacketUtil.DecodePacketString(p, 4),
-                                "<No map selected yet>");
-                            MultiplayerLobby lobby = (MultiplayerLobby)menu;
-                            lobby.AddGame(game);
-                        }
-                        break;
-                    }
-                case Headers.SERVER_DESTROY_GAME:
-                    {
-                        int gameID = PacketUtil.DecodePacketInt(p, 0);
-
-                        ParentComponent menu = MenuManager.GetInstance().GetCurrentlyDisplayedMenu();
-                        if (menu is GameLobby)
-                        {
-                            XNAMessageDialog dialog =
-                                XNAMessageDialog.CreateDialog("The host has disconnected.", XNAMessageDialog.DialogType.OK);
-                            // When OK is pressed .. get back to the lobby.
-                            dialog.button1.onClickListeners +=
-                                delegate(XNAButton source)
-                                {
-                                    MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLobby);
-                                    Packet newChannel = new Packet(Headers.CLIENT_CHANNEL);
-                                    newChannel.AddInt(1);
-                                    this.connection.SendPacket(newChannel);
-                                };
-
-                        }
-                        else if (menu is MultiplayerLobby)
-                        {
-                            MultiplayerLobby lobby = (MultiplayerLobby)menu;
-                            lobby.RemoveGameByID(gameID);
-                        }
-                        break;
-                    }
-                default:
-                    {
-                        Console.Out.WriteLine("Received unknown request from the server.");
-                        break;
-                    }
+                
             }
-        }
+        }*/
 
         /// <summary>
         /// User accepted disconnect by the server.

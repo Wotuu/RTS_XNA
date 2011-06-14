@@ -6,6 +6,7 @@ using GameServer.Users;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 using SocketLibrary.Multiplayer;
+using GameServer.ChatServer.Games;
 
 namespace GameServer.ChatServer.Channels
 {
@@ -28,12 +29,33 @@ namespace GameServer.ChatServer.Channels
         }
 
         /// <summary>
+        /// Whether a user exists or not.
+        /// </summary>
+        /// <param name="user">The user to check.</param>
+        /// <returns>True or false .. doh</returns>
+        public Boolean UserExists(ServerUser toCheck)
+        {
+            for (int i = 0; i < this.users.Count; i++)
+            {
+                ServerUser user = this.users.ElementAt(i);
+                if (user.id == toCheck.id ||
+                    user.username == toCheck.username) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Adds a user to the list, and notifies other users of this person's arrival.
         /// </summary>
         /// <param name="toAdd">The user to add to this channel</param>
         public void AddUser(ServerUser toAdd)
         {
-            Console.Out.WriteLine("Channel " + this.id + " adds a user: " + toAdd);
+            Console.Out.Write("User " + toAdd + " joins channel " + this.id);
+            if (this.UserExists(toAdd))
+            {
+                // toAdd.listener.client.messageLog.AddLast(new LogMes"TRIED TO ADD YOU TO A CHANNEL YOU'RE ALREADY IN");
+                return;
+            }
             toAdd.channelID = this.id;
             // The user that joined must know who is already in the channel
             for (int i = 0; i < users.Count; i++)
@@ -44,6 +66,24 @@ namespace GameServer.ChatServer.Channels
                 p.AddString(user.username);
                 toAdd.listener.client.SendPacket(p);
             }
+
+            // If this is the lobby, send the games that are already created
+            if (this.id == 1)
+            {
+                for (int i = 0; i < MultiplayerGameManager.GetInstance().games.Count; i++)
+                {
+                    MultiplayerGame game = MultiplayerGameManager.GetInstance().games.ElementAt(i);
+                    Packet p = new Packet(Headers.SERVER_CREATE_GAME);
+                    p.AddInt(game.id);
+                    p.AddString(game.gamename);
+                    toAdd.listener.client.SendPacket(p);
+
+                    p = new Packet(Headers.GAME_MAP_CHANGED);
+                    p.AddInt(game.id);
+                    p.AddString(game.mapname);
+                }
+            }
+
             // User joins the channel
             users.AddLast(toAdd);
             Packet newChannelPacket = new Packet(Headers.CLIENT_CHANNEL);
@@ -67,7 +107,7 @@ namespace GameServer.ChatServer.Channels
         /// <param name="toRemove">The user to remove from this channel</param>
         public void UserLeft(ServerUser toRemove)
         {
-            Console.Out.Write("Removed a user from channel " + this.id + ". Old count: " + users.Count);
+            Console.Out.Write("Removed user " + toRemove + " from channel " + this.id);
             users.Remove(toRemove);
             for (int i = 0; i < users.Count; i++)
             {
@@ -77,7 +117,6 @@ namespace GameServer.ChatServer.Channels
                 p.AddString(toRemove.username);
                 user.listener.client.SendPacket(p);
             }
-            Console.Out.WriteLine(", new count: " + users.Count);
         }
 
         /// <summary>

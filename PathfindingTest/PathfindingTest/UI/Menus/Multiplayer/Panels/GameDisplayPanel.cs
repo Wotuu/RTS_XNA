@@ -7,6 +7,9 @@ using XNAInterfaceComponents.AbstractComponents;
 using Microsoft.Xna.Framework;
 using SocketLibrary.Multiplayer;
 using XNAInterfaceComponents.ChildComponents;
+using PathfindingTest.Multiplayer.SocketConnection;
+using SocketLibrary.Packets;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.UI.Menus.Multiplayer.Panels
 {
@@ -24,8 +27,9 @@ namespace PathfindingTest.UI.Menus.Multiplayer.Panels
             base(parent, new Rectangle())
         {
             this.index = index;
-            this.bounds = new Rectangle(10, 10 + (componentHeight + componentSpacing) * this.index,
-                580, componentHeight);
+            this.bounds = new Rectangle(5, 5 + (componentHeight + componentSpacing) * this.index,
+                580,
+                componentHeight);
             this.border = new Border(this, 2, Color.Pink);
 
             this.multiplayerGame = multiplayerGame;
@@ -53,6 +57,15 @@ namespace PathfindingTest.UI.Menus.Multiplayer.Panels
         /// <param name="button">The button that was pressed.</param>
         public void JoinGame(XNAButton button)
         {
+            Packet joinPacket = new Packet(Headers.CLIENT_REQUEST_JOIN);
+            joinPacket.AddInt(this.multiplayerGame.id);
+            joinPacket.AddInt(ChatServerConnectionManager.GetInstance().user.id);
+            ChatServerConnectionManager.GetInstance().SendPacket(joinPacket);
+        }
+
+        public void Unload()
+        {
+            base.Unload();
 
         }
     }

@@ -34,7 +34,7 @@ namespace XNAInterfaceComponents.ChildComponents
             this.caret = new Caret(this);
             this.rows = rows;
             this.isEditable = true;
-            Rectangle drawRect = this.GetScreenLocation();
+            Rectangle drawRect = this.GetScreenBounds();
             this.scrollbarBounds = new Rectangle(drawRect.Left, drawRect.Bottom, drawRect.Width, 10);
             this.scrollbarButtonBounds = new Rectangle(drawRect.Left, drawRect.Bottom, drawRect.Width, 8);
             KeyboardManager.GetInstance().keyPressedListeners += this.OnKeyPressed;
@@ -143,7 +143,7 @@ namespace XNAInterfaceComponents.ChildComponents
             else drawColor = this.backgroundColor;
 
             // Get the location on the screen on which to draw this button.
-            Rectangle drawRect = this.GetScreenLocation();
+            Rectangle drawRect = this.GetScreenBounds();
             // Draw the button
             sb.Draw(clearTexture, drawRect, drawColor);
             // Draw the border
@@ -566,7 +566,7 @@ namespace XNAInterfaceComponents.ChildComponents
                 }
             }*/
 
-            Rectangle drawLocation = this.GetScreenLocation();
+            Rectangle drawLocation = this.GetScreenBounds();
 
             if (drawLocation.Contains(e.location))
             {
