@@ -174,6 +174,11 @@
     <Compile Include="Units\Melee\Engineer.cs" />
     <Compile Include="Units\Melee\Swordman.cs" />
     <Compile Include="Units\Ranged\Bowman.cs" />
+    <Compile Include="Units\Stores\CombatUnit.cs" />
+    <Compile Include="Units\Stores\FastStore.cs" />
+    <Compile Include="Units\Stores\MeleeStore.cs" />
+    <Compile Include="Units\Stores\RangedStore.cs" />
+    <Compile Include="Units\Stores\UnitStore.cs" />
     <Compile Include="XML\XMLAble.cs" />
     <Compile Include="XML\SaveManager.cs" />
     <Compile Include="Units\Stores\Unit.cs" />

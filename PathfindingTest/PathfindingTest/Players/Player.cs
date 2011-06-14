@@ -86,10 +86,10 @@ namespace PathfindingTest.Players
             {
                 if (i % 2 == 0)
                 {
-                    temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, 0, 0, 5));
+                    temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, 0, 0, 15));
                 } else
                 {
-                    temp_units.AddLast(rangedStore.getUnit(Unit.Type.Ranged, 0, 0, 5));
+                    temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, 0, 0, 15));
                 }
             }
 
@@ -473,6 +473,11 @@ namespace PathfindingTest.Players
                         {
                             if (previewPattern != null)
                             {
+                                foreach (Unit unit in currentSelection.units)
+                                {
+                                    unit.unitToStalk = null;
+                                    unit.waypoints.Clear();
+                                }
                                 this.currentSelection.MoveTo(previewPattern);
                             }
                             // If we're suppose to move in the first place

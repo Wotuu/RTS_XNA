@@ -16,3 +16,9 @@ C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\ResolveAssemblyReference
 C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.dll
 C:\Users\Wouter\RTS_XNA\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.pdb
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.dll
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\AStarCollisionMap\bin\x86\Debug\AStarCollisionMap.pdb
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\AStarCollisionMap\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\AStarCollisionMap\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.dll
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\AStarCollisionMap\obj\x86\Debug\AStarCollisionMap.pdb

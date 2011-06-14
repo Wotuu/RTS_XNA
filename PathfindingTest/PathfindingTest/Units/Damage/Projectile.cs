@@ -167,7 +167,7 @@ namespace PathfindingTest.Units.Projectiles
                         Util.GetPointOnCircle(this.GetLocation(), this.texture.Height / 2,
                         (float)(Util.GetHypoteneuseAngleDegrees(this.GetLocation(), this.waypoint)))))
                     {
-                        unit.OnDamage(new DamageEvent(this, unit));
+                        unit.OnDamage(new DamageEvent(this, unit, parent));
                         // Console.Out.WriteLine("Projectile had an impact!");
                         this.Dispose();
                         return;

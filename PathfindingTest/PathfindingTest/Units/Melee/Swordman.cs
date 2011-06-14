@@ -14,7 +14,7 @@ namespace PathfindingTest.Units.Melee
     class Swordman : CombatUnit
     {
         public Swordman(Player p, int x, int y, int baseDamage)
-            : base(p, x, y, 1f, 20f, 60)
+            : base(p, x, y, 1.25f, 20f, 100f, 60)
         {
             this.baseDamage = baseDamage;
 
@@ -34,6 +34,7 @@ namespace PathfindingTest.Units.Melee
             if (this.state == State.Finished)
             {
                 UpdateMovement();
+            UpdateTarget();
 
                 // Don't do this that often, not really needed.
                 if (Game1.GetInstance().frames % 4 == 0)
@@ -62,48 +63,43 @@ namespace PathfindingTest.Units.Melee
         /// </summary>
         public override void Swing()
         {
-            
-            //if (this.fireCooldown < 0)
-           // {
-                CheckForEnemiesInRange();
-                if (this.enemiesInRange.Count == 0)
-                {
-                    return;
-                }
-                Console.WriteLine("swung weapon");
-                Unit targetUnit = this.enemiesInRange.ElementAt(0);
-                AggroEvent e = new AggroEvent(this, targetUnit, true);
-                targetUnit.OnAggroRecieved(e);
-                this.OnAggro(e);
-                DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), targetUnit);
-                targetUnit.OnDamage(dmgEvent);
-                this.fireCooldown = this.rateOfFire;
-        //    }
-       //     else
-       //     {
-       //         Console.WriteLine("Cant fire Q.Q");
-        //    }
-        }
-
-        /// <summary>
-        /// Attempt to fire the weapon!
-        /// </summary>
-        public override void Swing(Unit unitToAttack)
-        {
-            if (this.fireCooldown < 0)
+            CheckForEnemiesInRange(this.aggroRange);
+            if (unitToStalk == null && enemiesInRange.Count < 1)
             {
-                AggroEvent e = new AggroEvent(this, unitToAttack, true);
-                unitToAttack.OnAggroRecieved(e);
-                this.OnAggro(e);
-                //DamageEvent dmgEvent = new DamageEvent(null, unitToAttack);
-                //unitToAttack.OnDamage(dmgEvent);
-                this.fireCooldown = this.rateOfFire;
+                return;
             }
+            else if (unitToStalk == null && enemiesInRange.Count > 0)
+            {
+                unitToStalk = this.enemiesInRange.ElementAt(0);
+                this.waypoints.Clear();
+            }
+
+            CheckForEnemiesInRange(this.attackRange);
+            if (this.enemiesInRange.Contains(unitToStalk))
+            {
+                this.waypoints.Clear();
+            }
+            else
+            {
+                Point p = new Point((int)unitToStalk.x, (int)unitToStalk.y);
+                this.MoveToQueue(p);
+                return;
+            }
+            AggroEvent e = new AggroEvent(this, unitToStalk, true);
+            unitToStalk.OnAggroRecieved(e);
+            this.OnAggro(e);
+            DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), unitToStalk, this);
+            unitToStalk.OnDamage(dmgEvent);
+            this.fireCooldown = this.rateOfFire;
         }
 
         public override void OnAggroRecieved(AggroEvent e)
         {
-            // Console.Out.WriteLine("Recieved aggro from something! D=");
+            if (unitToStalk == null)
+            {
+                unitToStalk = e.from;
+            }
+            //Console.Out.WriteLine("Recieved aggro from something! D=");
         }
 
         public override void OnAggro(AggroEvent e)

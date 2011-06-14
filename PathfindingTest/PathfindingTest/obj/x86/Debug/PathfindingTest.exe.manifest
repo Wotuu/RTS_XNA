@@ -93,6 +93,11 @@
     </dependentAssembly>
   </dependency>
   <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="MySql.Data" version="6.3.6.0" publicKeyToken="C5687FC88969C44D" language="neutral" processorArchitecture="msil" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="AStarCollisionMap.dll" size="18944">
       <assemblyIdentity name="AStarCollisionMap" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
@@ -100,43 +105,55 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>OOAC9gUoPkBTLS33qQLYh6CCV4o=</dsig:DigestValue>
+        <dsig:DigestValue>jSGTUcWYF2KNT6J4ebhRNTSDUdg=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="PathfindingTest.exe" size="71680">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="PathfindingTest.exe" size="103424">
       <assemblyIdentity name="PathfindingTest" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>LmkPd3n5gTuZ3/BmzWU/nDbAeeM=</dsig:DigestValue>
+        <dsig:DigestValue>Ml50oX+T53ETYuVKrtlXHnEj/HY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XNAInputLibrary.dll" size="9216">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SocketLibrary.dll" size="19968">
+      <assemblyIdentity name="SocketLibrary" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>PTg/K1xysknTmkjg1HDkqc2956Q=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XNAInputLibrary.dll" size="15360">
       <assemblyIdentity name="XNAInputLibrary" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>9LmRwIozxvWqgSr14y7sc0BtSF0=</dsig:DigestValue>
+        <dsig:DigestValue>Xi/5BVtC6sGc0QkS6cw1QMqmBAk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XNAInterfaceComponents.dll" size="15360">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XNAInterfaceComponents.dll" size="38912">
       <assemblyIdentity name="XNAInterfaceComponents" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>YJoqcSo4u5OLDgn9UHbhQYBJRGA=</dsig:DigestValue>
+        <dsig:DigestValue>mFva/6LagN1U1cO8OTlNW4hhFRk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -213,6 +230,33 @@
     </hash>
   </file>
   <file name="Content\Fonts\Arial.xnb" size="11438">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>zlQ5P6+JWLhfqGQsNp23A30JnNA=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Fonts\BigMenuTextField.xnb" size="20654">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>i6wEy5aaSSZl7AUtkgvxVsNot0I=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Fonts\MenuButton.xnb" size="20654">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>i6wEy5aaSSZl7AUtkgvxVsNot0I=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Fonts\SmallMenuTextField.xnb" size="11438">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
@@ -354,6 +398,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
       <dsig:DigestValue>HP0cN648N+XML7ct4vV5H9PYrFY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Units\melee.xnb" size="3787">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>+KQpvQku1GW0n6LeZPcKqW2QgWc=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Units\Projectiles\wooden_arrow.xnb" size="1195">

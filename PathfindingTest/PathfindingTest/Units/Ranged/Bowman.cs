@@ -14,7 +14,7 @@ namespace PathfindingTest.Units
     public class Bowman : CombatUnit
     {
         public Bowman(Player p, int x, int y, int baseDamage)
-            : base(p, x, y, 1f, 100f, 60)
+            : base(p, x, y, 1f, 100f, 100f, 60)
         {
             this.baseDamage = baseDamage;
 
@@ -35,6 +35,7 @@ namespace PathfindingTest.Units
             {
                 UpdateMovement();
                 AttemptReload();
+            UpdateTarget();
 
                 // Don't do this that often, not really needed.
                 if (Game1.GetInstance().frames % 4 == 0)
@@ -70,6 +71,10 @@ namespace PathfindingTest.Units
 
         public override void OnAggroRecieved(AggroEvent e)
         {
+            if (unitToStalk == null)
+            {
+                unitToStalk = e.from;
+            }
             // Console.Out.WriteLine("Recieved aggro from something! D=");
         }
 
@@ -94,37 +99,33 @@ namespace PathfindingTest.Units
         {
             if (this.fireCooldown < 0)
             {
-                CheckForEnemiesInRange();
-                if (this.enemiesInRange.Count == 0)
+                CheckForEnemiesInRange(this.aggroRange);
+                if (unitToStalk == null && enemiesInRange.Count < 1)
                 {
                     return;
                 }
-                Unit targetUnit = this.enemiesInRange.ElementAt(0);
-                AggroEvent e = new AggroEvent(this, targetUnit, true);
-                targetUnit.OnAggroRecieved(e);
-                this.OnAggro(e);
-                this.projectiles.AddLast(new Arrow(this, targetUnit));
-                this.fireCooldown = this.rateOfFire;
-            }
-        }
+                else if (unitToStalk == null && enemiesInRange.Count > 0)
+                {
+                    unitToStalk = this.enemiesInRange.ElementAt(0);
+                    this.waypoints.Clear();
+                }
 
-        /// <summary>
-        /// Attempt to fire the weapon!
-        /// </summary>
-        public override void Swing(Unit unitToAttack)
-        {
-            if (this.fireCooldown < 0)
-            {
-                CheckForEnemiesInRange();
-                if (this.enemiesInRange.Count == 0)
+                CheckForEnemiesInRange(this.attackRange);
+                if (this.enemiesInRange.Contains(unitToStalk))
                 {
+                    this.waypoints.Clear();
+                }
+                else
+                {
+                    
+                    Point p = new Point((int)unitToStalk.x, (int)unitToStalk.y);
+                    this.MoveToQueue(p);
                     return;
                 }
-                //Unit targetUnit = this.enemiesInRange.ElementAt(0);
-                AggroEvent e = new AggroEvent(this, unitToAttack, true);
-                unitToAttack.OnAggroRecieved(e);
+                AggroEvent e = new AggroEvent(this, unitToStalk, true);
+                unitToStalk.OnAggroRecieved(e);
                 this.OnAggro(e);
-                this.projectiles.AddLast(new Arrow(this, unitToAttack));
+                this.projectiles.AddLast(new Arrow(this, unitToStalk));
                 this.fireCooldown = this.rateOfFire;
             }
         }

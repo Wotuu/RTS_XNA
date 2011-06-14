@@ -30,7 +30,7 @@ namespace PathfindingTest.Units
         /// <param name="startLocation"></param>
         /// <param name="c"></param>
         public Engineer(Player p, int x, int y, int baseDamage)
-            : base(p, x, y, 1f, 1f)
+            : base(p, x, y, 1f, 1f, 1f)
         {
             this.baseDamage = baseDamage;
             this.type = Type.Engineer;
@@ -78,6 +78,7 @@ namespace PathfindingTest.Units
 
         public override void OnAggroRecieved(AggroEvent e)
         {
+            //todo flee
             // Console.Out.WriteLine("Recieved aggro from something! D=");
         }
 
@@ -89,9 +90,6 @@ namespace PathfindingTest.Units
         public override void Swing()
         {
         }
-
-        public override void Swing(Unit unitToAttack)
-        {
         }
 
         public void Repair(Building b)
@@ -119,6 +117,5 @@ namespace PathfindingTest.Units
             {
                 b.state = Building.State.Repairing;
             }
-        }
     }
 }

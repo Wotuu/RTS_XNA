@@ -13,6 +13,7 @@ namespace PathfindingTest.Combat
 
         public DamageSource by { get; set; }
         public Unit target { get; set; }
+        public Unit source { get; set; }
         public float damageDone { get; set; }
         public float usedModifier { get; set; }
 
@@ -43,8 +44,9 @@ namespace PathfindingTest.Combat
             Ranged
         }
 
-        public DamageEvent(DamageSource by, Unit target)
+        public DamageEvent(DamageSource by, Unit target, Unit source)
         {
+            this.source = source;
             this.by = by;
             this.target = target;
             this.usedModifier = this.GetModifier();

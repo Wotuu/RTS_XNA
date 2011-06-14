@@ -1,3 +1,4 @@
 D:\Dropbox\VisualStudioProjects\RTS\PathfindingTest\PathfindingTestContent\obj\x86\Debug\ResolveAssemblyReference.cache
 D:\VisualStudioProjects\RTS\PathfindingTest\PathfindingTestContent\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Wouter\RTS_XNA\PathfindingTest\PathfindingTestContent\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTestContent\obj\x86\Debug\ResolveAssemblyReference.cache

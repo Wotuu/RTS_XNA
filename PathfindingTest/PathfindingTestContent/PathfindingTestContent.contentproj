@@ -219,6 +219,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Units\melee.png">
+      <Name>melee</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
     <Compile Include="Units\Projectiles\wooden_arrow.png">
       <Name>wooden_arrow</Name>
       <Importer>TextureImporter</Importer>
@@ -230,6 +235,23 @@
       <Name>wooden_arrow_scale</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Fonts\BigMenuTextField.spritefont">
+      <Name>BigMenuTextField</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+    <Compile Include="Fonts\MenuButton.spritefont">
+      <Name>MenuButton</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+    </Compile>
+    <Compile Include="Fonts\SmallMenuTextField.spritefont">
+      <Name>SmallMenuTextField</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

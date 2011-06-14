@@ -20,7 +20,11 @@ Content\Units\Engineer.xnb
 Content\Selected.xnb
 Content\Buildings\Fortress.xnb
 Content\Units\bowman.xnb
+Content\Units\melee.xnb
 Content\Units\Projectiles\wooden_arrow.xnb
 Content\Units\Projectiles\wooden_arrow_scale.xnb
 Content\Fonts\Arial.xnb
 Content\Fonts\SpriteFont1.xnb
+Content\Fonts\BigMenuTextField.xnb
+Content\Fonts\MenuButton.xnb
+Content\Fonts\SmallMenuTextField.xnb

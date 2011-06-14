@@ -41,15 +41,18 @@ namespace PathfindingTest.Units
         public State state { get; set; }
         public double productionDuration { get; set; }
         public double productionProgress { get; set; }
+        public Boolean isDead = false;
+        public Job job { get; set; }
+
+        public Unit unitToStalk { get; set; }
+        public float attackRange { get; set; }
+        public float aggroRange { get; set; }
 
         #region Movement variables
         public LinkedList<Point> waypoints { get; set; }
-        private Boolean hasToMove { get; set; }
+        public Boolean hasToMove { get; set; }
         public float movementSpeed { get; set; }
         private float direction { get; set; }
-
-        public Unit unitToStalk { get; set; }
-        public float range { get; set; }
         #endregion
 
         public enum Type
@@ -66,6 +69,15 @@ namespace PathfindingTest.Units
         {
             Producing,
             Finished
+        }
+
+        public enum Job
+        {
+            Moving,
+            Attacking,
+            Defending,
+            Patrolling,
+            Idle
         }
 
         public abstract void Update(KeyboardState ks, MouseState ms);
@@ -109,7 +121,11 @@ namespace PathfindingTest.Units
         /// </summary>
         protected void UpdateMovement()
         {
-            if (this.waypoints.Count == 0) return;
+            if (this.waypoints.Count == 0)
+            {
+                this.job = Unit.Job.Idle;
+                return;
+            }
             // Point target = this.waypoints.ElementAt(0);
             Move();
             if (this.repelsOthers) this.CheckCollision();
@@ -139,14 +155,9 @@ namespace PathfindingTest.Units
         /// </summary>
         private void Move()
         {
-            if (!hasToMove) return;
-            if (unitToStalk != null)
+            if (!hasToMove)
             {
-                CheckForEnemiesInRange();
-                if (!enemiesInRange.Contains(unitToStalk))
-                {
-                    Point moveTo = new Point((int)unitToStalk.x, (int)unitToStalk.y);
-                }
+                return;
             }
             Point waypoint = this.waypoints.ElementAt(0);
             SetMoveToTarget(waypoint.X, waypoint.Y);
@@ -224,9 +235,9 @@ namespace PathfindingTest.Units
         }
 
         /// <summary>
-        /// Updates the enemiesInRange variable, to contain all the enemies within the range of this unit.
+        /// Updates the enemiesInRange variable, to contain all the enemies within the attack range of this unit.
         /// </summary>
-        public void CheckForEnemiesInRange()
+        public void CheckForEnemiesInRange(float rangeToCheck)
         {
             if (enemiesInRange != null)
             {
@@ -235,7 +246,7 @@ namespace PathfindingTest.Units
             else
             {
                 enemiesInRange = new LinkedList<Unit>();
-                CheckForEnemiesInRange();
+                CheckForEnemiesInRange(rangeToCheck);
             }
             foreach (Player player in Game1.GetInstance().players)
             {
@@ -245,7 +256,7 @@ namespace PathfindingTest.Units
                 {
                     foreach (Unit unit in player.units)
                     {
-                        if (Util.GetHypoteneuseLength(unit.GetLocation(), this.GetLocation()) < this.range)
+                        if (Util.GetHypoteneuseLength(unit.GetLocation(), this.GetLocation()) < rangeToCheck)
                         {
                             enemiesInRange.AddLast(unit);
                         }
@@ -320,13 +331,14 @@ namespace PathfindingTest.Units
             // Console.Out.WriteLine("Found path in " + ((DateTime.UtcNow.Ticks - ticks) / 10000) + "ms");
         }
 
-        public Unit(Player p, int x, int y, float movementSpeed, float range)
+        public Unit(Player p, int x, int y, float movementSpeed, float attackRange, float aggroRange)
         {
             this.player = p;
             this.x = x;
             this.y = y;
             this.movementSpeed = movementSpeed;
-            this.range = range;
+            this.attackRange = attackRange;
+            this.aggroRange = aggroRange;
             (this.quad = Game1.GetInstance().quadTree.GetQuadByPoint(this.GetLocation())).highlighted = true;
 
             this.color = player.color;
@@ -352,9 +364,9 @@ namespace PathfindingTest.Units
 
         void OnCollisionChangedListener.OnCollisionChanged(CollisionChangedEvent collisionEvent)
         {
-            if (waypoints.Count > 0) 
-            { 
-                this.MoveToNow(this.waypoints.ElementAt(this.waypoints.Count - 1)); 
+            if (waypoints.Count > 0)
+            {
+                this.MoveToNow(this.waypoints.ElementAt(this.waypoints.Count - 1));
             }
         }
 
@@ -373,15 +385,27 @@ namespace PathfindingTest.Units
 
         public void OnDamage(DamageEvent e)
         {
+            if (unitToStalk == null)
+            {
+                unitToStalk = e.source;
+            }
+
+            CheckForEnemiesInRange(this.aggroRange);
+            if (!this.enemiesInRange.Contains(unitToStalk))
+            {
+                Point p = new Point((int)unitToStalk.x, (int)unitToStalk.y);
+                this.MoveToQueue(p);
+            }
             this.currentHealth -= e.damageDone;
-            if (this.currentHealth <= 0) this.Dispose();
+            if (this.currentHealth <= 0)
+            {
+                this.Dispose();
+            }
         }
 
         public void Attack(Unit unitToAttack)
         {
             this.unitToStalk = unitToAttack;
-            Point p = new Point((int) unitToAttack.x, (int) unitToAttack.y);
-            this.MoveToQueue(p);
         }
 
         /// <summary>
@@ -389,6 +413,7 @@ namespace PathfindingTest.Units
         /// </summary>
         public void Dispose()
         {
+            this.isDead = true;
             this.player.units.Remove(this);
             if (this.player.currentSelection != null) this.player.currentSelection.units.Remove(this);
         }
@@ -399,6 +424,15 @@ namespace PathfindingTest.Units
         /// </summary>
         public abstract void Swing();
 
-        public abstract void Swing(Unit unitToAttack);
+        /// <summary>
+        /// Checks to see wether the set target has died yet.
+        /// </summary>
+        public void UpdateTarget()
+        {
+            if (unitToStalk != null && unitToStalk.isDead) 
+            { 
+                unitToStalk = null;
+            }
+        }
     }
 }

@@ -18,8 +18,8 @@ namespace PathfindingTest.Units
 
         public LinkedList<Projectile> projectiles { get; set; }
 
-        public CombatUnit(Player p, int x, int y, float movementSpeed, float range,float rateOfFire) : 
-            base( p, x, y, movementSpeed, range)
+        public CombatUnit(Player p, int x, int y, float movementSpeed, float attackRange, float aggroRange, float rateOfFire) : 
+            base( p, x, y, movementSpeed, attackRange, aggroRange)
         {
             this.rateOfFire = rateOfFire;
             this.enemiesInRange = new LinkedList<Unit>();

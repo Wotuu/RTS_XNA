@@ -22,3 +22,11 @@ C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\ResolveAssemblyRefe
 C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.dll
 C:\Users\Wouter\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.pdb
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.dll
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInterfaceComponents.pdb
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.dll
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\bin\x86\Debug\XNAInputLibrary.pdb
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.dll
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\XNAInterfaceComponents\obj\x86\Debug\XNAInterfaceComponents.pdb
