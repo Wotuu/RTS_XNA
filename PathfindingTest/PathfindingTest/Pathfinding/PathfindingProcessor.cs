@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using PathfindingTest.Units;
 using Microsoft.Xna.Framework;
+using PathfindingTest.State;
 
 namespace PathfindingTest.Pathfinding
 {
@@ -28,7 +29,7 @@ namespace PathfindingTest.Pathfinding
         /// <param name="unit">The unit.</param>
         public void Remove(Unit unit)
         {
-            for( int i = 0; i < toProcess.Count; i++ )
+            for (int i = 0; i < toProcess.Count; i++)
             {
                 UnitProcess up = toProcess.ElementAt(i);
                 if (up.unit == unit)
@@ -39,14 +40,29 @@ namespace PathfindingTest.Pathfinding
             }
         }
 
+        /// <summary>
+        /// Process the queue.
+        /// </summary>
         public void Process()
         {
-            if (toProcess.Count != 0)
+            double timeTaken = 0;
+            int count = 0;
+            do
             {
-                UnitProcess up = toProcess.ElementAt(0);
-                up.unit.MoveToNow(up.target);
-                toProcess.RemoveFirst();
+                timeTaken = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds;
+                if (toProcess.Count != 0)
+                {
+                    UnitProcess up = toProcess.ElementAt(0);
+                    up.unit.MoveToNow(up.target);
+                    toProcess.RemoveFirst();
+                }
+                else break;
+                count++;
+                timeTaken = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds - timeTaken;
+                // Console.Out.WriteLine(GameTimeManager.GetInstance().UpdateMSLeftThisFrame());
             }
+            while (GameTimeManager.GetInstance().UpdateMSLeftThisFrame() > timeTaken);
+            // if (count > 0) Console.Out.WriteLine("Paths processed: " + count);
         }
 
 

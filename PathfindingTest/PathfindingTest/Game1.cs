@@ -148,6 +148,7 @@ namespace PathfindingTest
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            GameTimeManager.GetInstance().OnStartUpdate();
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
@@ -192,8 +193,6 @@ namespace PathfindingTest
                      * This is done to save a massive lagspike when updating the collision mesh!
                      */
                     //if (frames % 2 == 0) 
-                    PathfindingNodeProcessor.GetInstance().Process();
-                    PathfindingProcessor.GetInstance().Process();
 
                     DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
                     DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
@@ -204,6 +203,9 @@ namespace PathfindingTest
                         previousFrameUpdateTime = timeStamp;
                         previousFrameUpdateFrames = frames;
                     }
+                    // These two fill the rest of the frame, so they're suppose to go last.
+                    SmartPathfindingNodeProcessor.GetInstance().Process();
+                    PathfindingProcessor.GetInstance().Process();
 
                     frames++;
                     break;
@@ -224,6 +226,7 @@ namespace PathfindingTest
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GameTimeManager.GetInstance().OnStartDraw();
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here

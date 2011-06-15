@@ -13,6 +13,7 @@ using PathfindingTest.Combat;
 using AStarCollisionMap.Pathfinding;
 using AStarCollisionMap.Collision;
 using XNAInputHandler.MouseInput;
+using PathfindingTest.State;
 
 namespace PathfindingTest.Units
 {
@@ -112,7 +113,6 @@ namespace PathfindingTest.Units
             if (this.waypoints.Count == 0) return;
             // Point target = this.waypoints.ElementAt(0);
             Move();
-            if (this.repelsOthers) this.CheckCollision();
         }
 
         /// <summary>
@@ -159,8 +159,10 @@ namespace PathfindingTest.Units
                 //Console.Out.WriteLine(direction);
                 //this.direction = angle + (float)(90 * ( Math.PI / 180 ));
             }
-            float xSpeedDirection = movementSpeed * (float)Math.Sin(direction);
-            float ySpeedDirection = movementSpeed * (float)Math.Cos(direction);
+            float timeSteppedSpeed = (float)(movementSpeed * GameTimeManager.GetInstance().time_step);
+
+            float xSpeedDirection = timeSteppedSpeed * (float)Math.Sin(direction);
+            float ySpeedDirection = timeSteppedSpeed * (float)Math.Cos(direction);
 
             if (x < waypoint.X && y < waypoint.Y)
             {
@@ -200,7 +202,8 @@ namespace PathfindingTest.Units
             }
 
 
-            if (Math.Abs(x - waypoint.X) < (xSpeedDirection * 1.1) && Math.Abs(y - waypoint.Y) < (ySpeedDirection * 1.1))
+            if (Math.Abs(x - waypoint.X) < (timeSteppedSpeed * 1.1) &&
+                Math.Abs(y - waypoint.Y) < (timeSteppedSpeed * 1.1))
             {
                 this.x = waypoint.X;
                 this.y = waypoint.Y;

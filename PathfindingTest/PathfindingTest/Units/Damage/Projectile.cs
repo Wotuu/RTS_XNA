@@ -138,7 +138,9 @@ namespace PathfindingTest.Units.Projectiles
             }
 
 
-            if (Game1.GetInstance().collision.CollisionAt(this.GetLocation()) || 
+            if (Game1.GetInstance().collision.CollisionAt(
+                Util.GetPointOnCircle(this.GetLocation(), this.texture.Height / 2,
+                        (float)(Util.GetHypoteneuseAngleDegrees(this.GetLocation(), this.waypoint)))) || 
                 Math.Abs(x - waypoint.X) < 2 && Math.Abs(y - waypoint.Y) < 2)
             {
                 // Console.Out.WriteLine("Projectile went out of range.");

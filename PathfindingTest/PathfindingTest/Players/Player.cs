@@ -82,7 +82,7 @@ namespace PathfindingTest.Players
         public void SpawnStartUnits(Point location)
         {
             LinkedList<Unit> temp_units = new LinkedList<Unit>();
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 150; i++)
             {
                 if (i % 2 == 0)
                 {
