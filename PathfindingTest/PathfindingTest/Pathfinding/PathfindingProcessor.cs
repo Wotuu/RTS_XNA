@@ -12,6 +12,7 @@ namespace PathfindingTest.Pathfinding
     {
         private static PathfindingProcessor instance { get; set; }
         private LinkedList<UnitProcess> toProcess { get; set; }
+        private readonly object queueLock = new object();
 
         /// <summary>
         /// Pushes a unit onto the list.
@@ -20,7 +21,10 @@ namespace PathfindingTest.Pathfinding
         /// <param name="target">The target of the unit</param>
         public void Push(Unit unit, Point target)
         {
-            toProcess.AddLast(new UnitProcess(unit, target));
+            lock (queueLock)
+            {
+                toProcess.AddLast(new UnitProcess(unit, target));
+            }
         }
 
         /// <summary>
@@ -45,24 +49,27 @@ namespace PathfindingTest.Pathfinding
         /// </summary>
         public void Process()
         {
-            double timeTaken = 0;
-            int count = 0;
-            do
+            lock (queueLock)
             {
-                timeTaken = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds;
-                if (toProcess.Count != 0)
+                double timeTaken = 0;
+                int count = 0;
+                do
                 {
-                    UnitProcess up = toProcess.ElementAt(0);
-                    up.unit.MoveToNow(up.target);
-                    toProcess.RemoveFirst();
+                    timeTaken = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds;
+                    if (toProcess.Count != 0)
+                    {
+                        UnitProcess up = toProcess.ElementAt(0);
+                        up.unit.MoveToNow(up.target, true);
+                        toProcess.RemoveFirst();
+                    }
+                    else break;
+                    count++;
+                    timeTaken = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds - timeTaken;
+                    // Console.Out.WriteLine(GameTimeManager.GetInstance().UpdateMSLeftThisFrame());
                 }
-                else break;
-                count++;
-                timeTaken = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds - timeTaken;
-                // Console.Out.WriteLine(GameTimeManager.GetInstance().UpdateMSLeftThisFrame());
+                while (GameTimeManager.GetInstance().UpdateMSLeftThisFrame() > timeTaken);
+                // if (count > 0) Console.Out.WriteLine("Paths processed: " + count);
             }
-            while (GameTimeManager.GetInstance().UpdateMSLeftThisFrame() > timeTaken);
-            // if (count > 0) Console.Out.WriteLine("Paths processed: " + count);
         }
 
 
@@ -72,15 +79,29 @@ namespace PathfindingTest.Pathfinding
             return instance;
         }
 
+        /// <summary>
+        /// Checks if this unit is already in the queue for processing.
+        /// </summary>
+        /// <param name="unit">The unit to check.</param>
+        /// <returns>True or false.</returns>
+        public Boolean AlreadyInQueue(Unit unit)
+        {
+            for (int i = 0; i < this.toProcess.Count; i++)
+            {
+                if (this.toProcess.ElementAt(i).unit == unit) return true;
+            }
+            return false;
+        }
+
         private PathfindingProcessor()
         {
             toProcess = new LinkedList<UnitProcess>();
         }
 
-        private class UnitProcess
+        private struct UnitProcess
         {
-            public Unit unit { get; set; }
-            public Point target { get; set; }
+            public Unit unit;
+            public Point target;
 
             public UnitProcess(Unit unit, Point target)
             {

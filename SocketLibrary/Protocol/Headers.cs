@@ -7,7 +7,10 @@ namespace SocketLibrary.Protocol
 {
     public class Headers
     {
-        // 0 - 15 Default reserved ranges
+        // 0 - 31   Chat reserved ranges (0x00, 0x1F )
+        // 32 - 47  General game reserved ranges (0x20, 0x2F)
+        // 48 - 63  Unit reserved ranges (0x30, 0x3F)
+        // 64 - 79  Building reserved ranged (0x40, 0x4F)
 
         // Client requests a connection
         public const byte HANDSHAKE_1 = 0x00;
@@ -83,9 +86,58 @@ namespace SocketLibrary.Protocol
         /// Client notifies the server that he's left the game.
         /// </summary>
         public const byte CLIENT_LEFT_GAME = 0x16;
+        /// <summary>
+        /// Client notifies the server that his color has changed.
+        /// [Header] [Int32 gameID] [Int32 userID] [Int32 colorArrayIndex]
+        /// </summary>
+        public const byte GAME_COLOR_CHANGED = 0x17;
+
+        /// <summary>
+        /// Client notifies the server that his team has changed.
+        /// [Header] [Int32 gameID] [Int32 userID] [Int32 team]
+        /// </summary>
+        public const byte GAME_TEAM_CHANGED = 0x18;
+
+        /// <summary>
+        /// Client notifies the server of a change in readystate
+        /// [Header] [Int32 gameID] [Int32 userID] [Int32 bool state]
+        /// </summary>
+        public const byte GAME_READY_CHANGED = 0x19;
+
+        /// <summary>
+        /// Host notifies the server that he wants to kick another user.
+        /// [Header] [Int32 userID]
+        /// </summary>
+        public const byte GAME_KICK_CLIENT = 0x1A;
+
+        /// <summary>
+        /// Host notifies the server that the game will start.
+        /// [Header]
+        /// </summary>
+        public const byte CLIENT_GAME_START = 0x1B;
+
+        /// <summary>
+        /// Server notifies the clients that the game will start
+        /// [Header] [Int32 secondsLeft]
+        /// </summary>
+        public const byte SERVER_GAME_START = 0x1C;
+
+        /// <summary>
+        /// Client builds something and needs an ID.
+        /// Client: [Header] [Int32 localID] [Int32 unitType]
+        /// </summary>
+        public const byte GAME_REQUEST_OBJECT_ID = 0x20;
+
+        /// <summary>
+        /// 
+        /// Server: [Header] [Int32 localID] [Int32 serverID] [Int32 unitType]
+        /// </summary>
+        public const byte GAME_OBJECT_ID = 0x21;
 
 
 
-        // 16 - 255 Yours to take
+
+
+        // 48 - 255 Yours to take
     }
 }

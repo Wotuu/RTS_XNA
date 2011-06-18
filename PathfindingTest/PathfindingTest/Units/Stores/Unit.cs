@@ -14,6 +14,7 @@ using AStarCollisionMap.Pathfinding;
 using AStarCollisionMap.Collision;
 using XNAInputHandler.MouseInput;
 using PathfindingTest.State;
+using PathfindingTest.Multiplayer.Data;
 
 namespace PathfindingTest.Units
 {
@@ -42,6 +43,8 @@ namespace PathfindingTest.Units
         public State state { get; set; }
         public double productionDuration { get; set; }
         public double productionProgress { get; set; }
+
+        public UnitMultiplayerData multiplayerData { get; set; }
 
         #region Movement variables
         public LinkedList<Point> waypoints { get; set; }
@@ -222,6 +225,19 @@ namespace PathfindingTest.Units
                 }
             }
 
+            // ONLY the current player may sync his units
+            if (Game1.CURRENT_PLAYER == this.player && Game1.GetInstance().IsMultiplayerGame())
+            {
+                double now = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds ;
+                if (now - this.multiplayerData.lastPulse > 
+                    this.multiplayerData.updateRate)
+                {
+                    // We may get stacking queues if we dont do this
+                    this.multiplayerData.lastPulse = now;
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+            }
+
             QuadRoot root = Game1.GetInstance().quadTree;
             root.GetQuadByPoint(this.GetLocation()).highlighted = true;
         }
@@ -262,19 +278,58 @@ namespace PathfindingTest.Units
         /// This method is preferred to MoveToNow(Point p), as it doesn't cause a performance peek, but it may take a few frames before
         /// your path is ready.
         /// </summary>
-        /// <param name="p">The point to move to, in a few frames</param>
+        /// <param name="p">The point to move to, in a few frames depending on the queue</param>
         public void MoveToQueue(Point p)
         {
-            PathfindingProcessor.GetInstance().Push(this, p);
+            if (p == Point.Zero)
+            {
+                Console.Out.WriteLine("Not moving to point (0, 0).");
+                return;
+            }
+
+            if (!Game1.GetInstance().IsMultiplayerGame() &&
+                !PathfindingProcessor.GetInstance().AlreadyInQueue(this)) PathfindingProcessor.GetInstance().Push(this, p);
+            else
+            {
+                if (this.multiplayerData.moveTarget == null || 
+                    this.multiplayerData.moveTarget == Point.Zero)
+                {
+                    this.multiplayerData.moveTarget = this.GetLocation();
+                }
+                PathfindingProcessor.GetInstance().Push(this, p);
+                /*
+                if (this.multiplayerData.moveTarget != Point.Zero)
+                {
+                    PathfindingProcessor.GetInstance().Push(this, p);
+                    this.multiplayerData.moveTarget = Point.Zero;
+                }
+                else
+                {
+                    this.multiplayerData.moveTarget = p;
+                    Console.Out.WriteLine("Queueing unit: " + p);
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+                */
+            }
         }
 
         /// <summary>
-        /// Moves to a point right now. Before using this function, check if you cannot use MoveToQueue(Point p). This function may
-        /// impact the FPS in a bad manner if used outside the queue.
+        /// Moves to a point now. Causes lagspikes if done incorrectly.
         /// </summary>
         /// <param name="p">The point to move to</param>
-        public void MoveToNow(Point p)
+        /// <param name="isProcessor">Should always be false for you. Only is true for the PathfindingProcessor.</param>
+        public void MoveToNow(Point p, Boolean isProcessor)
         {
+            //if (!isProcessor)
+            //{
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                if (!isProcessor) PathfindingProcessor.GetInstance().Remove(this);
+                this.multiplayerData.moveTarget = p;
+                Console.Out.WriteLine("Queueing unit now: " + p);
+                Synchronizer.GetInstance().QueueUnit(this);
+            }
+            //}
             long ticks = DateTime.UtcNow.Ticks;
             if (Game1.GetInstance().collision.IsCollisionBetween(new Point((int)this.x, (int)this.y), p))
             {
@@ -317,7 +372,7 @@ namespace PathfindingTest.Units
             }
             if (this.waypoints.Count > 0)
             {
-                Point newTarget = this.waypoints.ElementAt(0);
+                Point newTarget = this.waypoints.First.Value;
                 SetMoveToTarget(newTarget.X, newTarget.Y);
             }
             // Console.Out.WriteLine("Found path in " + ((DateTime.UtcNow.Ticks - ticks) / 10000) + "ms");
@@ -334,7 +389,6 @@ namespace PathfindingTest.Units
 
             this.color = player.color;
             this.waypoints = new LinkedList<Point>();
-            this.player.units.AddLast(this);
 
             this.repelsOthers = true;
             this.collisionWith = new LinkedList<Unit>();
@@ -345,6 +399,7 @@ namespace PathfindingTest.Units
             this.maxHealth = 100;
 
             this.state = State.Finished;
+            this.player.units.AddLast(this);
         }
 
         internal void DrawHealthBar(SpriteBatch sb)
@@ -355,9 +410,9 @@ namespace PathfindingTest.Units
 
         void OnCollisionChangedListener.OnCollisionChanged(CollisionChangedEvent collisionEvent)
         {
-            if (waypoints.Count > 0) 
-            { 
-                this.MoveToNow(this.waypoints.ElementAt(this.waypoints.Count - 1)); 
+            if (waypoints.Count > 0)
+            {
+                this.MoveToQueue(this.waypoints.ElementAt(this.waypoints.Count - 1));
             }
         }
 
@@ -383,7 +438,7 @@ namespace PathfindingTest.Units
         public void Attack(Unit unitToAttack)
         {
             this.unitToStalk = unitToAttack;
-            Point p = new Point((int) unitToAttack.x, (int) unitToAttack.y);
+            Point p = new Point((int)unitToAttack.x, (int)unitToAttack.y);
             this.MoveToQueue(p);
         }
 

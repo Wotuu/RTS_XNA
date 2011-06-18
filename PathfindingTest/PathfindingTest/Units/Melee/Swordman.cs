@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using PathfindingTest.Combat;
 using PathfindingTest.Units.Damage;
+using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Units.Melee
 {
@@ -18,15 +20,23 @@ namespace PathfindingTest.Units.Melee
         {
             this.baseDamage = baseDamage;
 
-            this.player = p;
-            this.x = x;
-            this.y = y;
             this.type = Type.Melee;
+
+            Console.Out.WriteLine("Constructed a swordsman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/melee");
 
             this.productionDuration = 5;
             this.productionProgress = 0;
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                this.multiplayerData = new UnitMultiplayerData(this);
+                if (this.player == Game1.CURRENT_PLAYER)
+                {
+                    this.multiplayerData.RequestServerID(UnitHeaders.TYPE_SWORDMAN);
+                }
+            }
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
@@ -62,27 +72,27 @@ namespace PathfindingTest.Units.Melee
         /// </summary>
         public override void Swing()
         {
-            
+
             //if (this.fireCooldown < 0)
-           // {
-                CheckForEnemiesInRange();
-                if (this.enemiesInRange.Count == 0)
-                {
-                    return;
-                }
-                Console.WriteLine("swung weapon");
-                Unit targetUnit = this.enemiesInRange.ElementAt(0);
-                AggroEvent e = new AggroEvent(this, targetUnit, true);
-                targetUnit.OnAggroRecieved(e);
-                this.OnAggro(e);
-                DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), targetUnit);
-                targetUnit.OnDamage(dmgEvent);
-                this.fireCooldown = this.rateOfFire;
-        //    }
-       //     else
-       //     {
-       //         Console.WriteLine("Cant fire Q.Q");
-        //    }
+            // {
+            CheckForEnemiesInRange();
+            if (this.enemiesInRange.Count == 0)
+            {
+                return;
+            }
+            Console.WriteLine("swung weapon");
+            Unit targetUnit = this.enemiesInRange.ElementAt(0);
+            AggroEvent e = new AggroEvent(this, targetUnit, true);
+            targetUnit.OnAggroRecieved(e);
+            this.OnAggro(e);
+            DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), targetUnit);
+            targetUnit.OnDamage(dmgEvent);
+            this.fireCooldown = this.rateOfFire;
+            //    }
+            //     else
+            //     {
+            //         Console.WriteLine("Cant fire Q.Q");
+            //    }
         }
 
         /// <summary>

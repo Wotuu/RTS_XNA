@@ -43,11 +43,15 @@ namespace XNAInterfaceComponents.Managers
             {
                 c.Update();
             }
-            for (int i = 0; i < unloadList.Count; i++)
+            if (unloadList.Count > 0)
             {
-                componentList.Remove(unloadList.ElementAt(i));
+                for (int i = 0; i < unloadList.Count; i++)
+                {
+                    ParentComponent unload = unloadList.ElementAt(i);
+                    componentList.Remove(unload);
+                }
+                unloadList.Clear();
             }
-            unloadList.Clear();
 
             if (loadList.Count > 0)
             {
@@ -75,6 +79,17 @@ namespace XNAInterfaceComponents.Managers
         public void QueueUnload(ParentComponent component)
         {
             unloadList.AddLast(component);
+        }
+
+        /// <summary>
+        /// Unloads all panels.
+        /// </summary>
+        public void UnloadAllPanels()
+        {
+            foreach (ParentComponent c in this.componentList)
+            {
+                QueueUnload(c);
+            }
         }
 
 

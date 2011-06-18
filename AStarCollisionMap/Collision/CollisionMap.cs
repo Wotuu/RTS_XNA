@@ -366,7 +366,7 @@ namespace AStarCollisionMap.Collision
 
         public CollisionMap(Game game, int width, int height)
         {
-            Texture2D map = game.Content.Load<Texture2D>("CollisionMap/collisionMap2");
+            Texture2D map = game.Content.Load<Texture2D>("CollisionMap/collisionMap5");
             mapWidth = width;
             mapHeight = height;
             this.data = TextureToBoolean(map);

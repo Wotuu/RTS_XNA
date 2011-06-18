@@ -9,7 +9,7 @@ using XNAInterfaceComponents.AbstractComponents;
 using PathfindingTest.UI.Menus.Multiplayer;
 using SocketLibrary.Users;
 
-namespace PathfindingTest.Multiplayer.SocketConnection
+namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
 {
     public class ChatPacketProcessor
     {
@@ -52,6 +52,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
                     }
                 case Headers.CLIENT_CHANNEL:
                     {
+                        UserManager.GetInstance().users.Clear();
                         // UserManager.GetInstance().users.Clear();
                         ChatServerConnectionManager.GetInstance().user.channelID = PacketUtil.DecodePacketInt(p, 0);
                         Console.Out.WriteLine("Switched channel to: " + ChatServerConnectionManager.GetInstance().user.channelID);
@@ -88,6 +89,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection
 
                         if (menu is MultiplayerLobby)
                         {
+                            Console.Out.WriteLine("New user in multiplayer lobby! -> " + user);
                             MultiplayerLobby lobby = ((MultiplayerLobby)menu);
                             lobby.AddUser(user);
                         }

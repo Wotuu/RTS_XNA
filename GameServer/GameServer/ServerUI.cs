@@ -21,6 +21,14 @@ namespace GameServer
     {
         private static ServerUI instance { get; set; }
         public String lastSelectedClientName { get; set; }
+        public ServerType viewClientsOf { get; set; }
+
+        public enum ServerType
+        {
+            GameServer,
+            ChatServer
+        }
+
         #region Scrollbar crap
         [DllImport("user32.dll")]
         static public extern bool ShowScrollBar(System.IntPtr hWnd, int wBar, bool bShow);
@@ -34,6 +42,17 @@ namespace GameServer
         {
             InitializeComponent();
             ClientsListView.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(ClientsSelectionChanged);
+
+            LinkedList<String> testlist = new LinkedList<string>();
+
+            String s = null;
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+
+            Console.Out.WriteLine("count: " + testlist.Count);
 
             this.Disposed += new EventHandler(ServerUI_Disposed);
             // ShowScrollBar(this.ReceivedMessagesListView.Handle, (int)SB_VERT, true);
@@ -62,24 +81,31 @@ namespace GameServer
         /// Refills the message logs.
         /// </summary>
         /// <param name="listener">The listener to display.</param>
-        public void RefillMessageLogs(ChatClientListener listener)
+        public void RefillMessageLogs(LinkedList<SocketLibrary.Protocol.Logger.LogMessage> messageLog)
         {
             this.ReceivedMessagesListView.Items.Clear();
             this.SentMessagesListView.Items.Clear();
 
-            for (int i = 0; i < listener.client.messageLog.Count; i++)
+            try
             {
-                SocketLibrary.SocketClient.LogMessage message = listener.client.messageLog.ElementAt(i);
-                String[] split = message.message.Split(' ');
-                String msg = "";
-                for (int j = 2; j < split.Length; j++)
+                for (int i = 0; i < messageLog.Count; i++)
                 {
-                    msg += split[j] + " ";
+                    SocketLibrary.Protocol.Logger.LogMessage message = messageLog.ElementAt(i);
+                    String[] split = message.message.Split(' ');
+                    String msg = "";
+                    for (int j = 2; j < split.Length; j++)
+                    {
+                        msg += split[j] + " ";
+                    }
+                    if (message.received) this.ReceivedMessagesListView.Items.Add(
+                        new ListViewItem(new String[] { split[0], split[1], msg }));
+                    else this.SentMessagesListView.Items.Add(
+                        new ListViewItem(new String[] { split[0], split[1], msg }));
                 }
-                if (message.received) this.ReceivedMessagesListView.Items.Add(
-                    new ListViewItem(new String[] { split[0], split[1], msg }));
-                else this.SentMessagesListView.Items.Add(
-                    new ListViewItem(new String[] { split[0], split[1], msg }));
+            }
+            catch (Exception e)
+            {
+
             }
         }
 
@@ -128,9 +154,11 @@ namespace GameServer
             SentMessagesListView.Items.Clear();
             ReceivedMessagesListView.Items.Clear();
             RemoveDisposedConnections();
-            foreach (SocketClient client in GameServerManager.GetInstance().clients)
+            viewClientsOf = ServerType.GameServer;
+            foreach (GameClientListener clientListener in GameServerManager.GetInstance().clients)
             {
-                ClientsListView.Items.Add(new ListViewItem(client.Sock.RemoteEndPoint.ToString(), 0));
+                ClientsListView.Items.Add(new ListViewItem(
+                    new String[] { clientListener.user.username, clientListener.client.GetRemoteHostIP() }));
             }
         }
 
@@ -140,6 +168,7 @@ namespace GameServer
             ReceivedMessagesListView.Items.Clear();
             SentMessagesListView.Items.Clear();
             RemoveDisposedConnections();
+            viewClientsOf = ServerType.ChatServer;
             foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
             {
                 ClientsListView.Items.Add(new ListViewItem(
@@ -154,14 +183,30 @@ namespace GameServer
             this.SentMessagesListView.Items.Clear();
             if (e.IsSelected)
             {
-                foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
+                if (viewClientsOf == ServerType.ChatServer)
                 {
-                    // Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
-                    if (e.Item.Text == clientListener.user.username)
+                    foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
                     {
-                        this.lastSelectedClientName = clientListener.user.username;
-                        RefillMessageLogs(clientListener);
-                        break;
+                        // Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
+                        if (e.Item.Text == clientListener.user.username)
+                        {
+                            this.lastSelectedClientName = clientListener.user.username;
+                            RefillMessageLogs(clientListener.client.log.messageLog);
+                            break;
+                        }
+                    }
+                }
+                else if (viewClientsOf == ServerType.GameServer)
+                {
+                    foreach (GameClientListener clientListener in GameServerManager.GetInstance().clients)
+                    {
+                        // Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
+                        if (e.Item.Text == clientListener.user.username)
+                        {
+                            this.lastSelectedClientName = clientListener.user.username;
+                            RefillMessageLogs(clientListener.client.log.messageLog);
+                            break;
+                        }
                     }
                 }
             }
@@ -170,6 +215,15 @@ namespace GameServer
         private void RemoveDisposedConnections()
         {
             // TODO: Remove disposed game connections
+            for (int i = 0; i < GameServerManager.GetInstance().clients.Count; i++)
+            {
+                GameClientListener cl = GameServerManager.GetInstance().clients.ElementAt(i);
+                if (cl.client.GetRemoteHostIP() == "SOCKET DISPOSED")
+                {
+                    GameServerManager.GetInstance().clients.Remove(cl);
+                    i--;
+                }
+            }
 
             // /TODO
             // Remove disposed connections

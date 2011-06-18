@@ -62,8 +62,9 @@ namespace PathfindingTest.QuadTree
         {
             if (this.children == null)
             {
+                DrawUtil.DrawCross(sb, this.rectangle, this.tree.drawWidth, this.tree.drawColor);
                 // Top left to bottom left
-                Game1.GetInstance().DrawLine(sb,
+                /*Game1.GetInstance().DrawLine(sb,
                     new Point(this.rectangle.Left, this.rectangle.Top),
                     new Point(this.rectangle.Left, this.rectangle.Bottom),
                     this.tree.drawColor,
@@ -85,16 +86,16 @@ namespace PathfindingTest.QuadTree
                     new Point(this.rectangle.Right, this.rectangle.Bottom),
                     new Point(this.rectangle.Left, this.rectangle.Bottom),
                     this.tree.drawColor,
-                    this.tree.drawWidth);
+                    this.tree.drawWidth);*/
 
                 if (this.highlighted)
                 {
-                    Game1.GetInstance().DrawLine(sb,
+                    DrawUtil.DrawLine(sb,
                         new Point(this.rectangle.Left, this.rectangle.Top),
                         new Point(this.rectangle.Right, this.rectangle.Bottom),
                         this.tree.highlightedColor,
                         this.tree.drawWidth);
-                    Game1.GetInstance().DrawLine(sb,
+                    DrawUtil.DrawLine(sb,
                         new Point(this.rectangle.Right, this.rectangle.Top),
                         new Point(this.rectangle.Left, this.rectangle.Bottom),
                         this.tree.highlightedColor,

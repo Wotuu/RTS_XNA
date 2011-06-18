@@ -12,11 +12,11 @@ namespace GameServer.GameServer
         private static GameServerManager instance { get; set; }
         public SocketServer serverSocket { get; set; }
         public int port = 14050;
-        public LinkedList<SocketClient> clients { get; set; }
+        public LinkedList<GameClientListener> clients { get; set; }
 
         private GameServerManager()
         {
-            clients = new LinkedList<SocketClient>();
+            clients = new LinkedList<GameClientListener>();
         }
 
         public static GameServerManager GetInstance()
@@ -50,7 +50,7 @@ namespace GameServer.GameServer
 
         public void OnClientConnected(SocketClient client)
         {
-            clients.AddLast(client);
+            clients.AddLast(new GameClientListener(client));
             client.SocketName = "Client nr " + clients.Count;
         }
     }

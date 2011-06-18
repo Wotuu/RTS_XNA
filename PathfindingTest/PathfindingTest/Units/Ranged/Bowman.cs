@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PathfindingTest.Units.Projectiles;
 using PathfindingTest.Combat;
+using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Units
 {
@@ -18,15 +20,22 @@ namespace PathfindingTest.Units
         {
             this.baseDamage = baseDamage;
 
-            this.player = p;
-            this.x = x;
-            this.y = y;
             this.type = Type.Ranged;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/bowman");
+            Console.Out.WriteLine("Constructed a bowman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
             this.productionDuration = 5;
             this.productionProgress = 0;
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                this.multiplayerData = new UnitMultiplayerData(this);
+                if (this.player == Game1.CURRENT_PLAYER)
+                {
+                    this.multiplayerData.RequestServerID(UnitHeaders.TYPE_BOWMAN);
+                }
+            }
         }
 
         public override void Update(KeyboardState ks, MouseState ms)

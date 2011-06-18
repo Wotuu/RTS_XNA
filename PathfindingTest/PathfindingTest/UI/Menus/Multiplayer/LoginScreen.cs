@@ -6,10 +6,11 @@ using XNAInterfaceComponents.Components;
 using Microsoft.Xna.Framework;
 using XNAInterfaceComponents.AbstractComponents;
 using XNAInterfaceComponents.ChildComponents;
-using PathfindingTest.Multiplayer.SocketConnection;
+using PathfindingTest.Multiplayer.PreGame.SocketConnection;
 using XNAInterfaceComponents.ParentComponents;
 using SocketLibrary.Packets;
 using SocketLibrary.Users;
+using PathfindingTest.Multiplayer.SocketConnection.InGame;
 
 namespace PathfindingTest.UI.Menus.Multiplayer
 {
@@ -81,6 +82,8 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             }
             else
             {
+                GameServerConnectionManager.GetInstance().serverLocation = ipTF.text;
+
                 ChatServerConnectionManager.GetInstance().serverLocation = ipTF.text;
                 ChatServerConnectionManager.GetInstance().user = new User(usernameTF.text);
                 ChatServerConnectionManager.GetInstance().ConnectToServer();

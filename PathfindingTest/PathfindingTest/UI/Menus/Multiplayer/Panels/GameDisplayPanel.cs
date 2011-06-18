@@ -7,7 +7,7 @@ using XNAInterfaceComponents.AbstractComponents;
 using Microsoft.Xna.Framework;
 using SocketLibrary.Multiplayer;
 using XNAInterfaceComponents.ChildComponents;
-using PathfindingTest.Multiplayer.SocketConnection;
+using PathfindingTest.Multiplayer.PreGame.SocketConnection;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 
@@ -61,12 +61,6 @@ namespace PathfindingTest.UI.Menus.Multiplayer.Panels
             joinPacket.AddInt(this.multiplayerGame.id);
             joinPacket.AddInt(ChatServerConnectionManager.GetInstance().user.id);
             ChatServerConnectionManager.GetInstance().SendPacket(joinPacket);
-        }
-
-        public void Unload()
-        {
-            base.Unload();
-
         }
     }
 }

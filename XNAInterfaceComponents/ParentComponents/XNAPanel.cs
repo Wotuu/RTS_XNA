@@ -53,9 +53,10 @@ namespace XNAInterfaceComponents.Components
 
         public override void Update()
         {
-            foreach (Component child in this.children)
+            for (int i = 0; i < this.children.Count; i++)
             {
-                child.Update();
+                Component c = this.children.ElementAt(i);
+                c.Update();
             }
         }
 

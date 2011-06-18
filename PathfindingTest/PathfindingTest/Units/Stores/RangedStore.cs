@@ -8,6 +8,8 @@ namespace PathfindingTest.Units.Stores
 {
     class RangedStore : UnitStore
     {
+        private readonly object lockObj = new object();
+
         public RangedStore(Player player)
         {
             this.player = player;
@@ -15,11 +17,14 @@ namespace PathfindingTest.Units.Stores
 
         protected override Unit createUnit(Unit.Type type, int x, int y, int baseDamage)
         {
-            switch (type)
+            lock (lockObj)
             {
-                case Unit.Type.Ranged:
-                    return new Bowman(player, x, y, baseDamage);
-                default: return null; 
+                switch (type)
+                {
+                    case Unit.Type.Ranged:
+                        return new Bowman(player, x, y, baseDamage);
+                    default: return null;
+                }
             }
         }
     }

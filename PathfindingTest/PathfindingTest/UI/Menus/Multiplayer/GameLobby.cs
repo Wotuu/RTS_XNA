@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using XNAInterfaceComponents.AbstractComponents;
 using XNAInterfaceComponents.ChildComponents;
 using XNAInputLibrary.KeyboardInput;
-using PathfindingTest.Multiplayer.SocketConnection;
+using PathfindingTest.Multiplayer.PreGame.SocketConnection;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 using PathfindingTest.Multiplayer;
@@ -25,10 +25,27 @@ namespace PathfindingTest.UI.Menus.Multiplayer
 
         private XNATextField messagesTextField { get; set; }
         private XNATextField messageTextField { get; set; }
-        public MultiplayerGame multiplayerGame { get; set; }
+        private XNAButton startGameButton { get; set; }
+        public XNAButton leaveGameButton { get; set; }
+
+        private MultiplayerGame _multiplayerGame { get; set; }
+        public MultiplayerGame multiplayerGame
+        {
+            get
+            {
+                return _multiplayerGame;
+            }
+            set
+            {
+                this.startGameButton.visible = value != null;
+
+                _multiplayerGame = value;
+            }
+        }
 
         private XNAPanel gameOptionsPanel { get; set; }
         private LinkedList<UserDisplayPanel> userDisplayPanels = new LinkedList<UserDisplayPanel>();
+        public double creationTime { get; set; }
 
         public GameLobby()
             : base(null,
@@ -44,6 +61,8 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             mapPreviewPanel.border = new Border(gameOptionsPanel, 1, Color.Blue);
 
 
+            this.creationTime = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds;
+
             XNAPanel messagesPanel = new XNAPanel(this, new Rectangle(5, 340, 790, 210));
             messagesPanel.border = new Border(messagesPanel, 1, Color.Blue);
 
@@ -57,11 +76,12 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             messageTextField.font = MenuManager.SMALL_TEXTFIELD_FONT;
             messageTextField.onTextFieldKeyPressedListeners += this.OnKeyPressed;
 
-            XNAButton createGameButton = new XNAButton(this,
-                new Rectangle(this.bounds.Width - 105, this.bounds.Height - 45, 100, 40), "Create Game");
-            createGameButton.onClickListeners += StartGame;
+            startGameButton = new XNAButton(this,
+                new Rectangle(this.bounds.Width - 105, this.bounds.Height - 45, 100, 40), "Start Game");
+            startGameButton.onClickListeners += StartGame;
+            startGameButton.visible = false;
 
-            XNAButton leaveGameButton = new XNAButton(this,
+            leaveGameButton = new XNAButton(this,
                 new Rectangle(5, this.bounds.Height - 45, 100, 40), "Leave Game");
             leaveGameButton.onClickListeners += LeaveGame;
         }
@@ -99,8 +119,9 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             // I prefer the ID function ..
             if (!UserExists(user.id))
             {
-                Console.Out.WriteLine(user + " has joined the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
-                userDisplayPanels.AddLast(new UserDisplayPanel(gameOptionsPanel, user, this.userDisplayPanels.Count));
+                Console.Out.WriteLine(this.creationTime + ": " + user + " has joined the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
+                this.userDisplayPanels.AddLast(new UserDisplayPanel(gameOptionsPanel, user, this.userDisplayPanels.Count));
+                Console.Out.WriteLine(this.creationTime + ": " + "Users now in lobby: " + this.userDisplayPanels.Count);
             }
         }
 
@@ -110,7 +131,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="user">The user that left.</param>
         public void UserLeft(User user)
         {
-            Console.Out.WriteLine(user + " has left the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
+            Console.Out.WriteLine(this.creationTime + ": " + user + " has left the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
             Boolean removed = false;
             for (int i = 0; i < userDisplayPanels.Count; i++)
             {
@@ -121,7 +142,9 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 }
                 else if (p.user.id == user.id)
                 {
+                    Console.Out.WriteLine(this.creationTime + ": " + "Removed a panel from the list because " + p.user + " == " + user.id + "!");
                     userDisplayPanels.Remove(p);
+                    Console.Out.WriteLine(this.creationTime + ": " + "Users now in lobby: " + this.userDisplayPanels.Count);
                     p.Unload();
                     i--;
                     removed = true;
@@ -146,7 +169,33 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="source"></param>
         public void StartGame(XNAButton source)
         {
+            Boolean isReady = true;
+            foreach (UserDisplayPanel panel in userDisplayPanels)
+            {
+                if (!panel.readyCheckBox.selected)
+                {
+                    this.AddMessageToLog("Not all players are ready.");
+                    isReady = false;
+                    break;
+                }
+            }
 
+            if (isReady)
+            {
+                Packet p = new Packet(Headers.CLIENT_GAME_START);
+                ChatServerConnectionManager.GetInstance().SendPacket(p);
+
+                this.startGameButton.visible = false;
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the current user is host or not.
+        /// </summary>
+        /// <returns>Yes or no.</returns>
+        public Boolean IsCurrentUserHost()
+        {
+            return this.multiplayerGame != null;
         }
 
         /// <summary>
@@ -156,7 +205,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         public void LeaveGame(XNAButton source)
         {
             // If I was the host..
-            if (this.multiplayerGame != null)
+            if (IsCurrentUserHost())
             {
                 // Destroy the game
                 Packet destroyGame = new Packet(Headers.CLIENT_DESTROY_GAME);
@@ -207,6 +256,39 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 result += messageLog.ElementAt(i).GetComposedMessage();
             }
             messagesTextField.text = result;
+        }
+
+        /// <summary>
+        /// Gets the amount of display panels in this lobby.
+        /// </summary>
+        /// <returns></returns>
+        public int GetDisplayPanelCount()
+        {
+            return this.userDisplayPanels.Count;
+        }
+
+        /// <summary>
+        /// Gets a display panel by user ID.
+        /// </summary>
+        /// <param name="userID">The user ID to get the panel from.</param>
+        /// <returns>The panel.</returns>
+        public UserDisplayPanel GetDisplayPanelByUserId(int userID)
+        {
+            foreach (UserDisplayPanel p in this.userDisplayPanels)
+            {
+                if (p.user.id == userID) return p;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a user display panel by index.
+        /// </summary>
+        /// <param name="index">The index to get.</param>
+        /// <returns></returns>
+        public UserDisplayPanel GetDisplayPanel(int index)
+        {
+            return this.userDisplayPanels.ElementAt(index);
         }
     }
 }

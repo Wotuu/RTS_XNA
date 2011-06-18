@@ -13,6 +13,8 @@ using PathfindingTest.UI;
 using PathfindingTest.Pathfinding;
 using PathfindingTest.Combat;
 using PathfindingTest.Buildings;
+using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Units
 {
@@ -37,10 +39,21 @@ namespace PathfindingTest.Units
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/Engineer");
             this.collisionRadiusTexture = Game1.GetInstance().Content.Load<Texture2D>("Misc/patternPreview");
 
+            Console.Out.WriteLine("Constructed an engineer @ " + this.GetLocation() + " (" + x + ", " + y + ")");
+
             this.collisionRadius = texture.Width / 2;
 
             this.productionDuration = 5;
             this.productionProgress = 0;
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                this.multiplayerData = new UnitMultiplayerData(this);
+                if (this.player == Game1.CURRENT_PLAYER)
+                {
+                    this.multiplayerData.RequestServerID(UnitHeaders.TYPE_ENGINEER);
+                }
+            }
         }
 
         /// <summary>
@@ -104,7 +117,7 @@ namespace PathfindingTest.Units
             else targetPoint = this.waypoints.ElementAt(this.waypoints.Count - 1);
             // Move to the point around the circle of the building, but increase the radius a bit
             // so we're not standing on the exact top of the building
-            this.MoveToNow(
+            this.MoveToQueue(
                 Util.GetPointOnCircle(p, b.GetCircleRadius() + this.texture.Width / 2,
                 Util.GetHypoteneuseAngleDegrees(p, targetPoint)));
 

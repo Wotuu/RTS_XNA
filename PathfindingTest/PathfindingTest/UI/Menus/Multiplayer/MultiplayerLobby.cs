@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using XNAInterfaceComponents.AbstractComponents;
 using XNAInterfaceComponents.ChildComponents;
 using XNAInputLibrary.KeyboardInput;
-using PathfindingTest.Multiplayer.SocketConnection;
+using PathfindingTest.Multiplayer.PreGame.SocketConnection;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 using XNAInterfaceComponents.ParentComponents;
@@ -22,6 +22,10 @@ namespace PathfindingTest.UI.Menus.Multiplayer
     {
         private XNATextField messagesTextField { get; set; }
         private LinkedList<Message> messageLog = new LinkedList<Message>();
+
+        public XNAButton disconnectButton { get; set; }
+        public XNAButton createGameButton { get; set; }
+
         private XNATextField messageTextField { get; set; }
         private XNATextField usersField { get; set; }
         public XNAInputDialog gameNameInput { get; set; }
@@ -64,11 +68,11 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             messageTextField.font = MenuManager.SMALL_TEXTFIELD_FONT;
             messageTextField.onTextFieldKeyPressedListeners += this.OnKeyPressed;
 
-            XNAButton disconnectButton = new XNAButton(this,
+            disconnectButton = new XNAButton(this,
                 new Rectangle(this.bounds.Width - 105, this.bounds.Height - 45, 100, 40), "Disconnect");
             disconnectButton.onClickListeners += DisconnectBtnClicked;
 
-            XNAButton createGameButton = new XNAButton(this,
+            createGameButton = new XNAButton(this,
                 new Rectangle(5, this.bounds.Height - 45, 100, 40), "Create Game");
             createGameButton.onClickListeners += CreateGameBtnClicked;
 
@@ -170,7 +174,6 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         public void DisconnectBtnClicked(XNAButton source)
         {
             ChatServerConnectionManager.GetInstance().DisconnectFromServer();
-            MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLogin);
         }
 
         #region User Management
@@ -195,7 +198,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="user">The user to remove.</param>
         public void RemoveUser(User toRemove)
         {
-            UserManager.GetInstance().users.Remove(toRemove);
+            UserManager.GetInstance().RemoveUserByID(toRemove.id);
             if (UserManager.GetInstance().users.Count == 0)
             {
                 usersField.text = "No users for some odd reason.";

@@ -53,6 +53,7 @@
     <Compile Include="ChatServer\Channels\ChannelManager.cs" />
     <Compile Include="ChatServer\ChatClientListener.cs" />
     <Compile Include="ChatServer\Games\MultiplayerGameManager.cs" />
+    <Compile Include="GameServer\GameClientListener.cs" />
     <Compile Include="GameServer\GameServerManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

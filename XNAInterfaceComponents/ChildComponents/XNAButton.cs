@@ -91,7 +91,6 @@ namespace XNAInterfaceComponents.AbstractComponents
                 Rectangle screenRect = new Rectangle(screenLocation.X, screenLocation.Y, this.bounds.Width, this.bounds.Height);
                 if (screenRect.Contains(m_event.location))
                 {
-                    Console.Out.WriteLine("Pressed on a button!");
                     if (this.onClickListeners != null) onClickListeners(this);
                 }
             }
@@ -104,13 +103,13 @@ namespace XNAInterfaceComponents.AbstractComponents
 
         public override void OnMouseEnter(MouseEvent m_event)
         {
-            this.isMouseOver = true;
+            if( this.enabled ) this.isMouseOver = true;
             // Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " mouse entered!");
         }
 
         public override void OnMouseExit(MouseEvent m_event)
         {
-            this.isMouseOver = false;
+            if( this.enabled ) this.isMouseOver = false;
             // Console.Out.WriteLine("XNA Button @ " + this.GetScreenLocation() + " mouse exitted!");
         }
 

@@ -23,10 +23,26 @@ namespace XNAInterfaceComponents.ParentComponents
         public int optionHeight { get; set; }
 
         private Boolean isExpanded { get; set; }
+        private Boolean _enabled { get; set; }
+        public Boolean enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+            set
+            {
+                foreach( ChildComponent c in this.children ){
+                    c.enabled = value;
+                }
+                this._enabled = value;
+            }
+        }
 
         public XNADropdown(ParentComponent parent, Rectangle bounds)
             : base(parent, bounds)
         {
+            this.enabled = true;
             optionHeight = this.bounds.Height;
             shownButton = new XNAButton(this, new Rectangle(
                 0,
@@ -113,12 +129,33 @@ namespace XNAInterfaceComponents.ParentComponents
         }
 
         /// <summary>
+        /// Removes an option by button.
+        /// </summary>
+        /// <param name="button">The button</param>
+        public void RemoveButton(XNAButton button)
+        {
+            this.children.Remove(button);
+            button.Unload();
+        }
+
+        /// <summary>
+        /// Removes an option by index.
+        /// </summary>
+        /// <param name="index">The index to remove.</param>
+        public void RemoveIndex(int index)
+        {
+            Component c = this.children.ElementAt(index + 1);
+            this.children.Remove(c);
+            c.Unload();
+        }
+
+        /// <summary>
         /// When the user wants to expand the dropdown/
         /// </summary>
         /// <param name="source"></param>
         private void ShownButtonClicked(XNAButton source)
         {
-            this.isExpanded = !this.isExpanded;
+            if (this.enabled) this.isExpanded = !this.isExpanded;
         }
 
         /// <summary>
@@ -132,15 +169,29 @@ namespace XNAInterfaceComponents.ParentComponents
             {
                 if (this.children.ElementAt(i) == source)
                 {
-                    if (i != selectedIndex && onOptionSelectedChangedListeners != null)
-                        onOptionSelectedChangedListeners();
-                    this.selectedIndex = i;
-                    shownButton.text = source.text;
-                    shownButton.backgroundColor = source.backgroundColor;
+                    if (i != selectedIndex)
+                    {
+                        SelectItem(i - 1);
+                        if (onOptionSelectedChangedListeners != null)
+                            onOptionSelectedChangedListeners();
+                    }
                     this.isExpanded = false;
                     break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Selects an item.
+        /// </summary>
+        /// <param name="index">The index to select.</param>
+        public void SelectItem(int index)
+        {
+            this.selectedIndex = index + 1;
+            // +1 because the shownButton is a child too.
+            XNAButton button = ((XNAButton)this.children.ElementAt(this.selectedIndex));
+            shownButton.text = button.text;
+            shownButton.backgroundColor = button.backgroundColor;
         }
 
         /// <summary>
@@ -150,6 +201,15 @@ namespace XNAInterfaceComponents.ParentComponents
         public String GetSelectedOption()
         {
             return ((XNAButton)this.children.ElementAt(selectedIndex)).text;
+        }
+
+        /// <summary>
+        /// Gets the button that was selected. (Yes, the Dropdown consists of buttons.)
+        /// </summary>
+        /// <returns>The button that is selected.</returns>
+        public XNAButton GetSelectedButton()
+        {
+            return ((XNAButton)this.children.ElementAt(selectedIndex));
         }
 
         public override void Draw(SpriteBatch sb)

@@ -306,7 +306,7 @@ namespace PathfindingTest.UI
                         {
                             if (u.type == Unit.Type.Engineer)
                             {
-                                u.MoveToNow(new Point(me.location.X, me.location.Y));
+                                u.MoveToNow(new Point(me.location.X, me.location.Y), false);
                                 // Get the last point of the pathfinding result
                                 Point lastPoint = u.waypoints.ElementAt(u.waypoints.Count - 1);
                                 // Remove that point

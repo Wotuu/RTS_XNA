@@ -113,18 +113,19 @@ namespace XNAInterfaceComponents.ChildComponents
 
         public override void OnMouseEnter(MouseEvent e)
         {
-            this.isMouseOver = true;
+            if( this.enabled ) this.isMouseOver = true;
             // Console.Out.WriteLine("Mouse enter on checkbox!");
         }
 
         public override void OnMouseExit(MouseEvent e)
         {
-            this.isMouseOver = false;
+            if( this.enabled ) this.isMouseOver = false;
             // Console.Out.WriteLine("Mouse out on checkbox!");
         }
 
         public void OnMouseClick(MouseEvent m_event)
         {
+            if (!this.enabled) return;
             if (m_event.button == MouseEvent.MOUSE_BUTTON_1)
             {
                 Point screenLocation = parent.RequestScreenLocation(new Point(this.bounds.X, this.bounds.Y));
