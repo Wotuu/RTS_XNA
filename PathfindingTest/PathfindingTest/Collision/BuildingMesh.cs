@@ -58,7 +58,7 @@ namespace PathfindingTest.Collision
                 {
                     if (!processedNodes.Contains(connectedNode))
                     {
-                        PathfindingNodeProcessor.GetInstance().Push(connectedNode);
+                        SmartPathfindingNodeProcessor.GetInstance().Push(connectedNode);
                         processedNodes.AddLast(connectedNode);
                     }
                 }

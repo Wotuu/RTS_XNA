@@ -111,7 +111,7 @@ namespace PathfindingTest.Collision
                         // Remove its current nodes
                         connectedNode.RemoveAllConnections();
                         // Scedule it for reprocessing
-                        PathfindingNodeProcessor.GetInstance().Push(connectedNode);
+                        SmartPathfindingNodeProcessor.GetInstance().Push(connectedNode);
                         processedNodes.AddLast(connectedNode);
                         nodesAdded++;
                     }

@@ -7,8 +7,8 @@ namespace AStarCollisionMap.Pathfinding
 {
     public class PathfindingNodeProcessor
     {
-        private LinkedList<PathfindingNode> toProcess { get; set; }
-        private static PathfindingNodeProcessor instance { get; set; }
+        protected LinkedList<PathfindingNode> toProcess { get; set; }
+        protected static PathfindingNodeProcessor instance { get; set; }
 
         /// <summary>
         /// Removes a node from the queue.
@@ -59,7 +59,7 @@ namespace AStarCollisionMap.Pathfinding
             return instance;
         }
 
-        private PathfindingNodeProcessor()
+        protected PathfindingNodeProcessor()
         {
             toProcess = new LinkedList<PathfindingNode>();
         }

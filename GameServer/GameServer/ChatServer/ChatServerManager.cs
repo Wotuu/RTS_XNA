@@ -57,11 +57,14 @@ namespace GameServer.ChatServer
                 clientListener.OnDisconnect();
             }
 
-            this.serverSocket.Disable();
-            ServerUI.GetInstance().ChatServerStatusLbl.Text = "Server offline";
-            ServerUI.GetInstance().StartChatServer.Enabled = true;
-            ServerUI.GetInstance().StopChatServer.Enabled = false;
-            ServerUI.GetInstance().ViewChatServerClientsBtn.Enabled = false;
+            if (this.serverSocket != null)
+            {
+                this.serverSocket.Disable();
+                ServerUI.GetInstance().ChatServerStatusLbl.Text = "Server offline";
+                ServerUI.GetInstance().StartChatServer.Enabled = true;
+                ServerUI.GetInstance().StopChatServer.Enabled = false;
+                ServerUI.GetInstance().ViewChatServerClientsBtn.Enabled = false;
+            }
         }
 
         /// <summary>

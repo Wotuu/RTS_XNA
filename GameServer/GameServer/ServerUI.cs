@@ -13,21 +13,51 @@ using GameServer.GameServer;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 using GameServer.ChatServer.Channels;
+using System.Runtime.InteropServices;
 
 namespace GameServer
 {
     public partial class ServerUI : Form
     {
         private static ServerUI instance { get; set; }
+        public String lastSelectedClientName { get; set; }
+        public ServerType viewClientsOf { get; set; }
+
+        public enum ServerType
+        {
+            GameServer,
+            ChatServer
+        }
+
+        #region Scrollbar crap
+        [DllImport("user32.dll")]
+        static public extern bool ShowScrollBar(System.IntPtr hWnd, int wBar, bool bShow);
+        private const uint SB_HORZ = 0;
+        private const uint SB_VERT = 1;
+        private const uint ESB_DISABLE_BOTH = 0x3;
+        private const uint ESB_ENABLE_BOTH = 0x0;
+        #endregion
 
         private ServerUI()
         {
             InitializeComponent();
             ClientsListView.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler(ClientsSelectionChanged);
 
-            this.Disposed += new EventHandler(ServerUI_Disposed);
+            LinkedList<String> testlist = new LinkedList<string>();
 
-            // Create a new channel. All is done in the constructor
+            String s = null;
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+            testlist.AddLast(s);
+
+            Console.Out.WriteLine("count: " + testlist.Count);
+
+            this.Disposed += new EventHandler(ServerUI_Disposed);
+            // ShowScrollBar(this.ReceivedMessagesListView.Handle, (int)SB_VERT, true);
+            // ShowScrollBar(this.SentMessagesListView.Handle, (int)SB_VERT, true);
+            // Create a new channel (the lobby!). All is done in the constructor
             new Channel();
         }
 
@@ -35,6 +65,48 @@ namespace GameServer
         {
             if (instance == null) instance = new ServerUI();
             return instance;
+        }
+
+        /// <summary>
+        /// Gets the selected client name.
+        /// </summary>
+        /// <returns>The selected client name.</returns>
+        public String GetSelectedClientName()
+        {
+            if (this.ClientsListView.SelectedItems.Count == 0) return "auriaejwfiuhef";
+            return this.ClientsListView.SelectedItems[0].ToString();
+        }
+
+        /// <summary>
+        /// Refills the message logs.
+        /// </summary>
+        /// <param name="listener">The listener to display.</param>
+        public void RefillMessageLogs(LinkedList<SocketLibrary.Protocol.Logger.LogMessage> messageLog)
+        {
+            this.ReceivedMessagesListView.Items.Clear();
+            this.SentMessagesListView.Items.Clear();
+
+            try
+            {
+                for (int i = 0; i < messageLog.Count; i++)
+                {
+                    SocketLibrary.Protocol.Logger.LogMessage message = messageLog.ElementAt(i);
+                    String[] split = message.message.Split(' ');
+                    String msg = "";
+                    for (int j = 2; j < split.Length; j++)
+                    {
+                        msg += split[j] + " ";
+                    }
+                    if (message.received) this.ReceivedMessagesListView.Items.Add(
+                        new ListViewItem(new String[] { split[0], split[1], msg }));
+                    else this.SentMessagesListView.Items.Add(
+                        new ListViewItem(new String[] { split[0], split[1], msg }));
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
@@ -45,11 +117,6 @@ namespace GameServer
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void Messages_Click(object sender, EventArgs e)
-        {
-
         }
 
 
@@ -78,43 +145,68 @@ namespace GameServer
             ChatServerManager.GetInstance().Stop();
         }
 
+
+
+
         private void ViewGameServerClientsBtn_Click(object sender, EventArgs e)
         {
             ClientsListView.Items.Clear();
-            MessagesListView.Items.Clear();
+            SentMessagesListView.Items.Clear();
+            ReceivedMessagesListView.Items.Clear();
             RemoveDisposedConnections();
-            foreach (SocketClient client in GameServerManager.GetInstance().clients)
+            viewClientsOf = ServerType.GameServer;
+            foreach (GameClientListener clientListener in GameServerManager.GetInstance().clients)
             {
-                ClientsListView.Items.Add(new ListViewItem(client.Sock.RemoteEndPoint.ToString(), 0));
+                ClientsListView.Items.Add(new ListViewItem(
+                    new String[] { clientListener.user.username, clientListener.client.GetRemoteHostIP() }));
             }
         }
 
         private void ViewChatServerClientsBtn_Click(object sender, EventArgs e)
         {
             ClientsListView.Items.Clear();
-            MessagesListView.Items.Clear();
+            ReceivedMessagesListView.Items.Clear();
+            SentMessagesListView.Items.Clear();
             RemoveDisposedConnections();
+            viewClientsOf = ServerType.ChatServer;
             foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
             {
-                ClientsListView.Items.Add(new ListViewItem(clientListener.client.GetRemoteHostIP()));
+                ClientsListView.Items.Add(new ListViewItem(
+                    new String[] { clientListener.user.username, clientListener.client.GetRemoteHostIP() }));
             }
         }
 
+
         void ClientsSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            this.MessagesListView.Items.Clear();
+            this.ReceivedMessagesListView.Items.Clear();
+            this.SentMessagesListView.Items.Clear();
             if (e.IsSelected)
             {
-                foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
+                if (viewClientsOf == ServerType.ChatServer)
                 {
-                    // Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
-                    if (e.Item.Text == clientListener.client.GetRemoteHostIP())
+                    foreach (ChatClientListener clientListener in ChatServerManager.GetInstance().clients)
                     {
-                        foreach (String s in clientListener.client.messageLog)
+                        // Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
+                        if (e.Item.Text == clientListener.user.username)
                         {
-                            this.MessagesListView.Items.Add(new ListViewItem(s));
+                            this.lastSelectedClientName = clientListener.user.username;
+                            RefillMessageLogs(clientListener.client.log.messageLog);
+                            break;
                         }
-                        break;
+                    }
+                }
+                else if (viewClientsOf == ServerType.GameServer)
+                {
+                    foreach (GameClientListener clientListener in GameServerManager.GetInstance().clients)
+                    {
+                        // Console.Out.WriteLine("Comparing " + e.Item.Text + " to " + clientListener.client.GetRemoteHostIP());
+                        if (e.Item.Text == clientListener.user.username)
+                        {
+                            this.lastSelectedClientName = clientListener.user.username;
+                            RefillMessageLogs(clientListener.client.log.messageLog);
+                            break;
+                        }
                     }
                 }
             }
@@ -123,6 +215,15 @@ namespace GameServer
         private void RemoveDisposedConnections()
         {
             // TODO: Remove disposed game connections
+            for (int i = 0; i < GameServerManager.GetInstance().clients.Count; i++)
+            {
+                GameClientListener cl = GameServerManager.GetInstance().clients.ElementAt(i);
+                if (cl.client.GetRemoteHostIP() == "SOCKET DISPOSED")
+                {
+                    GameServerManager.GetInstance().clients.Remove(cl);
+                    i--;
+                }
+            }
 
             // /TODO
             // Remove disposed connections

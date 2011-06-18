@@ -10,6 +10,8 @@ namespace XNAInterfaceComponents
     public class ComponentUtil
     {
 
+        public static Texture2D lineTexture;
+
         /// <summary>
         /// Gets the length of the hypoteneuse between two points.
         /// </summary>
@@ -67,7 +69,6 @@ namespace XNAInterfaceComponents
         /// <param name="c">The color of the line</param>
         public static void DrawLine(SpriteBatch batch, Point start, Point end, Color c, int width)
         {
-            Texture2D lineTexture = ComponentUtil.GetClearTexture2D(batch);
             if (c.A == 0) return;
             if (end.X < start.X)
             {
@@ -80,6 +81,41 @@ namespace XNAInterfaceComponents
             float angle = ComponentUtil.GetHypoteneuseAngleRad(start, end);
             batch.Draw(lineTexture, new Rectangle(start.X, start.Y, (int)Math.Round(hypoteneuse), width), null, c, angle,
                 new Vector2(0, 0), SpriteEffects.None, 0);
+        }
+
+        /// <summary>
+        /// Draws a cross.
+        /// </summary>
+        /// <param name="batch">The SpriteBatch to draw on.</param>
+        /// <param name="rect">The rectangle to draw on.</param>
+        /// <param name="width">The width of the border.</param>
+        /// <param name="c">The Color</param>
+        public static void DrawCross(SpriteBatch batch, Rectangle rect, int width, Color c)
+        {
+            // Top left to bottom left
+            DrawLine(batch,
+                new Point(rect.Left, rect.Top),
+                new Point(rect.Left, rect.Bottom),
+                c,
+                width);
+            // Top left to top right
+            DrawLine(batch,
+                new Point(rect.Left, rect.Top),
+                new Point(rect.Right, rect.Top),
+                c,
+                width);
+            // Top right to bottom right
+            DrawLine(batch,
+                new Point(rect.Right, rect.Top),
+                new Point(rect.Right, rect.Bottom),
+                c,
+                width);
+            // Bottom right to bottom left
+            DrawLine(batch,
+                new Point(rect.Right, rect.Bottom),
+                new Point(rect.Left, rect.Bottom),
+                c,
+                width);
         }
 
         public static void DrawClearRectangle(SpriteBatch batch, Rectangle rect, int width, Color c)

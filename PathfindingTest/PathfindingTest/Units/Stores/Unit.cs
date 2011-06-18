@@ -13,6 +13,8 @@ using PathfindingTest.Combat;
 using AStarCollisionMap.Pathfinding;
 using AStarCollisionMap.Collision;
 using XNAInputHandler.MouseInput;
+using PathfindingTest.State;
+using PathfindingTest.Multiplayer.Data;
 
 namespace PathfindingTest.Units
 {
@@ -48,9 +50,36 @@ namespace PathfindingTest.Units
         public float attackRange { get; set; }
         public float aggroRange { get; set; }
 
+        public UnitMultiplayerData multiplayerData { get; set; }
+
         #region Movement variables
         public LinkedList<Point> waypoints { get; set; }
-        public Boolean hasToMove { get; set; }
+        /*private LinkedList<Point> _waypoints { get; set; }
+        public LinkedList<Point> waypoints
+        {
+            get
+            {
+                return _waypoints;
+            }
+            set
+            {
+                if (!Game1.GetInstance().IsMultiplayerGame())
+                {
+                    if (value.Count > 0)
+                    {
+                        Point newTarget = value.First.Value;
+                        SetMoveToTarget(newTarget.X, newTarget.Y);
+                    }
+                }
+                else if( value.Count > 0 && this.multiplayerData != null &&
+                    this.player == Game1.CURRENT_PLAYER && this.multiplayerData.receivedPathRequest)
+                {
+                    this.multiplayerData.moveTarget = value.Last.Value;
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+                _waypoints = value;
+            }
+        }*/
         public float movementSpeed { get; set; }
         private float direction { get; set; }
         #endregion
@@ -128,7 +157,6 @@ namespace PathfindingTest.Units
             }
             // Point target = this.waypoints.ElementAt(0);
             Move();
-            if (this.repelsOthers) this.CheckCollision();
         }
 
         /// <summary>
@@ -170,8 +198,10 @@ namespace PathfindingTest.Units
                 //Console.Out.WriteLine(direction);
                 //this.direction = angle + (float)(90 * ( Math.PI / 180 ));
             }
-            float xSpeedDirection = movementSpeed * (float)Math.Sin(direction);
-            float ySpeedDirection = movementSpeed * (float)Math.Cos(direction);
+            float timeSteppedSpeed = (float)(movementSpeed * GameTimeManager.GetInstance().time_step);
+
+            float xSpeedDirection = timeSteppedSpeed * (float)Math.Sin(direction);
+            float ySpeedDirection = timeSteppedSpeed * (float)Math.Cos(direction);
 
             if (x < waypoint.X && y < waypoint.Y)
             {
@@ -211,7 +241,8 @@ namespace PathfindingTest.Units
             }
 
 
-            if (Math.Abs(x - waypoint.X) < (xSpeedDirection * 1.1) && Math.Abs(y - waypoint.Y) < (ySpeedDirection * 1.1))
+            if (Math.Abs(x - waypoint.X) < (timeSteppedSpeed * 1.1) &&
+                Math.Abs(y - waypoint.Y) < (timeSteppedSpeed * 1.1))
             {
                 this.x = waypoint.X;
                 this.y = waypoint.Y;
@@ -227,6 +258,20 @@ namespace PathfindingTest.Units
                 else
                 {
                     hasToMove = false;
+                }
+            }
+
+            // ONLY the current player may sync his units
+            if (Game1.CURRENT_PLAYER == this.player && Game1.GetInstance().IsMultiplayerGame())
+            {
+                double now = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds ;
+                if (now - this.multiplayerData.lastPulse > 
+                    this.multiplayerData.updateRate)
+                {
+                    Console.Out.WriteLine("Performing perodic unit update");
+                    // We may get stacking queues if we dont do this
+                    this.multiplayerData.lastPulse = now;
+                    Synchronizer.GetInstance().QueueUnit(this);
                 }
             }
 
@@ -270,19 +315,55 @@ namespace PathfindingTest.Units
         /// This method is preferred to MoveToNow(Point p), as it doesn't cause a performance peek, but it may take a few frames before
         /// your path is ready.
         /// </summary>
-        /// <param name="p">The point to move to, in a few frames</param>
+        /// <param name="p">The point to move to, in a few frames depending on the queue</param>
         public void MoveToQueue(Point p)
         {
-            PathfindingProcessor.GetInstance().Push(this, p);
+            if (p == Point.Zero)
+            {
+                Console.Out.WriteLine("Not moving to point (0, 0).");
+                return;
+            }
+
+            if (!Game1.GetInstance().IsMultiplayerGame() &&
+                !PathfindingProcessor.GetInstance().AlreadyInQueue(this)) PathfindingProcessor.GetInstance().Push(this, p);
+            else
+            {
+                if (this.multiplayerData.moveTarget == null || 
+                    this.multiplayerData.moveTarget == Point.Zero)
+                {
+                    this.multiplayerData.moveTarget = this.GetLocation();
+                }
+                if (this.multiplayerData.receivedPathRequest
+                    || this.player != Game1.CURRENT_PLAYER) PathfindingProcessor.GetInstance().Push(this, p);
+                else
+                {
+                    this.multiplayerData.moveTarget = p;
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+                /*
+                if (this.multiplayerData.moveTarget != Point.Zero)
+                {
+                    PathfindingProcessor.GetInstance().Push(this, p);
+                    this.multiplayerData.moveTarget = Point.Zero;
+                }
+                else
+                {
+                    this.multiplayerData.moveTarget = p;
+                    Console.Out.WriteLine("Queueing unit: " + p);
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+                */
+            }
         }
 
         /// <summary>
-        /// Moves to a point right now. Before using this function, check if you cannot use MoveToQueue(Point p). This function may
-        /// impact the FPS in a bad manner if used outside the queue.
+        /// Calculates a path between the current unit and the point.
         /// </summary>
-        /// <param name="p">The point to move to</param>
-        public void MoveToNow(Point p)
+        /// <param name="p">The point to calculate to.</param>
+        /// <returns>The list containing all the points that you should visit.</returns>
+        public LinkedList<Point> CalculatePath(Point p)
         {
+            LinkedList<Point> result = new LinkedList<Point>();
             long ticks = DateTime.UtcNow.Ticks;
             if (Game1.GetInstance().collision.IsCollisionBetween(new Point((int)this.x, (int)this.y), p))
             {
@@ -297,21 +378,9 @@ namespace PathfindingTest.Units
                     nodes.RemoveFirst();
                     // Clear our current waypoints
                     this.waypoints.Clear();
-                    /*PathfindingNode previousNode = null;
-                    foreach (Node node in nodes)
-                    {
-                        node.selected = true;
-                        if (previousNode != null)
-                        {
-                            PathfindingNodeConnection conn = node.IsConnected(previousNode);
-                            if (conn != null && ((Node)conn.node1).selected && ((Node)conn.node2).selected)
-                                conn.drawColor = Color.Blue;
-                        }
-                        previousNode = node;
-                    }*/
                     foreach (Node n in nodes)
                     {
-                        this.waypoints.AddLast(n.GetLocation());
+                        result.AddLast(n.GetLocation());
                     }
                 }
                 // Nodes can no longer be used
@@ -320,12 +389,33 @@ namespace PathfindingTest.Units
             }
             else
             {
-                this.waypoints.Clear();
-                this.waypoints.AddLast(p);
+                result.AddLast(p);
             }
+            return result;
+        }
+
+        /// <summary>
+        /// DO NOT EVER EVER CALL THIS FUNCTION OR I WILL CUT YOUR BALLS OFF.
+        /// If you want a path right now, call CalculatePath(Point p)
+        /// </summary>
+        /// <param name="p">The point to move to</param>
+        public void MoveToNow(Point p)
+        {
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                    PathfindingProcessor.GetInstance().Remove(this);
+                this.multiplayerData.moveTarget = p;
+                this.multiplayerData.receivedPathRequest = false;
+                if (Game1.CURRENT_PLAYER == this.player)
+                {
+                    Console.Out.WriteLine("Queueing unit now: " + p);
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+            }
+            this.waypoints = CalculatePath(p);
             if (this.waypoints.Count > 0)
             {
-                Point newTarget = this.waypoints.ElementAt(0);
+                Point newTarget = this.waypoints.First.Value;
                 SetMoveToTarget(newTarget.X, newTarget.Y);
             }
             // Console.Out.WriteLine("Found path in " + ((DateTime.UtcNow.Ticks - ticks) / 10000) + "ms");
@@ -343,7 +433,6 @@ namespace PathfindingTest.Units
 
             this.color = player.color;
             this.waypoints = new LinkedList<Point>();
-            this.player.units.AddLast(this);
 
             this.repelsOthers = true;
             this.collisionWith = new LinkedList<Unit>();
@@ -354,6 +443,7 @@ namespace PathfindingTest.Units
             this.maxHealth = 100;
 
             this.state = State.Finished;
+            this.player.units.AddLast(this);
         }
 
         internal void DrawHealthBar(SpriteBatch sb)
@@ -366,7 +456,7 @@ namespace PathfindingTest.Units
         {
             if (waypoints.Count > 0)
             {
-                this.MoveToNow(this.waypoints.ElementAt(this.waypoints.Count - 1));
+                this.MoveToQueue(this.waypoints.ElementAt(this.waypoints.Count - 1));
             }
         }
 
@@ -406,6 +496,7 @@ namespace PathfindingTest.Units
         public void Attack(Unit unitToAttack)
         {
             this.unitToStalk = unitToAttack;
+            Point p = new Point((int)unitToAttack.x, (int)unitToAttack.y);
         }
 
         /// <summary>

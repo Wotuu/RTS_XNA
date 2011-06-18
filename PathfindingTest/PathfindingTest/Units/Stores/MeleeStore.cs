@@ -18,12 +18,13 @@ namespace PathfindingTest.Units
 
         protected override Unit createUnit(Unit.Type type, int x, int y, int baseDamage)
         {
-            switch(type) {
-                case Unit.Type.Engineer:  
+            switch (type)
+            {
+                case Unit.Type.Engineer:
                     return new Engineer(player, x, y, baseDamage);
                 case Unit.Type.Melee:
-                     return new Swordman(player, x, y, baseDamage);
-                default: Console.WriteLine("Null Returned"); return null; 
+                    return new Swordman(player, x, y, baseDamage);
+                default: Console.WriteLine("Null Returned"); return null;
             }
         }
     }

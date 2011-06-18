@@ -77,7 +77,8 @@ namespace PathfindingTest.Selection
 
         internal void Draw(SpriteBatch sb)
         {
-            // Top left to bottom left
+            DrawUtil.DrawClearRectangle(sb, this.rect, this.borderWidth, SelectRectangle.BORDER_COLOR);
+            /*// Top left to bottom left
             Game1.GetInstance().DrawLine(sb,
                 new Point(this.rect.Left, this.rect.Top),
                 new Point(this.rect.Left, this.rect.Bottom + 2),
@@ -100,7 +101,7 @@ namespace PathfindingTest.Selection
                 new Point(this.rect.Right, this.rect.Bottom),
                 new Point(this.rect.Left, this.rect.Bottom),
                 SelectRectangle.BORDER_COLOR,
-                this.borderWidth);
+                this.borderWidth);*/
             /*Game1.GetInstance().DrawLine(sb,
                 new Point(this.innerRect.Left, this.innerRect.Top),
                 new Point(this.innerRect.Right, this.innerRect.Bottom),

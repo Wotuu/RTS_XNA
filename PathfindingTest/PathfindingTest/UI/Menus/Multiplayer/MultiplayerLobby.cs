@@ -7,13 +7,14 @@ using Microsoft.Xna.Framework;
 using XNAInterfaceComponents.AbstractComponents;
 using XNAInterfaceComponents.ChildComponents;
 using XNAInputLibrary.KeyboardInput;
-using PathfindingTest.Multiplayer.SocketConnection;
+using PathfindingTest.Multiplayer.PreGame.SocketConnection;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
 using XNAInterfaceComponents.ParentComponents;
 using SocketLibrary.Users;
 using SocketLibrary.Multiplayer;
 using PathfindingTest.UI.Menus.Multiplayer.Panels;
+using PathfindingTest.UI.Menus.Multiplayer.Misc;
 
 namespace PathfindingTest.UI.Menus.Multiplayer
 {
@@ -21,6 +22,10 @@ namespace PathfindingTest.UI.Menus.Multiplayer
     {
         private XNATextField messagesTextField { get; set; }
         private LinkedList<Message> messageLog = new LinkedList<Message>();
+
+        public XNAButton disconnectButton { get; set; }
+        public XNAButton createGameButton { get; set; }
+
         private XNATextField messageTextField { get; set; }
         private XNATextField usersField { get; set; }
         public XNAInputDialog gameNameInput { get; set; }
@@ -63,17 +68,31 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             messageTextField.font = MenuManager.SMALL_TEXTFIELD_FONT;
             messageTextField.onTextFieldKeyPressedListeners += this.OnKeyPressed;
 
-            XNAButton disconnectButton = new XNAButton(this,
+            disconnectButton = new XNAButton(this,
                 new Rectangle(this.bounds.Width - 105, this.bounds.Height - 45, 100, 40), "Disconnect");
             disconnectButton.onClickListeners += DisconnectBtnClicked;
 
-            XNAButton createGameButton = new XNAButton(this,
+            createGameButton = new XNAButton(this,
                 new Rectangle(5, this.bounds.Height - 45, 100, 40), "Create Game");
             createGameButton.onClickListeners += CreateGameBtnClicked;
 
         }
 
         #region Game Management
+        /// <summary>
+        /// Gets a game by ID.
+        /// </summary>
+        /// <param name="gameID">The game ID.</param>
+        /// <returns>The game or null</returns>
+        public MultiplayerGame GetGameByID(int gameID)
+        {
+            foreach (GameDisplayPanel game in this.gameList)
+            {
+                if (game.multiplayerGame.id == gameID) return game.multiplayerGame;
+            }
+            return null;
+        }
+
         /// <summary>
         /// User entered a game name and pressed OK
         /// </summary>
@@ -100,7 +119,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             for (int i = 0; i < this.gameList.Count; i++)
             {
                 GameDisplayPanel panel = this.gameList.ElementAt(i);
-                if (panel.multiplayerGame.id == id) this.RemoveGame(panel.multiplayerGame); 
+                if (panel.multiplayerGame.id == id) this.RemoveGame(panel.multiplayerGame);
             }
         }
 
@@ -134,7 +153,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="toAdd">The game to add</param>
         public void AddGame(MultiplayerGame toAdd)
         {
-            this.gameList.AddLast(new GameDisplayPanel(this, this.gameList.Count, toAdd));
+            this.gameList.AddLast(new GameDisplayPanel(gamesPanel, this.gameList.Count, toAdd));
         }
         #endregion
 
@@ -155,7 +174,6 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         public void DisconnectBtnClicked(XNAButton source)
         {
             ChatServerConnectionManager.GetInstance().DisconnectFromServer();
-            MenuManager.GetInstance().ShowMenu(MenuManager.Menu.MultiplayerLogin);
         }
 
         #region User Management
@@ -165,7 +183,6 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="user">The user to add</param>
         public void AddUser(User toAdd)
         {
-            UserManager.GetInstance().users.AddLast(toAdd);
             String result = "(" + UserManager.GetInstance().users.First.Value.id + ") " + UserManager.GetInstance().users.First.Value.username;
             for (int i = 1; i < UserManager.GetInstance().users.Count; i++)
             {
@@ -181,7 +198,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="user">The user to remove.</param>
         public void RemoveUser(User toRemove)
         {
-            UserManager.GetInstance().users.Remove(toRemove);
+            UserManager.GetInstance().RemoveUserByID(toRemove.id);
             if (UserManager.GetInstance().users.Count == 0)
             {
                 usersField.text = "No users for some odd reason.";
@@ -224,7 +241,6 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             if (gameNameInput != null) gameNameInput.Unload();
         }
 
-        #region Messages
         /// <summary>
         /// Adds a message to the log.
         /// </summary>
@@ -241,27 +257,5 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             }
             messagesTextField.text = result;
         }
-
-        public class Message
-        {
-            private String timestamp { get; set; }
-            private String message { get; set; }
-
-            public Message(String message)
-            {
-                this.message = message;
-                this.timestamp = DateTime.UtcNow.ToLongTimeString();
-            }
-
-            /// <summary>
-            /// Gets the message with a timestamp.
-            /// </summary>
-            /// <returns>The string to display</returns>
-            public String GetComposedMessage()
-            {
-                return "[" + timestamp + "] " + this.message;
-            }
-        }
-        #endregion
     }
 }

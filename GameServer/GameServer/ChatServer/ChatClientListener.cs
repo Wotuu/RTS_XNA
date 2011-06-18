@@ -10,6 +10,8 @@ using GameServer.ChatServer.Channels;
 using System.Threading;
 using GameServer.ChatServer.Games;
 using SocketLibrary.Multiplayer;
+using System.Windows.Forms;
+using System.Timers;
 
 namespace GameServer.ChatServer
 {
@@ -19,6 +21,7 @@ namespace GameServer.ChatServer
         public long lastAliveTicks { get; set; }
         public Boolean safeShutDown { get; set; }
         public ServerUser user { get; set; }
+        public int gameStartSeconds { get; set; }
 
         public ChatClientListener(SocketClient client)
         {
@@ -27,6 +30,7 @@ namespace GameServer.ChatServer
             while (client.packetProcessor == null) { Console.Out.WriteLine("Waiting for instance.."); Thread.Sleep(1); }
             client.packetProcessor.onProcessPacket += this.OnPacketReceived;
             this.client.onDisconnectListeners += this.OnDisconnect;
+            this.client.onPacketSendListeners += this.OnPacketSend;
         }
 
         /// <summary>
@@ -34,13 +38,46 @@ namespace GameServer.ChatServer
         /// </summary>
         public void OnDisconnect()
         {
-            Console.Out.Write("Client destroyed! -> " + ChatServerManager.GetInstance().clients.Count);
+            Console.Out.WriteLine("Client destroyed! -> " + ChatServerManager.GetInstance().clients.Count);
             if (!safeShutDown)
             {
-                ChatServerManager.GetInstance().clients.Remove(this);
-                this.client.Disable();
+                try
+                {
+                    ChannelManager.GetInstance().GetChannelByID(user.channelID).UserLeft(user);
+                    ChatServerManager.GetInstance().clients.Remove(this);
+                    MultiplayerGame game = MultiplayerGameManager.GetInstance().GetGameByHost(this.user);
+                    if (game != null)
+                    {
+                        // Tell everyone in the lobby that the game was destroyed.
+                        ChannelManager.GetInstance().GetChannelByID(1).DestroyGame(game);
+                        // Tell everyone in the game itsself that the game was destroyed.
+                        ChannelManager.GetInstance().GetChannelByID(game.id).DestroyGame(game);
+                        // Remove it completely
+                        MultiplayerGameManager.GetInstance().games.Remove(game);
+                    }
+                    this.client.Disable();
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine("Something went wrong in the OnDisconnect() function .. oh well!");
+                }
             }
-            Console.Out.WriteLine(", " + ChatServerManager.GetInstance().clients.Count);
+        }
+
+        delegate void TestDelegate();
+        /// <summary>
+        /// When a packet is sent
+        /// </summary>
+        /// <param name="p"></param>
+        public void OnPacketSend(Packet p)
+        {
+            TestDelegate bla = delegate()
+                 {
+                     if (this.user == null) return;
+                     if (ServerUI.GetInstance().lastSelectedClientName == this.user.username)
+                         ServerUI.GetInstance().RefillMessageLogs(this.client.log.messageLog);
+                 };
+            ((Control)ServerUI.GetInstance()).BeginInvoke(bla);
         }
 
         /// <summary>
@@ -59,6 +96,11 @@ namespace GameServer.ChatServer
                 case Headers.HANDSHAKE_1:
                     {
                         client.SendPacket(new Packet(Headers.HANDSHAKE_2));
+                        break;
+                    }
+                case Headers.HANDSHAKE_3:
+                    {
+                        // Nothing
                         break;
                     }
                 case Headers.CLIENT_DISCONNECT:
@@ -81,8 +123,9 @@ namespace GameServer.ChatServer
                     }
                 case Headers.CLIENT_CHANNEL:
                     {
-                        int newChannel = PacketUtil.DecodePacketInt(p, 0);
-                        this.user.ChangeChannel(newChannel);
+                        Console.Error.WriteLine(this.user + " tried to change his channel! That's not allowed.");
+                        //int newChannel = PacketUtil.DecodePacketInt(p, 0);
+                        //this.user.ChangeChannel(newChannel);
                         break;
                     }
                 case Headers.CHAT_MESSAGE:
@@ -97,7 +140,8 @@ namespace GameServer.ChatServer
                     }
                 case Headers.CLIENT_CREATE_GAME:
                     {
-                        if( this.user.channelID != 1 ) {
+                        if (this.user.channelID != 1)
+                        {
                             Console.Error.WriteLine("Received a request to create a channel that is NOT from a user in the lobby!");
                             return;
                         }
@@ -108,8 +152,8 @@ namespace GameServer.ChatServer
                         // Create game
                         MultiplayerGame mg = new MultiplayerGame(
                             MultiplayerGameManager.GetInstance().RequestGameID(),
-                            (ServerUser) ServerUserManager.GetInstance().GetUserByID(userID),
                             gameName, "<No map selected yet>");
+                        mg.host = (ServerUser)ServerUserManager.GetInstance().GetUserByID(userID);
                         // Add game to list
                         MultiplayerGameManager.GetInstance().games.AddLast(mg);
                         Console.Out.WriteLine("Created a game with ID = " + mg.id);
@@ -142,14 +186,131 @@ namespace GameServer.ChatServer
                             // Tell everyone in the lobby that the game was destroyed.
                             ChannelManager.GetInstance().GetChannelByID(1).DestroyGame(game);
                             // Tell everyone in the game itsself that the game was destroyed.
-                            ChannelManager.GetInstance().GetChannelByID(user.channelID).DestroyGame(game);
+                            ChannelManager.GetInstance().GetChannelByID(game.id).DestroyGame(game);
+                            // Remove it completely
+                            MultiplayerGameManager.GetInstance().games.Remove(game);
                         }
+                        break;
+                    }
+                case Headers.CLIENT_REQUEST_JOIN:
+                    {
+                        int gameID = PacketUtil.DecodePacketInt(p, 0);
+                        int userID = PacketUtil.DecodePacketInt(p, 4);
+                        MultiplayerGame game = MultiplayerGameManager.GetInstance().GetGameByID(gameID);
+                        Packet joinPacket = new Packet(Headers.SERVER_REQUEST_JOIN);
+                        joinPacket.AddInt(gameID);
+                        joinPacket.AddInt(userID);
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(game.host.id)).chatListener.client.SendPacket(
+                           joinPacket);
+                        break;
+                    }
+                case Headers.CLIENT_OK_JOIN:
+                    {
+                        // Notify the client of the response by host.
+                        int gameID = PacketUtil.DecodePacketInt(p, 0);
+                        int userID = PacketUtil.DecodePacketInt(p, 4);
+                        MultiplayerGame game = MultiplayerGameManager.GetInstance().GetGameByID(gameID);
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).chatListener.client.SendPacket(p);
+                        // Change this user's channel to the game channel.
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).chatListener.user.ChangeChannel(gameID);
+                        break;
+                    }
+                case Headers.CLIENT_GAME_FULL:
+                    {
+                        int gameID = PacketUtil.DecodePacketInt(p, 0);
+                        int userID = PacketUtil.DecodePacketInt(p, 4);
+                        MultiplayerGame game = MultiplayerGameManager.GetInstance().GetGameByID(gameID);
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).chatListener.client.SendPacket(p);
+                        break;
+                    }
+                case Headers.CLIENT_LEFT_GAME:
+                    {
+                        // Put user back in lobby.
+                        this.user.ChangeChannel(1);
+                        break;
+                    }
+                case Headers.GAME_COLOR_CHANGED:
+                    {
+                        int channel = PacketUtil.DecodePacketInt(p, 0);
+                        int userID = PacketUtil.DecodePacketInt(p, 4);
+                        int color = PacketUtil.DecodePacketInt(p, 8);
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).color = color;
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(channel);
+                        c.ChangeColor(userID, color);
+                        break;
+                    }
+                case Headers.GAME_TEAM_CHANGED:
+                    {
+                        int channel = PacketUtil.DecodePacketInt(p, 0);
+                        int userID = PacketUtil.DecodePacketInt(p, 4);
+                        int team = PacketUtil.DecodePacketInt(p, 8);
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).team = team;
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(channel);
+                        c.ChangeTeam(userID, team);
+                        break;
+                    }
+                case Headers.GAME_READY_CHANGED:
+                    {
+                        int channel = PacketUtil.DecodePacketInt(p, 0);
+                        int userID = PacketUtil.DecodePacketInt(p, 4);
+                        int readyState = PacketUtil.DecodePacketInt(p, 8);
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).readyState = readyState;
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(channel);
+                        c.ChangeReadyState(userID, readyState);
+                        break;
+                    }
+                case Headers.GAME_KICK_CLIENT:
+                    {
+                        int userID = PacketUtil.DecodePacketInt(p, 4);
+                        Packet kickPacket = new Packet(Headers.GAME_KICK_CLIENT);
+                        kickPacket.AddInt(userID);
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).
+                            chatListener.client.SendPacket(kickPacket);
+
+                        ((ServerUser)ServerUserManager.GetInstance().GetUserByID(userID)).ChangeChannel(1);
+                        break;
+                    }
+                case Headers.CLIENT_GAME_START:
+                    {
+                        System.Timers.Timer gameStartTimer = new System.Timers.Timer();
+                        gameStartTimer.Elapsed += new ElapsedEventHandler(GameStart);
+                        gameStartTimer.Interval = 1000;
+                        gameStartTimer.Start();
+                        this.gameStartSeconds = 5;
                         break;
                     }
                 default:
                     {
+                        String currTime = System.DateTime.Now.ToLongTimeString() + "," + System.DateTime.Now.Millisecond + " ";
+                        this.client.log.messageLog.AddLast(new Logger.LogMessage(currTime + "UNKNOWN Header switcher reached default. " + 
+                            "(" + p.GetHeader() + ")", true));
                         break;
                     }
+            }
+            TestDelegate bla = delegate()
+            {
+                if (this.user == null) return;
+                if (ServerUI.GetInstance().lastSelectedClientName == this.user.username)
+                    ServerUI.GetInstance().RefillMessageLogs(this.client.log.messageLog);
+            };
+            ((Control)ServerUI.GetInstance()).BeginInvoke(bla);
+        }
+
+        /// <summary>
+        /// Event that is called when the game is about to start.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        public void GameStart(object source, ElapsedEventArgs e)
+        {
+            ChannelManager.GetInstance().GetChannelByID(this.user.channelID).StartGame(this.gameStartSeconds);
+            this.gameStartSeconds--;
+
+            if (gameStartSeconds == -1)
+            {
+                ((System.Timers.Timer)source).Stop();
+                ((System.Timers.Timer)source).Interval = Double.MaxValue;
+                this.gameStartSeconds = 5;
             }
         }
     }

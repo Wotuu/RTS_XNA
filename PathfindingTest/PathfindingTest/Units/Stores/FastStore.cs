@@ -8,6 +8,8 @@ namespace PathfindingTest.Units.Stores
 {
     class FastStore : UnitStore
     {
+        private readonly object lockObj = new object();
+
         public FastStore(Player player)
         {
             this.player = player;
@@ -15,7 +17,10 @@ namespace PathfindingTest.Units.Stores
 
         protected override Unit createUnit(Unit.Type type, int x, int y, int baseDamage)
         {
-            return null;
+            lock (lockObj)
+            {
+                return null;
+            }
         }
     }
 }

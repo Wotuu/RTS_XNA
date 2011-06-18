@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using PathfindingTest.Pathfinding;
 using PathfindingTest.UI;
 using PathfindingTest.Buildings;
+using PathfindingTest.Multiplayer.Data;
 
 namespace PathfindingTest.Selection
 {

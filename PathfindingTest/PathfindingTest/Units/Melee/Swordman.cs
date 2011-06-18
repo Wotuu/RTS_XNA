@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using PathfindingTest.Combat;
 using PathfindingTest.Units.Damage;
+using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Units.Melee
 {
@@ -23,10 +25,22 @@ namespace PathfindingTest.Units.Melee
             this.y = y;
             this.type = Type.Melee;
 
+            Console.Out.WriteLine("Constructed a swordsman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
+
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/melee");
 
             this.productionDuration = 5;
             this.productionProgress = 0;
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.player == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new UnitMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID(UnitHeaders.TYPE_SWORDMAN);
+                }
+            }
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
@@ -51,10 +65,10 @@ namespace PathfindingTest.Units.Melee
             {
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
 
-                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                /*if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
                 {
                     this.DrawHealthBar(sb);
-                }
+                }*/
             }
         }
 
@@ -63,15 +77,27 @@ namespace PathfindingTest.Units.Melee
         /// </summary>
         public override void Swing()
         {
-            CheckForEnemiesInRange(this.aggroRange);
+            
             if (unitToStalk == null && enemiesInRange.Count < 1)
+           // {
+                CheckForEnemiesInRange();
+                if (this.enemiesInRange.Count == 0)
             {
                 return;
             }
-            else if (unitToStalk == null && enemiesInRange.Count > 0)
-            {
-                unitToStalk = this.enemiesInRange.ElementAt(0);
-                this.waypoints.Clear();
+                Console.WriteLine("swung weapon");
+                Unit targetUnit = this.enemiesInRange.ElementAt(0);
+                AggroEvent e = new AggroEvent(this, targetUnit, true);
+                targetUnit.OnAggroRecieved(e);
+                this.OnAggro(e);
+                DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), targetUnit);
+                targetUnit.OnDamage(dmgEvent);
+                this.fireCooldown = this.rateOfFire;
+        //    }
+       //     else
+       //     {
+       //         Console.WriteLine("Cant fire Q.Q");
+        //    }
             }
 
             CheckForEnemiesInRange(this.attackRange);

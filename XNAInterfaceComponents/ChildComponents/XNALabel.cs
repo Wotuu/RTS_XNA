@@ -44,7 +44,7 @@ namespace XNAInterfaceComponents.ChildComponents
             else drawColor = this.backgroundColor;
 
             // Get the location on the screen on which to draw this button.
-            Rectangle drawRect = this.GetScreenLocation();
+            Rectangle drawRect = this.GetScreenBounds();
             // Draw the label
             sb.Draw(clearTexture, drawRect, drawColor);
             // Draw the border

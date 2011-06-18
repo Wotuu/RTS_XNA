@@ -69,6 +69,8 @@
     <Compile Include="Packets\PacketProcessor.cs" />
     <Compile Include="Packets\PacketUtil.cs" />
     <Compile Include="Protocol\Headers.cs" />
+    <Compile Include="Protocol\Logger.cs" />
+    <Compile Include="Protocol\UnitHeaders.cs" />
     <Compile Include="SocketClient.cs" />
     <Compile Include="SocketServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

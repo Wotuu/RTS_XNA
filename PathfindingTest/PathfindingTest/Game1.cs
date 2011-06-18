@@ -29,6 +29,9 @@ using PathfindingTest.State;
 using System.Collections;
 using SocketLibrary.Packets;
 using XNAInterfaceComponents.ParentComponents;
+using SocketLibrary.Multiplayer;
+using PathfindingTest.Multiplayer.Data;
+using PathfindingTest.Misc;
 
 namespace PathfindingTest
 {
@@ -40,7 +43,6 @@ namespace PathfindingTest
 
         public GraphicsDeviceManager graphics { get; set; }
         SpriteBatch spriteBatch;
-        private Texture2D drawLineTexture { get; set; }
         public RTSCollisionMap collision { get; set; }
         public SpriteFont font { get; set; }
         public QuadRoot quadTree { get; set; }
@@ -55,6 +57,10 @@ namespace PathfindingTest
 
         public LinkedList<Player> players { get; set; }
         public static Player CURRENT_PLAYER { get; set; }
+
+        public MultiplayerGame multiplayerGame { get; set; }
+        public int objectsCreated { get; set; }
+
 
         private static Game1 instance { get; set; }
 
@@ -72,13 +78,7 @@ namespace PathfindingTest
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-
-            String message = "";
-            message = "This is a text message.";
-            Packet p = new Packet();
-            p.AddString(message);
-            Console.Out.WriteLine(message);
-            Console.Out.WriteLine((message = PacketUtil.DecodePacketString(p, 0)));
+            Content = new SynchronizedContentManager(this.Services); 
 
             Content.RootDirectory = "Content";
             this.IsMouseVisible = true;
@@ -103,7 +103,7 @@ namespace PathfindingTest
         {
             // TODO: Add your initialization logic here
 
-            drawLineTexture = this.Content.Load<Texture2D>("Misc/solid");
+            DrawUtil.lineTexture = this.Content.Load<Texture2D>("Misc/solid");
             font = Content.Load<SpriteFont>("Fonts/Arial");
             ChildComponent.DEFAULT_FONT = font;
 
@@ -148,6 +148,7 @@ namespace PathfindingTest
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            GameTimeManager.GetInstance().OnStartUpdate();
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
@@ -156,11 +157,12 @@ namespace PathfindingTest
             // Update input
             MouseManager.GetInstance().Update(this);
             KeyboardManager.GetInstance().Update(Keyboard.GetState());
+
+            // Updates all interface componentss
+            ComponentManager.GetInstance().Update();
             switch (sm.gameState)
             {
                 case StateManager.State.MainMenu:
-                    // Updates all interface componentss
-                    ComponentManager.GetInstance().Update();
                     break;
                 case StateManager.State.GameInit:
                     break;
@@ -192,8 +194,6 @@ namespace PathfindingTest
                      * This is done to save a massive lagspike when updating the collision mesh!
                      */
                     //if (frames % 2 == 0) 
-                    PathfindingNodeProcessor.GetInstance().Process();
-                    PathfindingProcessor.GetInstance().Process();
 
                     DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
                     DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
@@ -204,6 +204,11 @@ namespace PathfindingTest
                         previousFrameUpdateTime = timeStamp;
                         previousFrameUpdateFrames = frames;
                     }
+
+                    if (IsMultiplayerGame()) Synchronizer.GetInstance().Synchronize();
+                    // These two fill the rest of the frame, so they're supposed to go last.
+                    SmartPathfindingNodeProcessor.GetInstance().Process();
+                    PathfindingProcessor.GetInstance().Process();
 
                     frames++;
                     break;
@@ -224,16 +229,20 @@ namespace PathfindingTest
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GameTimeManager.GetInstance().OnStartDraw();
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Immediate, null);
 
             StateManager sm = StateManager.GetInstance();
+
+            // Draws all interface components
+            ComponentManager.GetInstance().Draw(spriteBatch);
+
             if (sm.gameState == StateManager.State.MainMenu)
             {
-                // Draws all interface components
-                ComponentManager.GetInstance().Draw(spriteBatch);
+
             }
             else if (sm.gameState == StateManager.State.GameInit)
             {
@@ -282,29 +291,6 @@ namespace PathfindingTest
             draws++;
 
             base.Draw(gameTime);
-        }
-
-        /// <summary>
-        /// Draws a line!
-        /// </summary>
-        /// <param name="batch">The batch to draw on.</param>
-        /// <param name="start">Startpoint</param>
-        /// <param name="end">Endpoint</param>
-        /// <param name="c">The color of the line</param>
-        public void DrawLine(SpriteBatch batch, Point start, Point end, Color c, int width)
-        {
-            if (c.A == 0) return;
-            if (end.X < start.X)
-            {
-                // Swap
-                Point temp = start;
-                start = end;
-                end = temp;
-            }
-            double hypoteneuse = Util.GetHypoteneuseLength(start, end);
-            float angle = Util.GetHypoteneuseAngleRad(start, end);
-            batch.Draw(drawLineTexture, new Rectangle(start.X, start.Y, (int)Math.Round(hypoteneuse), width), null, c, angle,
-                new Vector2(0, 0), SpriteEffects.None, 0);
         }
 
         void MouseClickListener.OnMouseClick(MouseEvent e)
@@ -409,6 +395,29 @@ namespace PathfindingTest
             ///if( e.location.X >= 10 && e.location.X <= graphics.PreferredBackBufferWidth - 10 &&
             ///    e.location.Y >= 10 && e.location.Y <= graphics.PreferredBackBufferHeight - 10)
             ///collision.UpdateCollisionMap(new Rectangle(e.location.X - 10, e.location.Y - 10, 20, 20), true);
+        }
+
+        /// <summary>
+        /// Checks whether the current game is a multiplayer game or not.
+        /// </summary>
+        /// <returns>The flag.</returns>
+        public Boolean IsMultiplayerGame()
+        {
+            return this.multiplayerGame != null;
+        }
+
+        /// <summary>
+        /// Gets a player by multiplayer ID.
+        /// </summary>
+        /// <param name="id">The ID that you want.</param>
+        /// <returns>The player that you need.</returns>
+        public Player GetPlayerByMultiplayerID(int id)
+        {
+            foreach (Player player in players)
+            {
+                if (player.multiplayerID == id) return player;
+            }
+            return null;
         }
     }
 }

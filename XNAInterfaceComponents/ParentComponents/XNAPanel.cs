@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using XNAInputHandler.MouseInput;
 using XNAInterfaceComponents.Managers;
+using XNAInterfaceComponents.ParentComponents;
 
 namespace XNAInterfaceComponents.Components
 {
@@ -27,22 +28,35 @@ namespace XNAInterfaceComponents.Components
             Color drawColor = new Color();
             //if (this.isMouseOver) drawColor = this.mouseOverColor;
             //else 
-                drawColor = this.backgroundColor;
+            drawColor = this.backgroundColor;
 
-            sb.Draw(clearTexture, this.GetScreenLocation(), drawColor);
-            if( this.border != null ) this.border.Draw(sb);
+            sb.Draw(clearTexture, this.GetScreenBounds(), drawColor);
+            if (this.border != null) this.border.Draw(sb);
 
-            for( int i = 0; i < this.children.Count; i++ )
+            for (int i = 0; i < this.children.Count; i++)
             {
-                this.children.ElementAt(i).Draw(sb);
+                Component c = this.children.ElementAt(i);
+                if (!(c is XNADropdown))
+                {
+                    c.Draw(sb);
+                }
+            }
+            for (int i = 0; i < this.children.Count; i++)
+            {
+                Component c = this.children.ElementAt(i);
+                if (c is XNADropdown)
+                {
+                    c.Draw(sb);
+                }
             }
         }
 
         public override void Update()
         {
-            foreach (Component child in this.children)
+            for (int i = 0; i < this.children.Count; i++)
             {
-                child.Update();
+                Component c = this.children.ElementAt(i);
+                c.Update();
             }
         }
 
@@ -60,8 +74,11 @@ namespace XNAInterfaceComponents.Components
 
         public override void Unload()
         {
-            Console.Out.WriteLine("Unloading a panel");
-            ComponentManager.GetInstance().QueueUnload(this);
+            // Console.Out.WriteLine("Unloading a " + this.GetType().FullName);
+
+            if (this.parent == null) ComponentManager.GetInstance().QueueUnload(this);
+            else this.parent.RemoveChild(this);
+
             for (int i = 0; i < children.Count; i++)
             {
                 children.ElementAt(i).Unload();

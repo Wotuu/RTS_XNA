@@ -3,9 +3,11 @@ using System.Net.Sockets;
 using SocketLibrary.Packets;
 using System.Collections;
 using SocketLibrary.Protocol;
+using System.Collections.Generic;
 
 
 public delegate void OnDisconnectListeners();
+public delegate void OnPacketSend(Packet p);
 namespace SocketLibrary
 {
     public class SocketClient
@@ -17,9 +19,10 @@ namespace SocketLibrary
         private readonly object SyncRecv;
         private readonly object SyncSend;
         public OnDisconnectListeners onDisconnectListeners { get; set; }
-        public ArrayList messageLog = new ArrayList();
+        public Logger log { get; set; }
 
         public PacketProcessor packetProcessor { get; set; }
+        public OnPacketSend onPacketSendListeners { get; set; }
 
         public SocketClient(Socket _sock, string _socketname)
         {
@@ -28,6 +31,7 @@ namespace SocketLibrary
             Sock.NoDelay = true;
             SyncRecv = new object();
             SyncSend = new object();
+            log = new Logger();
         }
 
         /// <summary>
@@ -99,7 +103,7 @@ namespace SocketLibrary
         /// <param name="p">The packet that needed processing</param>
         public void OnProcessPacket(Packet p)
         {
-            Log(p, true);
+            log.Log(p, true);
         }
 
         /// <summary>
@@ -116,8 +120,8 @@ namespace SocketLibrary
                     {
                         byte[] data = packet.GetFullData();
                         Sock.Send(data, data.Length, SocketFlags.None);
-                        Log(packet, false);
-                        Console.Out.WriteLine("Sending packet with header " + packet.GetHeader());
+                        log.Log(packet, false);
+                        if (onPacketSendListeners != null) onPacketSendListeners(packet);
                     }
                     catch (Exception ex)
                     {
@@ -147,171 +151,11 @@ namespace SocketLibrary
                 result = "SOCKET DISPOSED";
             }
             return result;
-        }
+        } 
 
         /// <summary>
-        /// Logs the data to the logger.
+        /// Disables the socket client.
         /// </summary>
-        /// <param name="data"></param>
-        public void Log(Packet p, Boolean isReceived)
-        {
-            String currTime = System.DateTime.Now.ToLongTimeString();
-            switch (p.GetHeader())
-            {
-                case Headers.HANDSHAKE_1:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received handshake request (1)");
-                        else this.messageLog.Add(currTime + " Sent handshake request (1)");
-                        break;
-                    }
-                case Headers.HANDSHAKE_2:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received handshake acknowledge (2)");
-                        else this.messageLog.Add(currTime + " Sent handshake acknowledge (2)");
-                        break;
-                    }
-                case Headers.HANDSHAKE_3:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received handshake confirmation (3)");
-                        else this.messageLog.Add(currTime + " Sent handshake confirmation (3)");
-                        break;
-                    }
-                case Headers.KEEP_ALIVE:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " User is still connected (still alive)");
-                        else this.messageLog.Add(currTime + " Asking client if he's still alive ");
-                        break;
-                    }
-                case Headers.CHAT_MESSAGE:
-                    {
-                        if (isReceived)
-                            this.messageLog.Add(currTime + " Received sent a chat message in channel " + PacketUtil.DecodePacketInt(p, 0) +
-                                ": " + PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " Sent chat message to all in channel " + PacketUtil.DecodePacketInt(p, 0) +
-                                ": " + PacketUtil.DecodePacketString(p, 4));
-                        break;
-                    }
-                case Headers.CLIENT_DISCONNECT:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Client disconnected");
-                        else this.messageLog.Add(currTime + " Disconnected this client");
-                        break;
-                    }
-                case Headers.SERVER_DISCONNECT:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Server disconnected");
-                        else this.messageLog.Add(currTime + " Disconnected from server");
-                        break;
-                    }
-                case Headers.CLIENT_USERNAME:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Requested a username: " +
-                            PacketUtil.DecodePacketString(p, 0));
-                        else this.messageLog.Add(currTime + " Confirming requested username: " + PacketUtil.DecodePacketString(p, 0));
-                        break;
-                    }
-                case Headers.CLIENT_USER_ID:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Requested a userid: " +
-                            PacketUtil.DecodePacketInt(p, 0));
-                        else this.messageLog.Add(currTime + " Confirming requested userid: " + PacketUtil.DecodePacketInt(p, 0));
-                        break;
-                    }
-                case Headers.CLIENT_CHANNEL:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received change channel request to " +
-                            PacketUtil.DecodePacketInt(p, 0));
-                        else this.messageLog.Add(currTime + " Sent change channel to " +
-                            PacketUtil.DecodePacketInt(p, 0));
-                        break;
-                    }
-                case Headers.NEW_USER:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received new user: " +
-                            PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " Sent new user: " +
-                            PacketUtil.DecodePacketString(p, 4));
-                        break;
-                    }
-                case Headers.USER_LEFT:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received user has left: " +
-                            PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " Sent user has left: " +
-                            PacketUtil.DecodePacketString(p, 4));
-                        break;
-                    }
-                case Headers.CLIENT_CREATE_GAME:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received game creation request: userid = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " +
-                            PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " Sent game creation request: userid = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", gamename = " +
-                            PacketUtil.DecodePacketString(p, 4));
-                        break;
-                    }
-                case Headers.SERVER_CREATE_GAME:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received server game creation request: " +
-                            "gameid = " + PacketUtil.DecodePacketInt(p, 0) +
-                            "userid = " + PacketUtil.DecodePacketInt(p, 4) +
-                            ", gamename = " + PacketUtil.DecodePacketString(p, 8));
-                        else this.messageLog.Add(currTime + " Sent server game creation request: " +
-                            "gameid = " + PacketUtil.DecodePacketInt(p, 0) +
-                            "userid = " + PacketUtil.DecodePacketInt(p, 4) +
-                            ", gamename = " + PacketUtil.DecodePacketString(p, 8));
-                        break;
-                    }
-                case Headers.GAME_ID:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received a game ID: " +
-                            PacketUtil.DecodePacketInt(p, 0));
-                        else this.messageLog.Add(currTime + " Sent a game ID to use: " +
-                           PacketUtil.DecodePacketInt(p, 0));
-                        break;
-                    }
-                case Headers.GAME_MAP_CHANGED:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received game map of game id = " +
-                            PacketUtil.DecodePacketInt(p, 0) + " has changed to -> " +
-                            PacketUtil.DecodePacketString(p, 4));
-                        else this.messageLog.Add(currTime + " Sent that game map of game id = " +
-                           PacketUtil.DecodePacketInt(p, 0) + " has changed to -> " +
-                           PacketUtil.DecodePacketString(p, 4));
-                        break;
-                    }
-                case Headers.CLIENT_DESTROY_GAME:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received destroy game request by client!");
-                        else this.messageLog.Add(currTime + " Sent destroy game request.");
-                        break;
-                    }
-                case Headers.SERVER_DESTROY_GAME:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received destroy game request of game " +
-                           PacketUtil.DecodePacketInt(p, 0));
-                        else this.messageLog.Add(currTime + " Sent destroy game request of game " +
-                           PacketUtil.DecodePacketInt(p, 0) + " to all clients.");
-                        break;
-                    }
-                /*
-                 * 
-                    if (isReceived) this.messageLog.Add(currTime + " ");
-                    else this.messageLog.Add(currTime + " ");
-                 *
-                 */
-                default:
-                    {
-                        if (isReceived) this.messageLog.Add(currTime + " Received an unknown request (" + p.GetHeader() + ") "
-                            + "(or have you forgotten to add the header to the log?)");
-                        else this.messageLog.Add(currTime + " Sent unknown request (" + p.GetHeader() + ") "
-                            + "(or have you forgotten to add the header to the log?)");
-                        break;
-                    }
-            }
-        }
-
         public void Disable()
         {
             Receiving = false;
@@ -322,6 +166,7 @@ namespace SocketLibrary
         {
             Console.Write(SocketName + ": " + Text);
         }
+
         public void Show(Exception Text)
         {
             Console.Write(SocketName + " ERROR: " + Text);

@@ -7,18 +7,25 @@ using GameServer.ChatServer.Channels;
 using SocketLibrary.Users;
 using SocketLibrary.Packets;
 using SocketLibrary.Protocol;
+using GameServer.GameServer;
 
 namespace GameServer.Users
 {
     public class ServerUser : User
     {
-        public ChatClientListener listener { get; set; }
+        public ChatClientListener chatListener { get; set; }
+        public GameClientListener gameListener { get; set; }
+        public int color { get; set; }
+        public int team { get; set; }
+        public int readyState { get; set; }
 
         public ServerUser(String username, ChatClientListener listener ) : base(username)
         {
+            // Init on -1, because 0 is a color! -1 will make sure nothing is selected.
+            this.color = -1;
             this.id = ServerUserManager.GetInstance().RequestUserID();
-            this.listener = listener;
-            this.listener.client.onDisconnectListeners += this.OnDisconnect;
+            this.chatListener = listener;
+            this.chatListener.client.onDisconnectListeners += this.OnDisconnect;
 
             ServerUserManager.GetInstance().users.AddLast(this);
         }
@@ -39,9 +46,9 @@ namespace GameServer.Users
         /// <param name="newChannel"></param>
         public void ChangeChannel(int newChannel)
         {
-            Console.Out.WriteLine("Leaving channel " + this.channelID);
+            Console.Out.WriteLine(this + " leaving channel " + this.channelID);
             ChannelManager.GetInstance().GetChannelByID(this.channelID).UserLeft(this);
-            Console.Out.WriteLine("Joining channel channel " + newChannel);
+            Console.Out.WriteLine(this + " joining channel " + newChannel);
             ChannelManager.GetInstance().GetChannelByID(newChannel).AddUser(this);
         }
     }

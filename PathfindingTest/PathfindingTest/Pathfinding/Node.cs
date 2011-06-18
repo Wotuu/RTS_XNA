@@ -69,7 +69,7 @@ namespace PathfindingTest.Pathfinding
             : base(map)
         {
             Init(x, y);
-            PathfindingNodeProcessor.GetInstance().Push(this);
+            SmartPathfindingNodeProcessor.GetInstance().Push(this);
         }
 
         /// <summary>

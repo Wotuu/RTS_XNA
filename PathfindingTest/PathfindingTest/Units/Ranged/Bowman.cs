@@ -8,6 +8,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using PathfindingTest.Units.Projectiles;
 using PathfindingTest.Combat;
+using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Units
 {
@@ -18,15 +20,23 @@ namespace PathfindingTest.Units
         {
             this.baseDamage = baseDamage;
 
-            this.player = p;
-            this.x = x;
-            this.y = y;
             this.type = Type.Ranged;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/bowman");
+            Console.Out.WriteLine("Constructed a bowman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
             this.productionDuration = 5;
             this.productionProgress = 0;
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.player == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new UnitMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID(UnitHeaders.TYPE_BOWMAN);
+                }
+            }
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
@@ -57,10 +67,10 @@ namespace PathfindingTest.Units
             {
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
 
-                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                /*if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
                 {
                     this.DrawHealthBar(sb);
-                }
+                }*/
 
                 for (int i = 0; i < projectiles.Count; i++)
                 {

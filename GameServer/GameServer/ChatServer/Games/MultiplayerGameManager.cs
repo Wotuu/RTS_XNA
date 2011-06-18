@@ -31,6 +31,20 @@ namespace GameServer.ChatServer.Games
         }
 
         /// <summary>
+        /// Gets a game by game id.
+        /// </summary>
+        /// <param name="gameID">The game ID</param>
+        /// <returns>The game.</returns>
+        public MultiplayerGame GetGameByID(int gameID)
+        {
+            foreach (MultiplayerGame game in this.games)
+            {
+                if (game.id == gameID) return game;
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Gets the game by a user 
         /// </summary>
         /// <param name="host">The host that has a game</param>

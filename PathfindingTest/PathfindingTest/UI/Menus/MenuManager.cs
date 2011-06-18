@@ -70,7 +70,8 @@ namespace PathfindingTest.UI.Menus
             }
             else if (menu == Menu.NoMenu)
             {
-                // Do nothing!
+                // Unload everything, just in case
+                ComponentManager.GetInstance().UnloadAllPanels();
             }
         }
 

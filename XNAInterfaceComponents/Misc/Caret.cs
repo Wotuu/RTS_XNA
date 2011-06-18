@@ -85,7 +85,7 @@ namespace XNAInterfaceComponents.Misc
         {
             if (this.visible && this.parent.isFocussed)
             {
-                Rectangle drawLocation = parent.GetScreenLocation();
+                Rectangle drawLocation = parent.GetScreenBounds();
                 String toMeasure = "";
                 Char[] array = this.GetTextOnCaretRow().ToCharArray();
                 if (array.Length == 0) toMeasure = "I"; 

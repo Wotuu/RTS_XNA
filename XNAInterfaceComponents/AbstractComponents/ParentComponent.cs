@@ -60,7 +60,7 @@ namespace XNAInterfaceComponents.AbstractComponents
         /// </summary>
         /// <param name="index">The index to get a component at.</param>
         /// <returns>The component</returns>
-        public Component ChildAt( int index ) { return this.children.ElementAt(index); }
+        public Component ChildAt(int index) { return this.children.ElementAt(index); }
 
         #endregion
 
@@ -72,7 +72,7 @@ namespace XNAInterfaceComponents.AbstractComponents
         /// <returns>The screen location.</returns>
         public Point RequestScreenLocation(Point childLocation)
         {
-            Point newPoint = new Point( this.bounds.X + childLocation.X, this.bounds.Y + childLocation.Y ) ;
+            Point newPoint = new Point(this.bounds.X + childLocation.X, this.bounds.Y + childLocation.Y);
             if (this.parent != null)
             {
                 return parent.RequestScreenLocation(newPoint);
@@ -90,12 +90,13 @@ namespace XNAInterfaceComponents.AbstractComponents
             Component focussedComponent = null;
             foreach (Component child in this.children)
             {
+                if (!child.visible) continue;
                 if (child is Focusable)
                 {
-                    if (child.GetScreenLocation().Contains(p))
+                    if (child.GetScreenBounds().Contains(p))
                     {
                         Focusable f = ((Focusable)child);
-                        if( !child.isFocussed ) f.OnFocusReceived();
+                        if (!child.isFocussed) f.OnFocusReceived();
                         focussedComponent = child;
                     }
                     if (focussedComponent != child && child.isFocussed)
@@ -113,19 +114,25 @@ namespace XNAInterfaceComponents.AbstractComponents
         }
 
         /// <summary>
-        /// Gets the component at a location (may be this component if no childs contain the location
+        /// Gets the component at a location (may be this component if no childs contain the location)
         /// </summary>
         /// <returns>The component</returns>
         public Component GetComponentAt(Point p)
         {
             foreach (Component child in this.children)
             {
-                if (child.GetScreenLocation().Contains(p))
+                if (!child.visible) continue;
+                if (child is ParentComponent)
+                {
+                    Component c = ((ParentComponent)child).GetComponentAt(p);
+                    if (c != null && !(c is ParentComponent)) return c;
+                }
+                if (child.GetScreenBounds().Contains(p))
                 {
                     return child;
                 }
             }
-            if (this.GetScreenLocation().Contains(p)) return this;
+            if (this.GetScreenBounds().Contains(p)) return this;
             return null;
         }
     }
