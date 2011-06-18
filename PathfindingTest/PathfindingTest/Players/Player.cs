@@ -89,36 +89,40 @@ namespace PathfindingTest.Players
         {
             if (Game1.GetInstance().IsMultiplayerGame() &&
                 Game1.CURRENT_PLAYER != this) return;
-            int unitCount = 6;
 
-
-            LinkedList<Unit> temp_units = new LinkedList<Unit>();
-            // +1 to compensate for the engineer
-            for (int i = 0; i < unitCount + 1; i++)
+            if (!Game1.GetInstance().IsMultiplayerGame())
             {
-                // Fill the list with dummy units
-                Unit u = null;
-                temp_units.AddLast(u);
+                int unitCount = 6;
+
+
+                LinkedList<Unit> temp_units = new LinkedList<Unit>();
+                // +1 to compensate for the engineer
+                for (int i = 0; i < unitCount + 1; i++)
+                {
+                    // Fill the list with dummy units
+                    Unit u = null;
+                    temp_units.AddLast(u);
+                }
+
+                UnitSelection selection = new UnitSelection(temp_units);
+                UnitGroupPattern pattern = new CirclePattern(location, selection, 90, 0);
+                LinkedList<Point> points = pattern.ApplyPattern();
+
+                for (int i = 0; i < unitCount; i++)
+                {
+                    Point p = points.ElementAt(i);
+                    if (i % 2 == 0)
+                    {
+                        temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, p.X, p.Y, 5));
+                    }
+                    else
+                    {
+                        temp_units.AddLast(rangedStore.getUnit(Unit.Type.Ranged, p.X, p.Y, 5));
+                    }
+                }
             }
 
-            UnitSelection selection = new UnitSelection(temp_units);
-            UnitGroupPattern pattern = new CirclePattern(location, selection, 90, 0);
-            LinkedList<Point> points = pattern.ApplyPattern();
-
-            for (int i = 0; i < unitCount; i++)
-            {
-                Point p = points.ElementAt(i);
-                if (i % 2 == 0)
-                {
-                    temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, p.X, p.Y, 5));
-                }
-                else
-                {
-                    temp_units.AddLast(rangedStore.getUnit(Unit.Type.Ranged, p.X, p.Y, 5));
-                }
-            }
-
-            temp_units.AddLast(meleeStore.getUnit(Unit.Type.Engineer, points.Last.Value.X, points.Last.Value.Y, 1));
+            meleeStore.getUnit(Unit.Type.Engineer, location.X, location.Y, 1);
 
         }
 
@@ -254,17 +258,29 @@ namespace PathfindingTest.Players
             }
             catch (Exception e) { }
 
+            // Healthbars
             if (currentSelection != null)
             {
                 try
                 {
                     for (int i = 0; i < currentSelection.units.Count; i++)
                     {
-                        units.ElementAt(i).DrawHealthBar(sb);
+                        currentSelection.units.ElementAt(i).DrawHealthBar(sb);
                     }
                 }
                 catch (Exception e) { }
             }
+
+            for (int i = 0; i < this.units.Count; i++)
+            {
+                Unit u = this.units.ElementAt(i);
+                if (u.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                {
+                    this.units.ElementAt(i).DrawHealthBar(sb);
+                    break;
+                }
+            }
+
             foreach (Building b in buildings)
             {
                 b.Draw(sb);
@@ -296,7 +312,7 @@ namespace PathfindingTest.Players
         /// if it is, it'll return it. =D
         /// </summary>
         /// <returns>The unit, or null if there was no unit!</returns>
-        public Unit getMouseOverUnit(LinkedList<Unit> units)
+        public Unit GetMouseOverUnit(LinkedList<Unit> units)
         {
             foreach (Unit u in units)
             {
@@ -388,7 +404,7 @@ namespace PathfindingTest.Players
             {
                 if (m.button == MouseEvent.MOUSE_BUTTON_1)
                 {
-                    Unit mouseOverUnit = this.getMouseOverUnit(this.units);
+                    Unit mouseOverUnit = this.GetMouseOverUnit(this.units);
                     if (mouseOverUnit == null)
                     {
                         if (this.currentSelection != null && this.currentSelection.units.Count != 0 &&
@@ -489,7 +505,7 @@ namespace PathfindingTest.Players
                 {
                     if (player.alliance.members.Contains(this))
                     {
-                        Unit selectedFriendly = getMouseOverUnit(player.units);
+                        Unit selectedFriendly = GetMouseOverUnit(player.units);
                         if (selectedFriendly != null)
                         {
                             Console.WriteLine("PROTECT");
@@ -498,7 +514,7 @@ namespace PathfindingTest.Players
                     }
                     else
                     {
-                        Unit selectedEnemy = getMouseOverUnit(player.units);
+                        Unit selectedEnemy = GetMouseOverUnit(player.units);
                         if (selectedEnemy != null)
                         {
                             foreach (Unit unit in currentSelection.units)
@@ -506,7 +522,7 @@ namespace PathfindingTest.Players
                                 unit.Attack(selectedEnemy);
                             }
                         }
-                        else
+                        else 
                         {
                             if (previewPattern != null)
                             {

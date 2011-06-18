@@ -48,6 +48,32 @@ namespace PathfindingTest.Units
 
         #region Movement variables
         public LinkedList<Point> waypoints { get; set; }
+        /*private LinkedList<Point> _waypoints { get; set; }
+        public LinkedList<Point> waypoints
+        {
+            get
+            {
+                return _waypoints;
+            }
+            set
+            {
+                if (!Game1.GetInstance().IsMultiplayerGame())
+                {
+                    if (value.Count > 0)
+                    {
+                        Point newTarget = value.First.Value;
+                        SetMoveToTarget(newTarget.X, newTarget.Y);
+                    }
+                }
+                else if( value.Count > 0 && this.multiplayerData != null &&
+                    this.player == Game1.CURRENT_PLAYER && this.multiplayerData.receivedPathRequest)
+                {
+                    this.multiplayerData.moveTarget = value.Last.Value;
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+                _waypoints = value;
+            }
+        }*/
         private Boolean hasToMove { get; set; }
         public float movementSpeed { get; set; }
         private float direction { get; set; }
@@ -232,6 +258,7 @@ namespace PathfindingTest.Units
                 if (now - this.multiplayerData.lastPulse > 
                     this.multiplayerData.updateRate)
                 {
+                    Console.Out.WriteLine("Performing perodic unit update");
                     // We may get stacking queues if we dont do this
                     this.multiplayerData.lastPulse = now;
                     Synchronizer.GetInstance().QueueUnit(this);
@@ -296,7 +323,13 @@ namespace PathfindingTest.Units
                 {
                     this.multiplayerData.moveTarget = this.GetLocation();
                 }
-                PathfindingProcessor.GetInstance().Push(this, p);
+                if (this.multiplayerData.receivedPathRequest
+                    || this.player != Game1.CURRENT_PLAYER) PathfindingProcessor.GetInstance().Push(this, p);
+                else
+                {
+                    this.multiplayerData.moveTarget = p;
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
                 /*
                 if (this.multiplayerData.moveTarget != Point.Zero)
                 {
@@ -314,22 +347,13 @@ namespace PathfindingTest.Units
         }
 
         /// <summary>
-        /// Moves to a point now. Causes lagspikes if done incorrectly.
+        /// Calculates a path between the current unit and the point.
         /// </summary>
-        /// <param name="p">The point to move to</param>
-        /// <param name="isProcessor">Should always be false for you. Only is true for the PathfindingProcessor.</param>
-        public void MoveToNow(Point p, Boolean isProcessor)
+        /// <param name="p">The point to calculate to.</param>
+        /// <returns>The list containing all the points that you should visit.</returns>
+        public LinkedList<Point> CalculatePath(Point p)
         {
-            //if (!isProcessor)
-            //{
-            if (Game1.GetInstance().IsMultiplayerGame())
-            {
-                if (!isProcessor) PathfindingProcessor.GetInstance().Remove(this);
-                this.multiplayerData.moveTarget = p;
-                Console.Out.WriteLine("Queueing unit now: " + p);
-                Synchronizer.GetInstance().QueueUnit(this);
-            }
-            //}
+            LinkedList<Point> result = new LinkedList<Point>();
             long ticks = DateTime.UtcNow.Ticks;
             if (Game1.GetInstance().collision.IsCollisionBetween(new Point((int)this.x, (int)this.y), p))
             {
@@ -344,21 +368,9 @@ namespace PathfindingTest.Units
                     nodes.RemoveFirst();
                     // Clear our current waypoints
                     this.waypoints.Clear();
-                    /*PathfindingNode previousNode = null;
-                    foreach (Node node in nodes)
-                    {
-                        node.selected = true;
-                        if (previousNode != null)
-                        {
-                            PathfindingNodeConnection conn = node.IsConnected(previousNode);
-                            if (conn != null && ((Node)conn.node1).selected && ((Node)conn.node2).selected)
-                                conn.drawColor = Color.Blue;
-                        }
-                        previousNode = node;
-                    }*/
                     foreach (Node n in nodes)
                     {
-                        this.waypoints.AddLast(n.GetLocation());
+                        result.AddLast(n.GetLocation());
                     }
                 }
                 // Nodes can no longer be used
@@ -367,9 +379,30 @@ namespace PathfindingTest.Units
             }
             else
             {
-                this.waypoints.Clear();
-                this.waypoints.AddLast(p);
+                result.AddLast(p);
             }
+            return result;
+        }
+
+        /// <summary>
+        /// DO NOT EVER EVER CALL THIS FUNCTION OR I WILL CUT YOUR BALLS OFF.
+        /// If you want a path right now, call CalculatePath(Point p)
+        /// </summary>
+        /// <param name="p">The point to move to</param>
+        public void MoveToNow(Point p)
+        {
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                    PathfindingProcessor.GetInstance().Remove(this);
+                this.multiplayerData.moveTarget = p;
+                this.multiplayerData.receivedPathRequest = false;
+                if (Game1.CURRENT_PLAYER == this.player)
+                {
+                    Console.Out.WriteLine("Queueing unit now: " + p);
+                    Synchronizer.GetInstance().QueueUnit(this);
+                }
+            }
+            this.waypoints = CalculatePath(p);
             if (this.waypoints.Count > 0)
             {
                 Point newTarget = this.waypoints.First.Value;

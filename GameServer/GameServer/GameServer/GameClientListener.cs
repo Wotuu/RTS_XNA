@@ -150,6 +150,31 @@ namespace GameServer.GameServer
                         }
                         break;
                     }
+                case UnitHeaders.GAME_REQUEST_UNIT_DATA:
+                    {
+                        // Our user wants to know data about a unit
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(user.channelID);
+                        for (int i = 0; i < c.GetUserCount(); i++)
+                        {
+                            ServerUser serverUser = c.GetUserAt(i);
+                            if (serverUser != this.user)
+                            {
+                                // Notify everyone but the one who requested the unit, that someone wants data
+                                serverUser.gameListener.client.SendPacket(p);
+                            }
+                        }
+                        break;
+                    }
+                case UnitHeaders.GAME_SEND_UNIT_DATA:
+                    {
+                        // I own data that someone else wants
+                        // Find the user to send data to
+                        int targetUserID = PacketUtil.DecodePacketInt(p, 0);
+                        ServerUser targetUser = ChannelManager.GetInstance().GetChannelByID(this.user.channelID).GetUserAt(targetUserID);
+                        targetUser.gameListener.client.SendPacket(p);
+
+                        break;
+                    }
                 default:
                     {
                         String currTime = System.DateTime.Now.ToLongTimeString() + "," + System.DateTime.Now.Millisecond + " ";

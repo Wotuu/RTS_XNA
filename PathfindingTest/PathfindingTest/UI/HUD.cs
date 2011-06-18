@@ -10,6 +10,7 @@ using PathfindingTest.Units;
 using PathfindingTest.Pathfinding;
 using XNAInputHandler.MouseInput;
 using PathfindingTest.UI.Commands;
+using AStarCollisionMap.Pathfinding;
 
 namespace PathfindingTest.UI
 {
@@ -306,20 +307,26 @@ namespace PathfindingTest.UI
                         {
                             if (u.type == Unit.Type.Engineer)
                             {
-                                u.MoveToNow(new Point(me.location.X, me.location.Y), false);
+                                Console.Out.WriteLine("Moving an engineer to a building now.");
+
+                                LinkedList<Point> path = u.CalculatePath(new Point(me.location.X, me.location.Y));
                                 // Get the last point of the pathfinding result
-                                Point lastPoint = u.waypoints.ElementAt(u.waypoints.Count - 1);
+                                Point lastPoint = path.ElementAt(path.Count - 1);
                                 // Remove that point
-                                u.waypoints.RemoveLast();
+                                path.RemoveLast();
                                 // Add a point that is on the circle near the building, not inside the building!
                                 Point targetPoint = new Point(0, 0);
-                                if (u.waypoints.Count == 0) targetPoint = new Point((int)u.x, (int)u.y);
-                                else targetPoint = u.waypoints.ElementAt(u.waypoints.Count - 1);
+                                if (path.Count == 0) targetPoint = new Point((int)u.x, (int)u.y);
+                                else targetPoint = path.ElementAt(path.Count - 1);
                                 // Move to the point around the circle of the building, but increase the radius a bit
                                 // so we're not standing on the exact top of the building
-                                u.waypoints.AddLast(
+                                path.AddLast(
                                     Util.GetPointOnCircle(lastPoint, b.GetCircleRadius() + u.texture.Width / 2,
                                     Util.GetHypoteneuseAngleDegrees(lastPoint, targetPoint)));
+                                // Now that we know the point where we should move to
+                                // Again calculate the path .. but now the proper way,
+                                // we only needed to calculate the point.
+                                u.MoveToQueue(path.Last.Value);
 
                                 // Set the Engineer to link with the Building so construction won't start without an Engineer
                                 // Since only one Engineer is needed, break aftwards

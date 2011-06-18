@@ -48,8 +48,9 @@ namespace PathfindingTest.Units
 
             if (Game1.GetInstance().IsMultiplayerGame())
             {
-                this.multiplayerData = new UnitMultiplayerData(this);
-                if (this.player == Game1.CURRENT_PLAYER)
+                Boolean isLocal = this.player == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new UnitMultiplayerData(this, isLocal);
+                if (isLocal)
                 {
                     this.multiplayerData.RequestServerID(UnitHeaders.TYPE_ENGINEER);
                 }
@@ -82,10 +83,10 @@ namespace PathfindingTest.Units
                 //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
 
-                if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
+                /*if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
                 {
                     this.DrawHealthBar(sb);
-                }
+                }*/
             }
         }
 

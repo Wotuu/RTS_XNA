@@ -10,6 +10,7 @@ namespace PathfindingTest.Multiplayer.Data
 {
     public abstract class MultiplayerData
     {
+        public Boolean isLocal { get; set; }
         public int localID { get; set; }
         public int serverID { get; set; }
         /// <summary>
@@ -19,8 +20,9 @@ namespace PathfindingTest.Multiplayer.Data
         public Boolean isCreated { get; set; }
         public double lastPulse { get; set; }
 
-        public MultiplayerData()
+        public MultiplayerData(Boolean isLocal)
         {
+            this.isLocal = isLocal;
             this.serverID = -1;
             this.localID = (Game1.GetInstance().objectsCreated++);
             MultiplayerDataManager.GetInstance().AddData(this);

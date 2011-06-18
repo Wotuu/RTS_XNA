@@ -15,13 +15,16 @@ namespace PathfindingTest.Multiplayer.Data
         // Send an update every 3 seconds.
         public int updateRate = 3000;
 
+        public Boolean receivedPathRequest { get; set; }
+
         /// <summary>
         /// Unit must know where it is going to.
         /// Used for multiplayer.
         /// </summary>
         public Point moveTarget { get; set; }
 
-        public UnitMultiplayerData(Unit unit)
+        public UnitMultiplayerData(Unit unit, Boolean isLocal)
+            : base(isLocal)
         {
             this.unit = unit;
         }

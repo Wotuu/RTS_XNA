@@ -10,7 +10,8 @@ namespace PathfindingTest.Multiplayer.Data
     {
         public Building building { get; set; }
 
-        public BuildingMultiplayerData(Building building)
+        public BuildingMultiplayerData(Building building, Boolean isLocal)
+            : base(isLocal)
         {
             this.building = building;
         }

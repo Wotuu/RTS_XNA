@@ -299,6 +299,31 @@ namespace SocketLibrary.Protocol
                             PacketUtil.DecodePacketInt(p, 8), isReceived));
                         break;
                     }
+                case UnitHeaders.GAME_REQUEST_UNIT_DATA:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_REQUEST_UNIT_DATA Received client wants info about a unit: player = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", serverID = " + +
+                            PacketUtil.DecodePacketInt(p, 4), isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_REQUEST_UNIT_DATA Sent info about a unit: player = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", serverID = " +
+                            PacketUtil.DecodePacketInt(p, 4), isReceived));
+                        break;
+                    }
+                case UnitHeaders.GAME_SEND_UNIT_DATA:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_SEND_UNIT_DATA Received info about a unit: targetPlayer = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", ownerID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", serverID = " +
+                            PacketUtil.DecodePacketInt(p, 8) + ", type = " +
+                            PacketUtil.DecodePacketInt(p, 12), isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_SEND_UNIT_DATA Sent data about a unit: targetPlayer = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", ownerID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", serverID = " +
+                            PacketUtil.DecodePacketInt(p, 8) + ", type = " +
+                            PacketUtil.DecodePacketInt(p, 12), isReceived));
+                        break;
+                    }
+
                 /*
                  * 
                     if (isReceived) this.messageLog.AddLast(new LogMessage( currTime + " ",isReceived ));

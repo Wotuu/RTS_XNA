@@ -24,5 +24,18 @@ namespace SocketLibrary.Protocol
         /// [Header] [Int32 playerID] [Int32 serverID] [Int32 type]
         /// </summary>
         public const byte GAME_NEW_UNIT = 0x31;
+
+        /// <summary>
+        /// Client didn't receive data about a unit, when it did need it for processing.
+        /// [Header] [Int32 requestingPlayerID] [Int32 serverID]
+        /// </summary>
+        public const byte GAME_REQUEST_UNIT_DATA = 0x32;
+
+        /// <summary>
+        /// Client that manages the data about this unit, will reply with the data
+        /// and a movement update right after
+        /// [Header] [Int32 requestingPlayerID] [Int32 owningPlayerID] [Int32 serverID] [Int32 type]
+        /// </summary>
+        public const byte GAME_SEND_UNIT_DATA = 0x33;
     }
 }

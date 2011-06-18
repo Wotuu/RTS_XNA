@@ -23,6 +23,8 @@ namespace PathfindingTest.Pathfinding
         {
             lock (queueLock)
             {
+                //Console.Out.WriteLine("Adding a unit to find it's path: \n" +
+                //    "StackTrace: '{0}'", Environment.StackTrace);
                 toProcess.AddLast(new UnitProcess(unit, target));
             }
         }
@@ -59,8 +61,9 @@ namespace PathfindingTest.Pathfinding
                     if (toProcess.Count != 0)
                     {
                         UnitProcess up = toProcess.ElementAt(0);
-                        up.unit.MoveToNow(up.target, true);
-                        toProcess.RemoveFirst();
+                        up.unit.MoveToNow(up.target);
+                        Console.Out.WriteLine("Processed a path! Left: " + toProcess.Count);
+                        toProcess.Remove(up);
                     }
                     else break;
                     count++;
