@@ -44,6 +44,12 @@ namespace PathfindingTest.Buildings
             this.mesh = Game1.GetInstance().collision.PlaceBuilding(this.DefineSelectedRectangle());
             this.waypoint = new Point((int)this.x + (this.texture.Width / 2), (int)this.y + this.texture.Height + 20);
             Game1.GetInstance().IsMouseVisible = true;
+
+            if (Game1.GetInstance().IsMultiplayerGame() &&
+                     this.p == Game1.CURRENT_PLAYER)
+            {
+                Synchronizer.GetInstance().QueueBuilding(this);
+            }
         }
 
         internal override void Draw(SpriteBatch sb)
