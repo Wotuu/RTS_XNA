@@ -32,11 +32,10 @@ namespace PathfindingTest.Multiplayer.Data
         /// This object will request a server id.
         /// </summary>
         /// <param name="type">The unit type as defined in [type]Headers.cs</param>
-        public void RequestServerID(int type)
+        public void RequestServerID()
         {
             Packet p = new Packet(Headers.GAME_REQUEST_OBJECT_ID);
             p.AddInt(localID);
-            p.AddInt(type);
 
             GameServerConnectionManager.GetInstance().SendPacket(p);
         }

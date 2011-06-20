@@ -26,16 +26,6 @@ namespace PathfindingTest.Buildings
             this.currentHealth = 0f;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Buildings/Factory");
-
-            if (Game1.GetInstance().IsMultiplayerGame())
-            {
-                Boolean isLocal = this.p == Game1.CURRENT_PLAYER;
-                this.multiplayerData = new BuildingMultiplayerData(this, isLocal);
-                if (isLocal)
-                {
-                    this.multiplayerData.RequestServerID(BuildingHeaders.TYPE_FACTORY);
-                }
-            }
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
@@ -46,6 +36,16 @@ namespace PathfindingTest.Buildings
         internal override void Draw(SpriteBatch sb)
         {
             DefaultDraw(sb);
+        }
+
+        public override void PlaceBuilding(Units.Engineer e)
+        {
+            this.state = State.Constructing;
+            this.constructedBy = e;
+            e.constructing = this;
+            this.mesh = Game1.GetInstance().collision.PlaceBuilding(this.DefineSelectedRectangle());
+            this.waypoint = new Point((int)this.x + (this.texture.Width / 2), (int)this.y + this.texture.Height + 20);
+            Game1.GetInstance().IsMouseVisible = true;
         }
     }
 }

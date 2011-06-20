@@ -403,6 +403,16 @@ namespace PathfindingTest.Units
 
             this.state = State.Finished;
             this.player.units.AddLast(this);
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.player == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new UnitMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID();
+                }
+            }
         }
 
         internal void DrawHealthBar(SpriteBatch sb)

@@ -96,10 +96,6 @@ namespace PathfindingTest.UI.Commands
                         break;
                 }
             }
-            //if (me.button == MouseEvent.MOUSE_BUTTON_1 || me.button == MouseEvent.MOUSE_BUTTON_2)
-            //{
-            //    this.Dispose();
-            //}
         }
 
         private Boolean CheckEngineers()

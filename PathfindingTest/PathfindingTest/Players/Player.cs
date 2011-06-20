@@ -28,6 +28,7 @@ namespace PathfindingTest.Players
         Texture2D selectionTex;
         Texture2D selectedTex;
 
+        public int resources { get; set; }
         public LinkedList<Unit> units { get; set; }
         public UnitSelection currentSelection { get; set; }
         public LinkedList<Building> buildings { get; set; }
@@ -378,6 +379,8 @@ namespace PathfindingTest.Players
                     i--;
                 }
             }
+
+            Game1.GetInstance().IsMouseVisible = true;
         }
 
         public void OnMouseClick(MouseEvent m)

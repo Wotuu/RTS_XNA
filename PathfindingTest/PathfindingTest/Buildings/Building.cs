@@ -14,6 +14,7 @@ using PathfindingTest.Units;
 using System.Diagnostics;
 using PathfindingTest.Units.Stores;
 using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Buildings
 {
@@ -248,28 +249,7 @@ namespace PathfindingTest.Buildings
         /// <summary>
         /// Places the building on the map
         /// </summary>
-        public void PlaceBuilding(Engineer e)
-        {
-            // It is likely an exception will be thrown, because applying the mesh takes a lot of time ..
-            // as such, you usually get a harmless 'InvalidOperationException'. Catch it and *shrug* it.
-            // This is only in multiplayer.
-            try
-            {
-                this.state = State.Constructing;
-                this.constructedBy = e;
-                e.constructing = this;
-                this.mesh = Game1.GetInstance().collision.PlaceBuilding(this.DefineSelectedRectangle());
-                this.waypoint = new Point((int)this.x + (this.texture.Width / 2), (int)this.y + this.texture.Height + 20);
-                Game1.GetInstance().IsMouseVisible = true;
-
-                if (Game1.GetInstance().IsMultiplayerGame() &&
-                    this.p == Game1.CURRENT_PLAYER)
-                {
-                    Synchronizer.GetInstance().QueueBuilding(this);
-                }
-            }
-            catch (Exception ex) { }
-        }
+        public abstract void PlaceBuilding(Engineer e);
 
         /// <summary>
         /// Gets the radius of the circle surrounding this building
@@ -418,6 +398,16 @@ namespace PathfindingTest.Buildings
             this.healthBar = new HealthBar(this);
 
             this.productionQueue = new LinkedList<Unit>();
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.p == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new BuildingMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID();
+                }
+            }
         }
     }
 }
