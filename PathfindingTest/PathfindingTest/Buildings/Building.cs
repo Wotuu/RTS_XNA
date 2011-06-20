@@ -272,7 +272,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Engineer:
                     if (this.type == Type.Fortress)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }
@@ -281,7 +281,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Melee:
                     if (this.type == Type.Barracks)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 5);
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }
@@ -290,7 +290,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.HeavyMelee:
                     if (this.type == Type.Factory)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }
@@ -299,7 +299,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Fast:
                     if (this.type == Type.Barracks)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }
@@ -308,7 +308,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Ranged:
                     if (this.type == Type.Barracks)
                     {
-                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 5);
+                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }
@@ -317,7 +317,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.HeavyRanged:
                     if (this.type == Type.Factory)
                     {
-                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2), 1);
+                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }

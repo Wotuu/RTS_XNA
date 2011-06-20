@@ -10,20 +10,21 @@ using PathfindingTest.Combat;
 using PathfindingTest.Units.Damage;
 using PathfindingTest.Multiplayer.Data;
 using SocketLibrary.Protocol;
+using PathfindingTest.Pathfinding;
 
 namespace PathfindingTest.Units.Melee
 {
-    class Swordman : CombatUnit
+    class Swordman : Unit
     {
-        public Swordman(Player p, int x, int y, int baseDamage)
+        public Swordman(Player p, int x, int y)
             : base(p, x, y, 1.25f, 20f, 100f, 60)
         {
-            this.baseDamage = baseDamage;
-
+            this.baseDamage = (int)Unit.Damage.Swordman;
             this.player = p;
             this.x = x;
             this.y = y;
             this.type = Type.Melee;
+
 
             Console.Out.WriteLine("Constructed a swordsman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
@@ -40,13 +41,18 @@ namespace PathfindingTest.Units.Melee
             if (this.state == State.Finished)
             {
                 UpdateMovement();
-            UpdateTarget();
-
-                // Don't do this that often, not really needed.
-                if (Game1.GetInstance().frames % 4 == 0)
+                if (Game1.GetInstance().frames % 15 == 0 && unitToDefend == null)
                 {
-                    // CheckCollision();
-                    Swing();
+                    UpdateAttack();
+                }
+                else if (Game1.GetInstance().frames % 15 == 0 && unitToDefend != null)
+                {
+                    UpdateDefense();
+                }
+
+                if (Game1.GetInstance().frames % 4 == 0 && unitToStalk != null)
+                {
+                    TryToSwing();
                 }
             }
         }
@@ -56,11 +62,6 @@ namespace PathfindingTest.Units.Melee
             if (this.state == State.Finished)
             {
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-
-                /*if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
-                {
-                    this.DrawHealthBar(sb);
-                }*/
             }
         }
 
@@ -69,40 +70,6 @@ namespace PathfindingTest.Units.Melee
         /// </summary>
         public override void Swing()
         {
-            
-            if (unitToStalk == null && enemiesInRange.Count < 1)
-           // {
-                CheckForEnemiesInRange();
-                if (this.enemiesInRange.Count == 0)
-            {
-                return;
-            }
-            // Console.WriteLine("swung weapon");
-                Unit targetUnit = this.enemiesInRange.ElementAt(0);
-                AggroEvent e = new AggroEvent(this, targetUnit, true);
-                targetUnit.OnAggroRecieved(e);
-                this.OnAggro(e);
-                DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), targetUnit);
-                targetUnit.OnDamage(dmgEvent);
-                this.fireCooldown = this.rateOfFire;
-        //    }
-       //     else
-       //     {
-       //         Console.WriteLine("Cant fire Q.Q");
-        //    }
-            }
-
-            CheckForEnemiesInRange(this.attackRange);
-            if (this.enemiesInRange.Contains(unitToStalk))
-            {
-                this.waypoints.Clear();
-            }
-            else
-            {
-                Point p = new Point((int)unitToStalk.x, (int)unitToStalk.y);
-                this.MoveToQueue(p);
-                return;
-            }
             AggroEvent e = new AggroEvent(this, unitToStalk, true);
             unitToStalk.OnAggroRecieved(e);
             this.OnAggro(e);
@@ -116,6 +83,13 @@ namespace PathfindingTest.Units.Melee
             if (unitToStalk == null)
             {
                 unitToStalk = e.from;
+            }
+            if (friendliesProtectingMe.Count > 0)
+            {
+                foreach (Unit unit in friendliesProtectingMe)
+                {
+                    unit.OnAggroRecieved(e);
+                }
             }
             //Console.Out.WriteLine("Recieved aggro from something! D=");
         }

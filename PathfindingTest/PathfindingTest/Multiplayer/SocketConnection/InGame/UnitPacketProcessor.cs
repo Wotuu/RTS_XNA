@@ -128,19 +128,19 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                 case UnitHeaders.TYPE_BOWMAN:
                     {
                         unit =
-                            Game1.GetInstance().GetPlayerByMultiplayerID(playerID).rangedStore.getUnit(Unit.Type.Ranged, 0, 0, 5);
+                            Game1.GetInstance().GetPlayerByMultiplayerID(playerID).rangedStore.getUnit(Unit.Type.Ranged, 0, 0);
                         break;
                     }
                 case UnitHeaders.TYPE_ENGINEER:
                     {
                         unit =
-                            Game1.GetInstance().GetPlayerByMultiplayerID(playerID).meleeStore.getUnit(Unit.Type.Engineer, 0, 0, 1);
+                            Game1.GetInstance().GetPlayerByMultiplayerID(playerID).meleeStore.getUnit(Unit.Type.Engineer, 0, 0);
                         break;
                     }
                 case UnitHeaders.TYPE_SWORDMAN:
                     {
                         unit =
-                            Game1.GetInstance().GetPlayerByMultiplayerID(playerID).meleeStore.getUnit(Unit.Type.Melee, 0, 0, 5);
+                            Game1.GetInstance().GetPlayerByMultiplayerID(playerID).meleeStore.getUnit(Unit.Type.Melee, 0, 0);
                         break;
                     }
             }

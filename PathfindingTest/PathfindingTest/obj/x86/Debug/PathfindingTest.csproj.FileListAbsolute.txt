@@ -172,3 +172,5 @@ C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest
 C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\BigMenuTextField.xnb
 C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\MenuButton.xnb
 C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\SmallMenuTextField.xnb
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap5.xnb
+C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\horseman.xnb

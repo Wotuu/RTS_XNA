@@ -26,12 +26,12 @@ namespace PathfindingTest.Units.Projectiles
 
         protected Point waypoint { get; set; }
 
-        private CombatUnit parent { get; set; }
+        private Bowman parent { get; set; }
 
 
-        public Projectile(CombatUnit parent, Unit target, DamageEvent.DamageType type, float movementSpeed, int maxRange, int baseDamage)
+        public Projectile(Unit parent, Unit target, DamageEvent.DamageType type, float movementSpeed, int maxRange, int baseDamage)
         {
-            this.parent = parent;
+            this.parent = (Bowman) parent;
             this.x = parent.x;
             this.y = parent.y;
             this.startX = this.x;

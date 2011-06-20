@@ -93,7 +93,7 @@ namespace PathfindingTest.Players
 
             if (!Game1.GetInstance().IsMultiplayerGame())
             {
-                int unitCount = 6;
+                int unitCount = 75;
 
 
                 LinkedList<Unit> temp_units = new LinkedList<Unit>();
@@ -111,19 +111,23 @@ namespace PathfindingTest.Players
 
                 for (int i = 0; i < unitCount; i++)
                 {
+                    
                     Point p = points.ElementAt(i);
                     if (i % 2 == 0)
                     {
-                        temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, p.X, p.Y, 5));
+                        temp_units.AddLast(fastStore.getUnit(Unit.Type.Fast, p.X, p.Y));
                     }
                     else
                     {
-                        temp_units.AddLast(rangedStore.getUnit(Unit.Type.Ranged, p.X, p.Y, 5));
+                        //temp_units.AddLast(rangedStore.getUnit(Unit.Type.Ranged, p.X, p.Y));
                     }
+                    
+                   // Point p = points.ElementAt(i);
+                    //temp_units.AddLast(meleeStore.getUnit(Unit.Type.Melee, p.X, p.Y));
                 }
             }
 
-            meleeStore.getUnit(Unit.Type.Engineer, location.X, location.Y, 1);
+            meleeStore.getUnit(Unit.Type.Engineer, location.X, location.Y);
 
         }
 
@@ -512,8 +516,11 @@ namespace PathfindingTest.Players
                         Unit selectedFriendly = GetMouseOverUnit(player.units);
                         if (selectedFriendly != null)
                         {
-                            Console.WriteLine("PROTECT");
-                            //@todo start protect.
+                            foreach (Unit unit in currentSelection.units)
+                            {
+                                unit.Defend(selectedFriendly);
+                                selectedFriendly.friendliesProtectingMe.AddLast(unit);
+                            }
                         }
                     }
                     else
@@ -530,20 +537,29 @@ namespace PathfindingTest.Players
                         {
                             if (previewPattern != null)
                             {
-                                foreach (Unit unit in currentSelection.units)
-                                {
-                                    unit.unitToStalk = null;
-                                    unit.waypoints.Clear();
-                                }
+                                stopUnitSelection();
                                 this.currentSelection.MoveTo(previewPattern);
                             }
                             // If we're suppose to move in the first place
-                            else this.currentSelection.MoveTo(GetNewPreviewPattern(m.location, 0));
+                            else
+                            {
+                                stopUnitSelection();
+                                this.currentSelection.MoveTo(GetNewPreviewPattern(m.location, 0));
+                            }
                         }
                         previewPattern = null;
 
                     }
                 }
+            }
+        }
+
+        public void stopUnitSelection()
+        {
+            foreach (Unit unit in currentSelection.units)
+            {
+                unit.unitToStalk = null;
+                unit.waypoints.Clear();
             }
         }
 

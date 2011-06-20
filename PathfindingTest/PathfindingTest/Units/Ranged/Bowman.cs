@@ -10,17 +10,21 @@ using PathfindingTest.Units.Projectiles;
 using PathfindingTest.Combat;
 using PathfindingTest.Multiplayer.Data;
 using SocketLibrary.Protocol;
+using PathfindingTest.Pathfinding;
 
 namespace PathfindingTest.Units
 {
-    public class Bowman : CombatUnit
+    public class Bowman : Unit
     {
-        public Bowman(Player p, int x, int y, int baseDamage)
+        public LinkedList<Projectile> projectiles { get; set; }
+
+        public Bowman(Player p, int x, int y)
             : base(p, x, y, 1f, 100f, 100f, 60)
         {
             this.baseDamage = baseDamage;
 
             this.type = Type.Ranged;
+            this.projectiles = new LinkedList<Projectile>();
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/bowman");
             Console.Out.WriteLine("Constructed a bowman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
@@ -35,13 +39,18 @@ namespace PathfindingTest.Units
             {
                 UpdateMovement();
                 AttemptReload();
-            UpdateTarget();
-
-                // Don't do this that often, not really needed.
-                if (Game1.GetInstance().frames % 4 == 0)
+                if (Game1.GetInstance().frames % 15 == 0 && unitToDefend == null)
                 {
-                    // CheckCollision();
-                    Swing();
+                    UpdateAttack();
+                }
+                else if (Game1.GetInstance().frames % 15 == 0 && unitToDefend != null)
+                {
+                    UpdateDefense();
+                }
+
+                if (Game1.GetInstance().frames % 4 == 0 && unitToStalk != null)
+                {
+                    TryToSwing();
                 }
 
                 for (int i = 0; i < projectiles.Count; i++)
@@ -75,6 +84,13 @@ namespace PathfindingTest.Units
             {
                 unitToStalk = e.from;
             }
+            if (friendliesProtectingMe.Count > 0)
+            {
+                foreach (Unit unit in friendliesProtectingMe)
+                {
+                    unit.OnAggroRecieved(e);
+                }
+            }
             // Console.Out.WriteLine("Recieved aggro from something! D=");
         }
 
@@ -99,29 +115,6 @@ namespace PathfindingTest.Units
         {
             if (this.fireCooldown < 0)
             {
-                CheckForEnemiesInRange(this.aggroRange);
-                if (unitToStalk == null && enemiesInRange.Count < 1)
-                {
-                    return;
-                }
-                else if (unitToStalk == null && enemiesInRange.Count > 0)
-                {
-                    unitToStalk = this.enemiesInRange.ElementAt(0);
-                    this.waypoints.Clear();
-                }
-
-                CheckForEnemiesInRange(this.attackRange);
-                if (this.enemiesInRange.Contains(unitToStalk))
-                {
-                    this.waypoints.Clear();
-                }
-                else
-                {
-                    
-                    Point p = new Point((int)unitToStalk.x, (int)unitToStalk.y);
-                    this.MoveToQueue(p);
-                    return;
-                }
                 AggroEvent e = new AggroEvent(this, unitToStalk, true);
                 unitToStalk.OnAggroRecieved(e);
                 this.OnAggro(e);

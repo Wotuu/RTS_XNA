@@ -271,6 +271,24 @@
       <Output>C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Fonts\SmallMenuTextField.xnb</Output>
       <Time>2011-06-09T16:05:59.7368171+02:00</Time>
     </Item>
+    <Item>
+      <Source>CollisionMap\collisionMap5.png</Source>
+      <Name>CollisionMap\collisionMap5</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\CollisionMap\collisionMap5.xnb</Output>
+      <Time>2011-06-19T13:18:09.3661319+02:00</Time>
+    </Item>
+    <Item>
+      <Source>Units\horseman.png</Source>
+      <Name>Units\horseman</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Cur10s1ty\Documents\Visual Studio 2010\Projects\RTS_XNA\PathfindingTest\PathfindingTest\bin\x86\Debug\Content\Units\horseman.xnb</Output>
+      <Time>2011-06-20T10:38:28.2579789+02:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

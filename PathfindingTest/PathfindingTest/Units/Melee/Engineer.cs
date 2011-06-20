@@ -31,10 +31,10 @@ namespace PathfindingTest.Units
         /// <param name="cm"></param>
         /// <param name="startLocation"></param>
         /// <param name="c"></param>
-        public Engineer(Player p, int x, int y, int baseDamage)
-            : base(p, x, y, 1f, 1f, 1f)
+        public Engineer(Player p, int x, int y)
+            : base(p, x, y, 1f, 1f, 1f, 1f)
         {
-            this.baseDamage = baseDamage;
+            this.baseDamage = (int) Unit.Damage.Engineer;
             this.type = Type.Engineer;
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/Engineer");
             this.collisionRadiusTexture = Game1.GetInstance().Content.Load<Texture2D>("Misc/patternPreview");
@@ -94,7 +94,7 @@ namespace PathfindingTest.Units
         public override void Swing()
         {
         }
-        }
+
 
         public void Repair(Building b)
         {
@@ -121,5 +121,6 @@ namespace PathfindingTest.Units
             {
                 b.state = Building.State.Repairing;
             }
+        }
     }
 }

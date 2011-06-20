@@ -190,10 +190,10 @@
     <Compile Include="Units\Damage\Arrow.cs" />
     <Compile Include="Units\Damage\MeleeSwing.cs" />
     <Compile Include="Units\Damage\Projectile.cs" />
+    <Compile Include="Units\Fast\Horseman.cs" />
     <Compile Include="Units\Melee\Engineer.cs" />
     <Compile Include="Units\Melee\Swordman.cs" />
     <Compile Include="Units\Ranged\Bowman.cs" />
-    <Compile Include="Units\Stores\CombatUnit.cs" />
     <Compile Include="Units\Stores\FastStore.cs" />
     <Compile Include="Units\Stores\MeleeStore.cs" />
     <Compile Include="Units\Stores\RangedStore.cs" />
@@ -266,9 +266,7 @@
     <None Include="ClassDiagram2.cd" />
     <None Include="PathfindingTest_TemporaryKey.pfx" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Units\Fast\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

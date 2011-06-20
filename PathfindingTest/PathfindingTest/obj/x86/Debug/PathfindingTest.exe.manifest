@@ -105,31 +105,31 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>jSGTUcWYF2KNT6J4ebhRNTSDUdg=</dsig:DigestValue>
+        <dsig:DigestValue>T5J8+wotli/0lEWSrDe3PalH3kU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="PathfindingTest.exe" size="103424">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="PathfindingTest.exe" size="136192">
       <assemblyIdentity name="PathfindingTest" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>Ml50oX+T53ETYuVKrtlXHnEj/HY=</dsig:DigestValue>
+        <dsig:DigestValue>umU1lx3TclzFyThsNeWtXTFl5O8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SocketLibrary.dll" size="19968">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SocketLibrary.dll" size="29696">
       <assemblyIdentity name="SocketLibrary" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>PTg/K1xysknTmkjg1HDkqc2956Q=</dsig:DigestValue>
+        <dsig:DigestValue>R9+pXRndP/35+DJFxppEBsadX1c=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -141,19 +141,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>Xi/5BVtC6sGc0QkS6cw1QMqmBAk=</dsig:DigestValue>
+        <dsig:DigestValue>JYbL7vWWnYmt3uw+f8q+gKLhDkU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XNAInterfaceComponents.dll" size="38912">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="XNAInterfaceComponents.dll" size="44544">
       <assemblyIdentity name="XNAInterfaceComponents" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>mFva/6LagN1U1cO8OTlNW4hhFRk=</dsig:DigestValue>
+        <dsig:DigestValue>ijfdlKErDRkJDoUsUh5+JzkomKA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -227,6 +227,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
       <dsig:DigestValue>GedhQgU3UkEyrLAWYsYlbJuVn7s=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\CollisionMap\collisionMap5.xnb" size="3145915">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>Dfj8x/CpFHb0uMPw3lJtJAJf73E=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Fonts\Arial.xnb" size="11438">
@@ -398,6 +407,15 @@
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
       <dsig:DigestValue>HP0cN648N+XML7ct4vV5H9PYrFY=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Content\Units\horseman.xnb" size="3787">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>3+NgKIz3XNFn1CI8r5N88/8O0Bs=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Content\Units\melee.xnb" size="3787">

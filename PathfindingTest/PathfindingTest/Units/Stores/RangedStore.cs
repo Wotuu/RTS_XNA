@@ -15,14 +15,14 @@ namespace PathfindingTest.Units.Stores
             this.player = player;
         }
 
-        protected override Unit createUnit(Unit.Type type, int x, int y, int baseDamage)
+        protected override Unit createUnit(Unit.Type type, int x, int y)
         {
             lock (lockObj)
             {
                 switch (type)
                 {
                     case Unit.Type.Ranged:
-                        return new Bowman(player, x, y, baseDamage);
+                        return new Bowman(player, x, y);
                     default: return null;
                 }
             }

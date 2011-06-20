@@ -38,6 +38,7 @@ namespace PathfindingTest.Units
         public float maxHealth { get; set; }
         private HealthBar healthBar { get; set; }
         public LinkedList<Unit> enemiesInRange { get; set; }
+        public LinkedList<Unit> friendliesProtectingMe { get; set; }
         public int baseDamage { get; set; }
 
         public State state { get; set; }
@@ -47,8 +48,11 @@ namespace PathfindingTest.Units
         public Job job { get; set; }
 
         public Unit unitToStalk { get; set; }
+        public Unit unitToDefend { get; set; }
         public float attackRange { get; set; }
         public float aggroRange { get; set; }
+        public float fireCooldown { get; set; }
+        public float rateOfFire { get; set; }
 
         public UnitMultiplayerData multiplayerData { get; set; }
 
@@ -56,6 +60,7 @@ namespace PathfindingTest.Units
         public LinkedList<Point> waypoints { get; set; }
         public float movementSpeed { get; set; }
         private float direction { get; set; }
+        public Boolean hasToMove { get; set; }
         #endregion
 
         public enum Type
@@ -81,6 +86,14 @@ namespace PathfindingTest.Units
             Defending,
             Patrolling,
             Idle
+        }
+
+        public enum Damage
+        {
+            Engineer = 4,
+            Bowman = 15,
+            Swordman = 35,
+            Horseman = 15
         }
 
         public abstract void Update(KeyboardState ks, MouseState ms);
@@ -238,8 +251,8 @@ namespace PathfindingTest.Units
             // ONLY the current player may sync his units
             if (Game1.CURRENT_PLAYER == this.player && Game1.GetInstance().IsMultiplayerGame())
             {
-                double now = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds ;
-                if (now - this.multiplayerData.lastPulse > 
+                double now = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds;
+                if (now - this.multiplayerData.lastPulse >
                     this.multiplayerData.updateRate)
                 {
                     // Console.Out.WriteLine("Performing perodic unit update");
@@ -294,11 +307,15 @@ namespace PathfindingTest.Units
         {
             if (p == Point.Zero) return;
 
-            if (!Game1.GetInstance().IsMultiplayerGame() &&
-                !PathfindingProcessor.GetInstance().AlreadyInQueue(this)) PathfindingProcessor.GetInstance().Push(this, p);
+            if (!Game1.GetInstance().IsMultiplayerGame())
+            {
+                if (
+                !PathfindingProcessor.GetInstance().AlreadyInQueue(this))
+                    PathfindingProcessor.GetInstance().Push(this, p);
+            }
             else
             {
-                if (this.multiplayerData.moveTarget == null || 
+                if (this.multiplayerData.moveTarget == null ||
                     this.multiplayerData.moveTarget == Point.Zero)
                 {
                     this.multiplayerData.moveTarget = this.GetLocation();
@@ -373,7 +390,7 @@ namespace PathfindingTest.Units
         {
             if (Game1.GetInstance().IsMultiplayerGame())
             {
-                    PathfindingProcessor.GetInstance().Remove(this);
+                PathfindingProcessor.GetInstance().Remove(this);
                 this.multiplayerData.moveTarget = p;
                 this.multiplayerData.receivedPathRequest = false;
                 if (Game1.CURRENT_PLAYER == this.player)
@@ -391,7 +408,7 @@ namespace PathfindingTest.Units
             // Console.Out.WriteLine("Found path in " + ((DateTime.UtcNow.Ticks - ticks) / 10000) + "ms");
         }
 
-        public Unit(Player p, int x, int y, float movementSpeed, float attackRange, float aggroRange)
+        public Unit(Player p, int x, int y, float movementSpeed, float attackRange, float aggroRange, float rateOfFire)
         {
             this.player = p;
             this.x = x;
@@ -399,6 +416,7 @@ namespace PathfindingTest.Units
             this.movementSpeed = movementSpeed;
             this.attackRange = attackRange;
             this.aggroRange = aggroRange;
+            this.rateOfFire = rateOfFire;
             (this.quad = Game1.GetInstance().quadTree.GetQuadByPoint(this.GetLocation())).highlighted = true;
 
             this.color = player.color;
@@ -406,6 +424,8 @@ namespace PathfindingTest.Units
 
             this.repelsOthers = true;
             this.collisionWith = new LinkedList<Unit>();
+            this.enemiesInRange = new LinkedList<Unit>();
+            this.friendliesProtectingMe = new LinkedList<Unit>();
 
             healthBar = new HealthBar(this);
 
@@ -459,13 +479,6 @@ namespace PathfindingTest.Units
             {
                 unitToStalk = e.source;
             }
-
-            CheckForEnemiesInRange(this.aggroRange);
-            if (!this.enemiesInRange.Contains(unitToStalk))
-            {
-                Point p = new Point((int)unitToStalk.x, (int)unitToStalk.y);
-                this.MoveToQueue(p);
-            }
             this.currentHealth -= e.damageDone;
             if (this.currentHealth <= 0)
             {
@@ -473,10 +486,100 @@ namespace PathfindingTest.Units
             }
         }
 
+        /// <summary>
+        /// Sets the target to attack
+        /// </summary>
+        /// <param name="unitToAttack"></param>
         public void Attack(Unit unitToAttack)
         {
+            this.unitToDefend = null;
             this.unitToStalk = unitToAttack;
-            Point p = new Point((int)unitToAttack.x, (int)unitToAttack.y);
+        }
+
+        /// <summary>
+        /// Sets the target to defenc
+        /// </summary>
+        /// <param name="unitToDefend"></param>
+        public void Defend(Unit unitToDefend)
+        {
+            this.unitToStalk = null;
+            this.unitToDefend = unitToDefend;
+        }
+
+        public void TryToSwing()
+        {
+            if (Util.GetHypoteneuseLength(unitToStalk.GetLocation(), this.GetLocation()) < this.attackRange)
+            {
+                this.waypoints.Clear();
+                Swing();
+            }
+            else
+            {
+                if (waypoints.Count < 1)
+                {
+                    Point p = new Point((int)unitToStalk.x, (int)unitToStalk.y);
+                    this.MoveToQueue(p);
+                }
+            }
+        }
+        /// <summary>
+        /// This unit will attempt to fire/swing/kill/cast!
+        /// </summary>
+        public abstract void Swing();
+
+        public void UpdateAttack()
+        {
+            if (unitToStalk == null || isTargetDead())
+            {
+                //get new target
+                CheckForEnemiesInRange(this.aggroRange);
+                if (this.enemiesInRange.Count > 0)
+                {
+                    unitToStalk = enemiesInRange.ElementAt(0);
+                }
+            }
+        }
+
+        public void UpdateDefense()
+        {
+            if (!isUnitDead(unitToDefend))
+            {
+                if (Util.GetHypoteneuseLength(unitToDefend.GetLocation(), this.GetLocation()) < this.attackRange)
+                {
+                    this.waypoints.Clear();
+                }
+                else
+                {
+                    if (waypoints.Count < 1)
+                    {
+                        Point p = new Point((int)unitToDefend.x, (int)unitToDefend.y);
+                        this.MoveToQueue(p);
+                    }
+                }
+            }
+        }
+
+        private Boolean isUnitDead(Unit unit)
+        {
+            if (unit != null && unit.isDead)
+            {
+                unit = null;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks to see wether the set target has died yet.
+        /// </summary>
+        private Boolean isTargetDead()
+        {
+            if (unitToStalk != null && unitToStalk.isDead)
+            {
+                unitToStalk = null;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -487,23 +590,6 @@ namespace PathfindingTest.Units
             this.isDead = true;
             this.player.units.Remove(this);
             if (this.player.currentSelection != null) this.player.currentSelection.units.Remove(this);
-        }
-
-
-        /// <summary>
-        /// This unit will attempt to fire/swing/kill/cast!
-        /// </summary>
-        public abstract void Swing();
-
-        /// <summary>
-        /// Checks to see wether the set target has died yet.
-        /// </summary>
-        public void UpdateTarget()
-        {
-            if (unitToStalk != null && unitToStalk.isDead) 
-            { 
-                unitToStalk = null;
-            }
         }
     }
 }
