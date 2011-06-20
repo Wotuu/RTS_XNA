@@ -13,6 +13,7 @@ using SocketLibrary.Multiplayer;
 using SocketLibrary.Users;
 using PathfindingTest.UI.Menus.Multiplayer.Panels;
 using PathfindingTest.Multiplayer.SocketConnection.InGame;
+using PathfindingTest.Buildings;
 
 namespace PathfindingTest.State
 {
@@ -79,8 +80,6 @@ namespace PathfindingTest.State
                         Game1.CURRENT_PLAYER = humanPlayer;
                         humanPlayer.SpawnStartUnits(new Point((int)Game1.GetInstance().graphics.PreferredBackBufferWidth / 2,
                             (int)Game1.GetInstance().graphics.PreferredBackBufferWidth / 2));
-
-
 
 
                         Alliance greenAlliance = new Alliance();

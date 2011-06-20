@@ -33,7 +33,7 @@ namespace PathfindingTest.Multiplayer.Data
         /// Gets the type of this unit as defined in UnitHeaders.cs
         /// </summary>
         /// <returns></returns>
-        public override int GetUnitType()
+        public override int GetObjectType()
         {
             if (this.unit is Bowman) return UnitHeaders.TYPE_BOWMAN;
             else if (this.unit is Swordman) return UnitHeaders.TYPE_SWORDMAN;
