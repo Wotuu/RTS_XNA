@@ -71,7 +71,8 @@ namespace PathfindingTest.Buildings
             Interrupted,
             Finished,
             Repairing,
-            Producing
+            Producing,
+            MultiplayerWaitingForLocation
         }
 
         public abstract void Update(KeyboardState ks, MouseState ms);
@@ -393,7 +394,6 @@ namespace PathfindingTest.Buildings
             this.p.buildings.AddLast(this);
             this.constructProgress = 0;
 
-            this.state = State.Preview;
             this.progressBar = new ProgressBar(this);
             this.healthBar = new HealthBar(this);
 
@@ -406,7 +406,16 @@ namespace PathfindingTest.Buildings
                 if (isLocal)
                 {
                     this.multiplayerData.RequestServerID();
+                    this.state = State.Preview;
                 }
+                else
+                {
+                    this.state = State.MultiplayerWaitingForLocation;
+                }
+            }
+            else
+            {
+                this.state = State.Preview;
             }
         }
     }

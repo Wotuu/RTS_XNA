@@ -78,7 +78,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
 
                         try
                         {
-                            if (building.state == Building.State.Preview) building.PlaceBuilding(building.constructedBy);
+                            if (building.state == Building.State.MultiplayerWaitingForLocation) building.PlaceBuilding(building.constructedBy);
                         }
                         catch (Exception e) { }
 
