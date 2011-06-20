@@ -6,8 +6,8 @@ using Microsoft.Xna.Framework;
 using System.Xml;
 using System.IO;
 using System.Windows.Forms;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections;
 
 namespace MapEditor.TileMap
 
@@ -16,22 +16,23 @@ namespace MapEditor.TileMap
     {
         public string textureName;
         public int tileWidth, tileHeight;
-        public List<Rectangle> tiles;
+        public ArrayList tiles;
         public string TilesetTextureName;
 
 
         public Tileset(Texture2D TilesetTexture)
         {
-           
+            tiles = new ArrayList();
             textureName = "";
             tileWidth = 0;
             tileHeight = 0;
-            tiles = new List<Rectangle>();
+            //tiles = new List<Rectangle>();
             ProcessTileSet(TilesetTexture);
         }
 
         void ProcessTileSet(Texture2D TilesetTexture)
         {
+            
             for (int y = 0; y <= TilesetTexture.Height / Engine.TileHeight; y++)
             {
                 for (int x = 0; x <= TilesetTexture.Width / Engine.TileWidth; x++)

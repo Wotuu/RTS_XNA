@@ -37,6 +37,16 @@
             this.PnlPaletteContainer = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.BtnShowGrid = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.Layers = new System.Windows.Forms.ToolStripLabel();
+            this.BtnLayerDown = new System.Windows.Forms.ToolStripButton();
+            this.TBCurrentLayer = new System.Windows.Forms.ToolStripTextBox();
+            this.BtnLayerUp = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.BtnPaint = new System.Windows.Forms.ToolStripButton();
+            this.BtnMarqueePaint = new System.Windows.Forms.ToolStripButton();
+            this.BtnErase = new System.Windows.Forms.ToolStripButton();
+            this.BtnMarqueeerase = new System.Windows.Forms.ToolStripButton();
             this.tileMapDisplay1 = new MapEditor.Display.TileMapDisplay(this.components);
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -85,7 +95,17 @@
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BtnShowGrid});
+           this.BtnShowGrid,
+           this.toolStripSeparator1,
+           this.Layers,
+           this.BtnLayerDown,
+           this.TBCurrentLayer,
+           this.BtnLayerUp,
+           this.toolStripSeparator2,
+           this.BtnPaint,
+           this.BtnMarqueePaint,
+           this.BtnErase,
+           this.BtnMarqueeerase});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1264, 25);
@@ -101,7 +121,93 @@
             this.BtnShowGrid.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.BtnShowGrid.Name = "BtnShowGrid";
             this.BtnShowGrid.Size = new System.Drawing.Size(23, 22);
-            this.BtnShowGrid.Text = "BtnShowgrid";
+            this.BtnShowGrid.Text = "Toggle grid visibility";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // Layers
+            // 
+            this.Layers.Name = "Layers";
+            this.Layers.Size = new System.Drawing.Size(40, 22);
+            this.Layers.Text = "Layers";
+            // 
+            // BtnLayerDown
+            // 
+            this.BtnLayerDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.BtnLayerDown.Image = ((System.Drawing.Image)(resources.GetObject("BtnLayerDown.Image")));
+            this.BtnLayerDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BtnLayerDown.Name = "BtnLayerDown";
+            this.BtnLayerDown.Size = new System.Drawing.Size(23, 22);
+            this.BtnLayerDown.Text = "Layer Down";
+            this.BtnLayerDown.Click += new System.EventHandler(this.BtnLayerDown_Click);
+            // 
+            // TBCurrentLayer
+            // 
+            this.TBCurrentLayer.MaxLength = 3;
+            this.TBCurrentLayer.Name = "TBCurrentLayer";
+            this.TBCurrentLayer.ReadOnly = true;
+            this.TBCurrentLayer.Size = new System.Drawing.Size(25, 25);
+            this.TBCurrentLayer.Text = "0";
+            // 
+            // BtnLayerUp
+            // 
+            this.BtnLayerUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.BtnLayerUp.Image = ((System.Drawing.Image)(resources.GetObject("BtnLayerUp.Image")));
+            this.BtnLayerUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BtnLayerUp.Name = "BtnLayerUp";
+            this.BtnLayerUp.Size = new System.Drawing.Size(23, 22);
+            this.BtnLayerUp.Text = "Layer Up";
+            this.BtnLayerUp.Click += new System.EventHandler(this.BtnLayerUp_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // BtnPaint
+            // 
+            this.BtnPaint.Checked = true;
+            this.BtnPaint.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.BtnPaint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.BtnPaint.Image = ((System.Drawing.Image)(resources.GetObject("BtnPaint.Image")));
+            this.BtnPaint.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BtnPaint.Name = "BtnPaint";
+            this.BtnPaint.Size = new System.Drawing.Size(23, 22);
+            this.BtnPaint.Text = "toolStripButton1";
+            this.BtnPaint.Click += new System.EventHandler(this.BtnPaint_Click);
+            // 
+            // BtnMarqueePaint
+            // 
+            this.BtnMarqueePaint.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.BtnMarqueePaint.Image = ((System.Drawing.Image)(resources.GetObject("BtnMarqueePaint.Image")));
+            this.BtnMarqueePaint.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BtnMarqueePaint.Name = "BtnMarqueePaint";
+            this.BtnMarqueePaint.Size = new System.Drawing.Size(23, 22);
+            this.BtnMarqueePaint.Text = "toolStripButton2";
+            this.BtnMarqueePaint.Click += new System.EventHandler(this.BtnMarqueePaint_Click);
+            // 
+            // BtnErase
+            // 
+            this.BtnErase.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.BtnErase.Image = ((System.Drawing.Image)(resources.GetObject("BtnErase.Image")));
+            this.BtnErase.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BtnErase.Name = "BtnErase";
+            this.BtnErase.Size = new System.Drawing.Size(23, 22);
+            this.BtnErase.Text = "toolStripButton3";
+            this.BtnErase.Click += new System.EventHandler(this.BtnErase_Click);
+            // 
+            // BtnMarqueeerase
+            // 
+            this.BtnMarqueeerase.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.BtnMarqueeerase.Image = ((System.Drawing.Image)(resources.GetObject("BtnMarqueeerase.Image")));
+            this.BtnMarqueeerase.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.BtnMarqueeerase.Name = "BtnMarqueeerase";
+            this.BtnMarqueeerase.Size = new System.Drawing.Size(23, 22);
+            this.BtnMarqueeerase.Text = "toolStripButton4";
+            this.BtnMarqueeerase.Click += new System.EventHandler(this.BtnMarqueeerase_Click);
             // 
             // tileMapDisplay1
             // 
@@ -142,6 +248,16 @@
         private System.Windows.Forms.Panel PnlPaletteContainer;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton BtnShowGrid;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripLabel Layers;
+        private System.Windows.Forms.ToolStripButton BtnLayerDown;
+        private System.Windows.Forms.ToolStripTextBox TBCurrentLayer;
+        private System.Windows.Forms.ToolStripButton BtnLayerUp;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton BtnPaint;
+        private System.Windows.Forms.ToolStripButton BtnMarqueePaint;
+        private System.Windows.Forms.ToolStripButton BtnErase;
+        private System.Windows.Forms.ToolStripButton BtnMarqueeerase;
     }
 }
 
