@@ -32,15 +32,7 @@ namespace PathfindingTest.Units.Melee
             this.productionDuration = 5;
             this.productionProgress = 0;
 
-            if (Game1.GetInstance().IsMultiplayerGame())
-            {
-                Boolean isLocal = this.player == Game1.CURRENT_PLAYER;
-                this.multiplayerData = new UnitMultiplayerData(this, isLocal);
-                if (isLocal)
-                {
-                    this.multiplayerData.RequestServerID(UnitHeaders.TYPE_SWORDMAN);
-                }
-            }
+
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
@@ -85,7 +77,7 @@ namespace PathfindingTest.Units.Melee
             {
                 return;
             }
-                Console.WriteLine("swung weapon");
+            // Console.WriteLine("swung weapon");
                 Unit targetUnit = this.enemiesInRange.ElementAt(0);
                 AggroEvent e = new AggroEvent(this, targetUnit, true);
                 targetUnit.OnAggroRecieved(e);

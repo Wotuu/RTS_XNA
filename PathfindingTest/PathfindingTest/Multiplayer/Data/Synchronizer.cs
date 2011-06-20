@@ -15,7 +15,7 @@ namespace PathfindingTest.Multiplayer.Data
         private LinkedList<Unit> unitList = new LinkedList<Unit>();
         private LinkedList<Building> buildingList = new LinkedList<Building>();
 
-        private int maxUnitsPerFrame = 2;
+        private int maxObjectsPerFrame = 5;
 
         private static Synchronizer instance;
 
@@ -33,9 +33,9 @@ namespace PathfindingTest.Multiplayer.Data
         /// </summary>
         public void Synchronize()
         {
-            int unitsSynced = 0;
+            int objectsSynced = 0;
 
-            while (unitsSynced < maxUnitsPerFrame && unitList.Count > 0)
+            while (objectsSynced < maxObjectsPerFrame && unitList.Count > 0)
             {
                 // Sync this unit.
                 Unit unit = unitList.First.Value;
@@ -47,7 +47,7 @@ namespace PathfindingTest.Multiplayer.Data
                     // Get this packet going before the other one
                     newUnitPacket.AddInt(unit.player.multiplayerID);
                     newUnitPacket.AddInt(unit.multiplayerData.serverID);
-                    newUnitPacket.AddInt(unit.multiplayerData.GetUnitType());
+                    newUnitPacket.AddInt(unit.multiplayerData.GetObjectType());
                     // Notify everyone else that we have created a unit
                     GameServerConnectionManager.GetInstance().SendPacket(newUnitPacket);
                     unit.multiplayerData.isCreated = true;
@@ -64,10 +64,43 @@ namespace PathfindingTest.Multiplayer.Data
                 unit.multiplayerData.lastPulse = new TimeSpan(DateTime.UtcNow.Ticks).TotalMilliseconds;
                 GameServerConnectionManager.GetInstance().SendPacket(p);
 
-                Console.Out.WriteLine("Synchronised " + unit);
+                // Console.Out.WriteLine("Synchronised " + unit);
 
                 unitList.RemoveFirst();
-                unitsSynced++;
+                objectsSynced++;
+            }
+
+
+            while (objectsSynced < maxObjectsPerFrame && buildingList.Count > 0)
+            {
+                Building building = buildingList.First.Value;
+
+                if (!building.multiplayerData.isCreated)
+                {
+                    // Notify the rest of the world of the creation of this unit.
+                    Packet newBuildingPacket = new Packet(BuildingHeaders.GAME_NEW_BUILDING);
+
+                    // Get this packet going before the other one
+                    newBuildingPacket.AddInt(building.p.multiplayerID);
+                    newBuildingPacket.AddInt(building.multiplayerData.serverID);
+                    newBuildingPacket.AddInt(building.multiplayerData.GetObjectType());
+                    newBuildingPacket.AddInt(building.constructedBy.multiplayerData.serverID);
+
+                    // Notify everyone else that we have created a unit
+                    GameServerConnectionManager.GetInstance().SendPacket(newBuildingPacket);
+                    building.multiplayerData.isCreated = true;
+                }
+
+                Packet movePacket = new Packet(BuildingHeaders.GAME_BUILDING_LOCATION);
+                movePacket.AddInt(building.multiplayerData.serverID);
+                movePacket.AddInt((int)building.x);
+                movePacket.AddInt((int)building.y);
+                GameServerConnectionManager.GetInstance().SendPacket(movePacket);
+
+
+
+                buildingList.RemoveFirst();
+                objectsSynced++;
             }
         }
 

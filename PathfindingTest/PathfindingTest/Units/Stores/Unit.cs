@@ -54,32 +54,6 @@ namespace PathfindingTest.Units
 
         #region Movement variables
         public LinkedList<Point> waypoints { get; set; }
-        /*private LinkedList<Point> _waypoints { get; set; }
-        public LinkedList<Point> waypoints
-        {
-            get
-            {
-                return _waypoints;
-            }
-            set
-            {
-                if (!Game1.GetInstance().IsMultiplayerGame())
-                {
-                    if (value.Count > 0)
-                    {
-                        Point newTarget = value.First.Value;
-                        SetMoveToTarget(newTarget.X, newTarget.Y);
-                    }
-                }
-                else if( value.Count > 0 && this.multiplayerData != null &&
-                    this.player == Game1.CURRENT_PLAYER && this.multiplayerData.receivedPathRequest)
-                {
-                    this.multiplayerData.moveTarget = value.Last.Value;
-                    Synchronizer.GetInstance().QueueUnit(this);
-                }
-                _waypoints = value;
-            }
-        }*/
         public float movementSpeed { get; set; }
         private float direction { get; set; }
         #endregion
@@ -268,7 +242,7 @@ namespace PathfindingTest.Units
                 if (now - this.multiplayerData.lastPulse > 
                     this.multiplayerData.updateRate)
                 {
-                    Console.Out.WriteLine("Performing perodic unit update");
+                    // Console.Out.WriteLine("Performing perodic unit update");
                     // We may get stacking queues if we dont do this
                     this.multiplayerData.lastPulse = now;
                     Synchronizer.GetInstance().QueueUnit(this);
@@ -318,11 +292,7 @@ namespace PathfindingTest.Units
         /// <param name="p">The point to move to, in a few frames depending on the queue</param>
         public void MoveToQueue(Point p)
         {
-            if (p == Point.Zero)
-            {
-                Console.Out.WriteLine("Not moving to point (0, 0).");
-                return;
-            }
+            if (p == Point.Zero) return;
 
             if (!Game1.GetInstance().IsMultiplayerGame() &&
                 !PathfindingProcessor.GetInstance().AlreadyInQueue(this)) PathfindingProcessor.GetInstance().Push(this, p);
@@ -408,7 +378,7 @@ namespace PathfindingTest.Units
                 this.multiplayerData.receivedPathRequest = false;
                 if (Game1.CURRENT_PLAYER == this.player)
                 {
-                    Console.Out.WriteLine("Queueing unit now: " + p);
+                    // Console.Out.WriteLine("Queueing unit now: " + p);
                     Synchronizer.GetInstance().QueueUnit(this);
                 }
             }
@@ -444,6 +414,16 @@ namespace PathfindingTest.Units
 
             this.state = State.Finished;
             this.player.units.AddLast(this);
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.player == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new UnitMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID();
+                }
+            }
         }
 
         internal void DrawHealthBar(SpriteBatch sb)

@@ -29,19 +29,17 @@ namespace PathfindingTest.Multiplayer.Data
         }
 
         /// <summary>
-        /// This object will request a server id, and notify the rest of the players of its
-        /// creation.
+        /// This object will request a server id.
         /// </summary>
-        /// <param name="type">The unit type as defined in UnitHeaders.cs</param>
-        public void RequestServerID(int type)
+        /// <param name="type">The unit type as defined in [type]Headers.cs</param>
+        public void RequestServerID()
         {
             Packet p = new Packet(Headers.GAME_REQUEST_OBJECT_ID);
             p.AddInt(localID);
-            p.AddInt(type);
 
             GameServerConnectionManager.GetInstance().SendPacket(p);
         }
 
-        public abstract int GetUnitType();
+        public abstract int GetObjectType();
     }
 }

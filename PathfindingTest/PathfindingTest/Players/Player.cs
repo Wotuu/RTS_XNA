@@ -28,6 +28,7 @@ namespace PathfindingTest.Players
         Texture2D selectionTex;
         Texture2D selectedTex;
 
+        public int resources { get; set; }
         public LinkedList<Unit> units { get; set; }
         public UnitSelection currentSelection { get; set; }
         public LinkedList<Building> buildings { get; set; }
@@ -184,15 +185,16 @@ namespace PathfindingTest.Players
                     units.ElementAt(i).Update(ks, ms);
                 }
             }
-            catch (InvalidOperationException e)
-            {
-                // blabla
-            }
+            catch (InvalidOperationException e) { }
 
-            for (int i = 0; i < buildings.Count; i++)
+            try
             {
-                buildings.ElementAt(i).Update(ks, ms);
+                for (int i = 0; i < buildings.Count; i++)
+                {
+                    buildings.ElementAt(i).Update(ks, ms);
+                }
             }
+            catch (Exception e) { }
 
             if (command != null)
             {
@@ -377,6 +379,8 @@ namespace PathfindingTest.Players
                     i--;
                 }
             }
+
+            Game1.GetInstance().IsMouseVisible = true;
         }
 
         public void OnMouseClick(MouseEvent m)

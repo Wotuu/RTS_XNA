@@ -13,6 +13,8 @@ using PathfindingTest.Collision;
 using PathfindingTest.Units;
 using System.Diagnostics;
 using PathfindingTest.Units.Stores;
+using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Buildings
 {
@@ -51,6 +53,8 @@ namespace PathfindingTest.Buildings
         public LinkedList<Unit> constructionQueue { get; set; }
         public Point waypoint { get; set; }
 
+        public BuildingMultiplayerData multiplayerData { get; set; }
+
 
         public enum Type
         {
@@ -67,7 +71,8 @@ namespace PathfindingTest.Buildings
             Interrupted,
             Finished,
             Repairing,
-            Producing
+            Producing,
+            MultiplayerWaitingForLocation
         }
 
         public abstract void Update(KeyboardState ks, MouseState ms);
@@ -75,7 +80,7 @@ namespace PathfindingTest.Buildings
         internal abstract void Draw(SpriteBatch sb);
 
         public void DefaultUpdate(KeyboardState ks, MouseState ms)
-        {            
+        {
             switch (state)
             {
                 case State.Preview:
@@ -245,15 +250,7 @@ namespace PathfindingTest.Buildings
         /// <summary>
         /// Places the building on the map
         /// </summary>
-        public void PlaceBuilding(Engineer e)
-        {
-            this.state = State.Constructing;
-            this.constructedBy = e;
-            e.constructing = this;
-            this.mesh = Game1.GetInstance().collision.PlaceBuilding(this.DefineSelectedRectangle());
-            this.waypoint = new Point((int)this.x + (this.texture.Width / 2), (int)this.y + this.texture.Height + 20);
-            Game1.GetInstance().IsMouseVisible = true;
-        }
+        public abstract void PlaceBuilding(Engineer e);
 
         /// <summary>
         /// Gets the radius of the circle surrounding this building
@@ -345,6 +342,9 @@ namespace PathfindingTest.Buildings
                 produced.y = waypoint.Y;
                 productionQueue.RemoveFirst();
                 this.state = State.Finished;
+
+                // Synchronize this unit, since the unit has moved (in other words, teleported)
+                if (Game1.GetInstance().IsMultiplayerGame()) Synchronizer.GetInstance().QueueUnit(produced);
             }
         }
 
@@ -394,11 +394,29 @@ namespace PathfindingTest.Buildings
             this.p.buildings.AddLast(this);
             this.constructProgress = 0;
 
-            this.state = State.Preview;
             this.progressBar = new ProgressBar(this);
             this.healthBar = new HealthBar(this);
 
             this.productionQueue = new LinkedList<Unit>();
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.p == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new BuildingMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID();
+                    this.state = State.Preview;
+                }
+                else
+                {
+                    this.state = State.MultiplayerWaitingForLocation;
+                }
+            }
+            else
+            {
+                this.state = State.Preview;
+            }
         }
     }
 }

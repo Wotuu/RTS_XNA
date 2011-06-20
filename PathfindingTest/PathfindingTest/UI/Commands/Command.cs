@@ -36,7 +36,8 @@ namespace PathfindingTest.UI.Commands
             this.y = y;
             this.color = color;
 
-            Game1.GetInstance().IsMouseVisible = false;
+            // Was false
+            Game1.GetInstance().IsMouseVisible = true;
 
             MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += ((MouseClickListener)this).OnMouseRelease;
@@ -96,10 +97,6 @@ namespace PathfindingTest.UI.Commands
                         break;
                 }
             }
-            //if (me.button == MouseEvent.MOUSE_BUTTON_1 || me.button == MouseEvent.MOUSE_BUTTON_2)
-            //{
-            //    this.Dispose();
-            //}
         }
 
         private Boolean CheckEngineers()
