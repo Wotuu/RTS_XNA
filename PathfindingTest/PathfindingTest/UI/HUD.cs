@@ -215,9 +215,9 @@ namespace PathfindingTest.UI
         void MouseClickListener.OnMouseClick(MouseEvent me)
         {
             if (me.button == MouseEvent.MOUSE_BUTTON_1)
-                //player.currentSelection != null
-                //player.currentSelection.units.Count == 1 &&
-                //player.currentSelection.units.ElementAt(0).type == Unit.UnitType.Engineer &&)
+            //player.currentSelection != null
+            //player.currentSelection.units.Count == 1 &&
+            //player.currentSelection.units.ElementAt(0).type == Unit.UnitType.Engineer &&)
             {
                 foreach (HUDObject o in objects)
                 {
@@ -231,22 +231,26 @@ namespace PathfindingTest.UI
                         {
                             case HUDObject.Type.Resources:
                                 b = new ResourceGather(this.player, this.color);
-                                Game1.GetInstance().IsMouseVisible = false;
+                                // Was false
+                                Game1.GetInstance().IsMouseVisible = true;
                                 break;
 
                             case HUDObject.Type.Barracks:
                                 b = new Barracks(this.player, this.color);
-                                Game1.GetInstance().IsMouseVisible = false;
+                                // Was false
+                                Game1.GetInstance().IsMouseVisible = true;
                                 break;
 
                             case HUDObject.Type.Factory:
                                 b = new Factory(this.player, this.color);
-                                Game1.GetInstance().IsMouseVisible = false;
+                                // Was false
+                                Game1.GetInstance().IsMouseVisible = true;
                                 break;
 
                             case HUDObject.Type.Fortress:
                                 b = new Fortress(this.player, this.color);
-                                Game1.GetInstance().IsMouseVisible = false;
+                                // Was false
+                                Game1.GetInstance().IsMouseVisible = true;
                                 break;
 
                             case HUDObject.Type.Engineer:
@@ -332,7 +336,7 @@ namespace PathfindingTest.UI
                                 // Since only one Engineer is needed, break aftwards
                                 if (temp == null)
                                 {
-                                    temp = (Engineer) u;
+                                    temp = (Engineer)u;
                                     break;
                                 }
                             }

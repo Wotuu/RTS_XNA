@@ -76,7 +76,11 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                         building.x = locationX;
                         building.y = locationY;
 
-                        if (building.state == Building.State.Preview) building.PlaceBuilding(building.constructedBy);
+                        try
+                        {
+                            if (building.state == Building.State.Preview) building.PlaceBuilding(building.constructedBy);
+                        }
+                        catch (Exception e) { }
 
                         break;
                     }
@@ -94,29 +98,29 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
             Building building = null;
             Player p = Game1.GetInstance().GetPlayerByMultiplayerID(playerID);
             Engineer engineer = (Engineer)((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(byID)).unit;
-            switch (type)
-            {
-                case BuildingHeaders.TYPE_BARRACKS:
-                    {
-                        building = new Barracks(p, p.color);
-                        break;
-                    }
-                case BuildingHeaders.TYPE_FACTORY:
-                    {
-                        building = new Factory(p, p.color);
-                        break;
-                    }
-                case BuildingHeaders.TYPE_FORTRESS:
-                    {
-                        building = new Fortress(p, p.color);
-                        break;
-                    }
-                case BuildingHeaders.TYPE_RESOURCES_GATHER:
-                    {
-                        building = new ResourceGather(p, p.color);
-                        break;
-                    }
-            }
+                switch (type)
+                {
+                    case BuildingHeaders.TYPE_BARRACKS:
+                        {
+                            building = new Barracks(p, p.color);
+                            break;
+                        }
+                    case BuildingHeaders.TYPE_FACTORY:
+                        {
+                            building = new Factory(p, p.color);
+                            break;
+                        }
+                    case BuildingHeaders.TYPE_FORTRESS:
+                        {
+                            building = new Fortress(p, p.color);
+                            break;
+                        }
+                    case BuildingHeaders.TYPE_RESOURCES_GATHER:
+                        {
+                            building = new ResourceGather(p, p.color);
+                            break;
+                        }
+                }
             building.constructedBy = engineer;
             Console.Out.WriteLine("New building! : " + serverID);
             building.multiplayerData.serverID = serverID;
