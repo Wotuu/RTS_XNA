@@ -124,13 +124,13 @@ namespace SocketLibrary.Protocol
 
         /// <summary>
         /// Client builds something and needs an ID.
-        /// Client: [Header] [Int32 localID] [Int32 unitType]
+        /// Client: [Header] [Int32 localID]
         /// </summary>
         public const byte GAME_REQUEST_OBJECT_ID = 0x20;
 
         /// <summary>
         /// 
-        /// Server: [Header] [Int32 localID] [Int32 serverID] [Int32 unitType]
+        /// Server: [Header] [Int32 localID] [Int32 serverID]
         /// </summary>
         public const byte GAME_OBJECT_ID = 0x21;
 

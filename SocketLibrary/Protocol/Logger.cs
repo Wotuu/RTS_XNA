@@ -252,11 +252,9 @@ namespace SocketLibrary.Protocol
                 case Headers.GAME_REQUEST_OBJECT_ID:
                     {
                         if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_REQUEST_OBJECT_ID Received client wants object ID message: local = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", type = " + +
-                            PacketUtil.DecodePacketInt(p, 4), isReceived));
+                            PacketUtil.DecodePacketInt(p, 0), isReceived));
                         else this.messageLog.AddLast(new LogMessage(currTime + "GAME_REQUEST_OBJECT_ID Sent server ID package: local = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", type = " +
-                            PacketUtil.DecodePacketInt(p, 4), isReceived));
+                            PacketUtil.DecodePacketInt(p, 0), isReceived));
                         break;
                     }
                 case Headers.GAME_OBJECT_ID:
