@@ -48,10 +48,14 @@ namespace AStarCollisionMap.Pathfinding
         /// </summary>
         public void RemoveAllConnections()
         {
-            foreach (PathfindingNode node in PathfindingNodeManager.GetInstance().nodeList)
+            try
             {
-                node.RemoveConnection(this);
+                for (int i = 0; i < PathfindingNodeManager.GetInstance().nodeList.Count; i++)
+                {
+                    PathfindingNodeManager.GetInstance().nodeList.ElementAt(i).RemoveConnection(this);
+                }
             }
+            catch (Exception e) { }
         }
 
         /// <summary>
