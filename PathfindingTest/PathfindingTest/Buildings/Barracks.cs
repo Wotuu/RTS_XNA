@@ -27,6 +27,8 @@ namespace PathfindingTest.Buildings
             this.currentHealth = 0f;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Buildings/Barracks");
+
+
         }
 
         public override void Update(KeyboardState ks, MouseState ms)

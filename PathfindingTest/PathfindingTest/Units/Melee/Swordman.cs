@@ -28,6 +28,8 @@ namespace PathfindingTest.Units.Melee
 
             this.productionDuration = 5;
             this.productionProgress = 0;
+
+
         }
 
         public override void Update(KeyboardState ks, MouseState ms)

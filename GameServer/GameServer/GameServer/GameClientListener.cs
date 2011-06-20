@@ -108,7 +108,6 @@ namespace GameServer.GameServer
                 case Headers.GAME_REQUEST_OBJECT_ID:
                     {
                         int localID = PacketUtil.DecodePacketInt(p, 0);
-                        int unitType = PacketUtil.DecodePacketInt(p, 4);
                         int serverID = 0;
                         lock (gameObjectCountLock)
                         {
@@ -118,7 +117,6 @@ namespace GameServer.GameServer
                         Packet packet = new Packet(Headers.GAME_OBJECT_ID);
                         packet.AddInt(localID);
                         packet.AddInt(serverID);
-                        packet.AddInt(unitType);
                         this.client.SendPacket(packet);
                         break;
                     }
@@ -187,7 +185,6 @@ namespace GameServer.GameServer
                                 serverUser.gameListener.client.SendPacket(p);
                             }
                         }
-
                         break;
                     }
                 case BuildingHeaders.GAME_BUILDING_LOCATION:
