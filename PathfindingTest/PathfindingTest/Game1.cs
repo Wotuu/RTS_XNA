@@ -61,6 +61,8 @@ namespace PathfindingTest
         public MultiplayerGame multiplayerGame { get; set; }
         public int objectsCreated { get; set; }
 
+        public int exceptionsCount { get; set; }
+
 
         private static Game1 instance { get; set; }
 
@@ -78,7 +80,7 @@ namespace PathfindingTest
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            Content = new SynchronizedContentManager(this.Services); 
+            Content = new SynchronizedContentManager(this.Services);
 
             Content.RootDirectory = "Content";
             this.IsMouseVisible = true;
@@ -148,79 +150,90 @@ namespace PathfindingTest
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            GameTimeManager.GetInstance().OnStartUpdate();
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-            StateManager sm = StateManager.GetInstance();
-
-            // Update input
-            MouseManager.GetInstance().Update(this);
-            KeyboardManager.GetInstance().Update(Keyboard.GetState());
-
-            // Updates all interface componentss
-            ComponentManager.GetInstance().Update();
-            switch (sm.gameState)
+            try
             {
-                case StateManager.State.MainMenu:
-                    break;
-                case StateManager.State.GameInit:
-                    break;
-                case StateManager.State.GameRunning:
-                    // TODO: Add your update logic here
+                GameTimeManager.GetInstance().OnStartUpdate();
+                // Allows the game to exit
+                if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+                    this.Exit();
+                StateManager sm = StateManager.GetInstance();
 
-                    // Update units
-                    foreach (Player p in players)
-                    {
-                        p.Update(Keyboard.GetState(), Mouse.GetState());
-                    }
+                // Update input
+                MouseManager.GetInstance().Update(this);
+                KeyboardManager.GetInstance().Update(Keyboard.GetState());
 
-                    // Update other random stuff?
-                    KeyboardState keyboardState = Keyboard.GetState();
-                    MouseState mouseState = Mouse.GetState();
-                    if ((keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
-                        && mouseState.LeftButton == ButtonState.Pressed)
-                    {
-                        PathfindingNodeManager manager = PathfindingNodeManager.GetInstance();
-                        if (manager.selectedNode != null)
+                // Updates all interface componentss
+                ComponentManager.GetInstance().Update();
+                switch (sm.gameState)
+                {
+                    case StateManager.State.MainMenu:
+                        break;
+                    case StateManager.State.GameInit:
+                        break;
+                    case StateManager.State.GameRunning:
+                        // TODO: Add your update logic here
+
+                        // Update units
+                        foreach (Player p in players)
                         {
-                            manager.selectedNode.x = mouseState.X;
-                            manager.selectedNode.y = mouseState.Y;
+                            p.Update(Keyboard.GetState(), Mouse.GetState());
                         }
-                    }
 
-                    /*
-                     * The NodeProcessor has a stack of Nodes. When popping a node, it calculates the connections.
-                     * This is done to save a massive lagspike when updating the collision mesh!
-                     */
-                    //if (frames % 2 == 0) 
+                        // Update other random stuff?
+                        KeyboardState keyboardState = Keyboard.GetState();
+                        MouseState mouseState = Mouse.GetState();
+                        if ((keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
+                            && mouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            PathfindingNodeManager manager = PathfindingNodeManager.GetInstance();
+                            if (manager.selectedNode != null)
+                            {
+                                manager.selectedNode.x = mouseState.X;
+                                manager.selectedNode.y = mouseState.Y;
+                            }
+                        }
 
-                    DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
-                    DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
-                    long timeStamp = (UtcNow - baseTime).Ticks / 10000;
-                    if (timeStamp - previousFrameUpdateTime > 1000)
-                    {
-                        // Console.Out.WriteLine("Updates this second: " + (frames - previousFrameUpdateFrames) + ", slowly: " + gameTime.IsRunningSlowly);
-                        previousFrameUpdateTime = timeStamp;
-                        previousFrameUpdateFrames = frames;
-                    }
+                        /*
+                         * The NodeProcessor has a stack of Nodes. When popping a node, it calculates the connections.
+                         * This is done to save a massive lagspike when updating the collision mesh!
+                         */
+                        //if (frames % 2 == 0) 
 
-                    if (IsMultiplayerGame()) Synchronizer.GetInstance().Synchronize();
-                    // These two fill the rest of the frame, so they're supposed to go last.
-                    SmartPathfindingNodeProcessor.GetInstance().Process();
-                    PathfindingProcessor.GetInstance().Process();
+                        DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
+                        DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
+                        long timeStamp = (UtcNow - baseTime).Ticks / 10000;
+                        if (timeStamp - previousFrameUpdateTime > 1000)
+                        {
+                            // Console.Out.WriteLine("Updates this second: " + (frames - previousFrameUpdateFrames) + ", slowly: " + gameTime.IsRunningSlowly);
+                            previousFrameUpdateTime = timeStamp;
+                            previousFrameUpdateFrames = frames;
+                        }
 
-                    frames++;
-                    break;
+                        if (IsMultiplayerGame()) Synchronizer.GetInstance().Synchronize();
+                        // These two fill the rest of the frame, so they're supposed to go last.
+                        SmartPathfindingNodeProcessor.GetInstance().Process();
+                        PathfindingProcessor.GetInstance().Process();
 
-                case StateManager.State.GamePaused:
-                    break;
-                case StateManager.State.GameShutdown:
-                    break;
+                        frames++;
+                        break;
 
-                default: break;
+                    case StateManager.State.GamePaused:
+                        break;
+                    case StateManager.State.GameShutdown:
+                        break;
+
+                    default: break;
+                }
+                base.Update(gameTime);
             }
-            base.Update(gameTime);
+            catch (Exception e)
+            {
+                if (exceptionsCount < 0) exceptionsCount = 1;
+                else exceptionsCount++;
+
+                if (exceptionsCount > 3) 
+                    throw e; 
+            }
         }
 
         /// <summary>
@@ -229,68 +242,83 @@ namespace PathfindingTest
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GameTimeManager.GetInstance().OnStartDraw();
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
-            spriteBatch.Begin(SpriteSortMode.Immediate, null);
-
-            StateManager sm = StateManager.GetInstance();
-
-            // Draws all interface components
-            ComponentManager.GetInstance().Draw(spriteBatch);
-
-            if (sm.gameState == StateManager.State.MainMenu)
+            try
             {
+                GameTimeManager.GetInstance().OnStartDraw();
+                GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            }
-            else if (sm.gameState == StateManager.State.GameInit)
-            {
+                // TODO: Add your drawing code here
+                spriteBatch.Begin(SpriteSortMode.Immediate, null);
 
-            }
-            else if (sm.gameState == StateManager.State.GameRunning)
-            {
-                //quadTree.Draw(spriteBatch);
-                collision.DrawMap(spriteBatch);
+                StateManager sm = StateManager.GetInstance();
 
-                LinkedList<PathfindingNode> list = PathfindingNodeManager.GetInstance().nodeList;
-                foreach (Node node in list)
+                // Draws all interface components
+                ComponentManager.GetInstance().Draw(spriteBatch);
+
+                if (sm.gameState == StateManager.State.MainMenu)
                 {
-                    node.Draw(spriteBatch);
+
+                }
+                else if (sm.gameState == StateManager.State.GameInit)
+                {
+
+                }
+                else if (sm.gameState == StateManager.State.GameRunning)
+                {
+                    //quadTree.Draw(spriteBatch);
+                    collision.DrawMap(spriteBatch);
+
+                    try
+                    {
+                        LinkedList<PathfindingNode> list = PathfindingNodeManager.GetInstance().nodeList;
+                        foreach (Node node in list)
+                        {
+                            node.Draw(spriteBatch);
+                        }
+
+                        foreach (Player p in players)
+                        {
+                            p.Draw(this.spriteBatch);
+                        }
+                    }
+                    catch (Exception e) { }
+                }
+                else if (sm.gameState == StateManager.State.GamePaused)
+                {
+
+                }
+                else if (sm.gameState == StateManager.State.GameShutdown)
+                {
+
                 }
 
-                foreach (Player p in players)
+
+
+
+                spriteBatch.End();
+
+                DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
+                DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
+                long timeStamp = (UtcNow - baseTime).Ticks / 10000;
+                if (timeStamp - previousDrawUpdateTime > 1000)
                 {
-                    p.Draw(this.spriteBatch);
+                    // Console.Out.WriteLine("Draws this second: " + (draws - previousDrawUpdateFrames));
+                    previousDrawUpdateTime = timeStamp;
+                    previousDrawUpdateFrames = draws;
                 }
+
+                draws++;
+
+                base.Draw(gameTime);
             }
-            else if (sm.gameState == StateManager.State.GamePaused)
+            catch (Exception e)
             {
+                if (exceptionsCount < 0) exceptionsCount = 1;
+                else exceptionsCount++;
 
+                if (exceptionsCount > 3)
+                    throw e; 
             }
-            else if (sm.gameState == StateManager.State.GameShutdown)
-            {
-
-            }
-
-
-
-
-            spriteBatch.End();
-
-            DateTime UtcNow = new DateTime(DateTime.UtcNow.Ticks);
-            DateTime baseTime = new DateTime(1970, 1, 1, 0, 0, 0);
-            long timeStamp = (UtcNow - baseTime).Ticks / 10000;
-            if (timeStamp - previousDrawUpdateTime > 1000)
-            {
-                // Console.Out.WriteLine("Draws this second: " + (draws - previousDrawUpdateFrames));
-                previousDrawUpdateTime = timeStamp;
-                previousDrawUpdateFrames = draws;
-            }
-
-            draws++;
-
-            base.Draw(gameTime);
         }
 
         void MouseClickListener.OnMouseClick(MouseEvent e)

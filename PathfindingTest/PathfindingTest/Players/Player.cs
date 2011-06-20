@@ -184,15 +184,16 @@ namespace PathfindingTest.Players
                     units.ElementAt(i).Update(ks, ms);
                 }
             }
-            catch (InvalidOperationException e)
-            {
-                // blabla
-            }
+            catch (InvalidOperationException e) { }
 
-            for (int i = 0; i < buildings.Count; i++)
+            try
             {
-                buildings.ElementAt(i).Update(ks, ms);
+                for (int i = 0; i < buildings.Count; i++)
+                {
+                    buildings.ElementAt(i).Update(ks, ms);
+                }
             }
+            catch (Exception e) { }
 
             if (command != null)
             {

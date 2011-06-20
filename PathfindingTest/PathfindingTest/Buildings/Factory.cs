@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PathfindingTest.Players;
 using Microsoft.Xna.Framework.Input;
+using PathfindingTest.Multiplayer.Data;
+using SocketLibrary.Protocol;
 
 namespace PathfindingTest.Buildings
 {
@@ -24,6 +26,16 @@ namespace PathfindingTest.Buildings
             this.currentHealth = 0f;
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Buildings/Factory");
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.p == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new BuildingMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID(BuildingHeaders.TYPE_FACTORY);
+                }
+            }
         }
 
         public override void Update(KeyboardState ks, MouseState ms)

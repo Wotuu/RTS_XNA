@@ -175,6 +175,28 @@ namespace GameServer.GameServer
 
                         break;
                     }
+                case BuildingHeaders.GAME_NEW_BUILDING:
+                    {
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(user.channelID);
+                        for (int i = 0; i < c.GetUserCount(); i++)
+                        {
+                            ServerUser serverUser = c.GetUserAt(i);
+                            if (serverUser != this.user)
+                            {
+                                // Notify everyone but the one who created the unit, that the unit has been created.
+                                serverUser.gameListener.client.SendPacket(p);
+                            }
+                        }
+
+                        break;
+                    }
+                case BuildingHeaders.GAME_BUILDING_LOCATION:
+                    {
+                        // Send the packet back to everyone.
+                        ChannelManager.GetInstance().GetChannelByID(user.channelID).SendGamePacketToAll(p);
+                        break;
+                    }
+
                 default:
                     {
                         String currTime = System.DateTime.Now.ToLongTimeString() + "," + System.DateTime.Now.Millisecond + " ";

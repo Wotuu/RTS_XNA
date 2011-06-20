@@ -153,6 +153,7 @@
     <Compile Include="Multiplayer\SocketConnection\InGame\BuildingPacketProcessor.cs" />
     <Compile Include="Multiplayer\SocketConnection\InGame\GeneralPacketProcessor.cs" />
     <Compile Include="Multiplayer\SocketConnection\InGame\GameServerConnectionManager.cs" />
+    <Compile Include="Multiplayer\SocketConnection\InGame\UnitMultiplayerDataManager.cs" />
     <Compile Include="Multiplayer\SocketConnection\InGame\UnitPacketProcessor.cs" />
     <Compile Include="Multiplayer\SocketConnection\PreGame\ChatPacketProcessor.cs" />
     <Compile Include="Multiplayer\SocketConnection\PreGame\ChatServerConnectionManager.cs" />

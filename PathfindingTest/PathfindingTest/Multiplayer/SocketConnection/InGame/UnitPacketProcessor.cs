@@ -90,7 +90,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                             response.AddInt(targetUserID);
                             response.AddInt(Game1.CURRENT_PLAYER.multiplayerID);
                             response.AddInt(serverID);
-                            response.AddInt(data.GetUnitType());
+                            response.AddInt(data.GetObjectType());
                             GameServerConnectionManager.GetInstance().SendPacket(response);
 
                             // Queue it for a location update, since someone missed the previous one.

@@ -8,6 +8,7 @@ using PathfindingTest.Multiplayer.Data;
 using PathfindingTest.Units;
 using Microsoft.Xna.Framework;
 using System.Threading;
+using PathfindingTest.Buildings;
 
 namespace PathfindingTest.Multiplayer.SocketConnection.InGame
 {
@@ -53,23 +54,13 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                             unit.multiplayerData.serverID = serverID;
 
                             // Now we have the data, queue the unit for synching .. as in, move it to it's own location :]
-                            Console.Out.WriteLine("Moving a local created unit to " + unit.GetLocation());
-                            //while (unit.GetLocation() == Point.Zero) { 
-                            //    Console.Out.WriteLine("Waiting for point to become non-zero");
-                            //} // Wait
                             unit.multiplayerData.moveTarget = unit.GetLocation();
                             unit.MoveToQueue(unit.GetLocation());
                         }
                         else if (data is BuildingMultiplayerData)
                         {
-                            /*
-                            // TO-DO
-                            // Get this packet going before the other one
-                            newUnitPacket.AddInt(((BuildingMultiplayerData)data).building.p.multiplayerID);
-                            newUnitPacket.AddInt(serverID);
-                            newUnitPacket.AddInt(data.GetUnitType());
-                            // Notify everyone else that we have created a unit
-                            GameServerConnectionManager.GetInstance().SendPacket(newUnitPacket);*/
+                            Building building = ((BuildingMultiplayerData)data).building;
+                            building.multiplayerData.serverID = serverID;
                         }
                         break;
                     }

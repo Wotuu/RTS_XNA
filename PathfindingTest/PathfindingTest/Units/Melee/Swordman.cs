@@ -81,7 +81,7 @@ namespace PathfindingTest.Units.Melee
             {
                 return;
             }
-            Console.WriteLine("swung weapon");
+            // Console.WriteLine("swung weapon");
             Unit targetUnit = this.enemiesInRange.ElementAt(0);
             AggroEvent e = new AggroEvent(this, targetUnit, true);
             targetUnit.OnAggroRecieved(e);

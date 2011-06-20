@@ -13,6 +13,7 @@ using PathfindingTest.Collision;
 using PathfindingTest.Units;
 using System.Diagnostics;
 using PathfindingTest.Units.Stores;
+using PathfindingTest.Multiplayer.Data;
 
 namespace PathfindingTest.Buildings
 {
@@ -51,6 +52,8 @@ namespace PathfindingTest.Buildings
         public LinkedList<Unit> constructionQueue { get; set; }
         public Point waypoint { get; set; }
 
+        public BuildingMultiplayerData multiplayerData { get; set; }
+
 
         public enum Type
         {
@@ -75,7 +78,7 @@ namespace PathfindingTest.Buildings
         internal abstract void Draw(SpriteBatch sb);
 
         public void DefaultUpdate(KeyboardState ks, MouseState ms)
-        {            
+        {
             switch (state)
             {
                 case State.Preview:
@@ -247,12 +250,25 @@ namespace PathfindingTest.Buildings
         /// </summary>
         public void PlaceBuilding(Engineer e)
         {
-            this.state = State.Constructing;
-            this.constructedBy = e;
-            e.constructing = this;
-            this.mesh = Game1.GetInstance().collision.PlaceBuilding(this.DefineSelectedRectangle());
-            this.waypoint = new Point((int)this.x + (this.texture.Width / 2), (int)this.y + this.texture.Height + 20);
-            Game1.GetInstance().IsMouseVisible = true;
+            // It is likely an exception will be thrown, because applying the mesh takes a lot of time ..
+            // as such, you usually get a harmless 'InvalidOperationException'. Catch it and *shrug* it.
+            // This is only in multiplayer.
+            try
+            {
+                this.state = State.Constructing;
+                this.constructedBy = e;
+                e.constructing = this;
+                this.mesh = Game1.GetInstance().collision.PlaceBuilding(this.DefineSelectedRectangle());
+                this.waypoint = new Point((int)this.x + (this.texture.Width / 2), (int)this.y + this.texture.Height + 20);
+                Game1.GetInstance().IsMouseVisible = true;
+
+                if (Game1.GetInstance().IsMultiplayerGame() &&
+                    this.p == Game1.CURRENT_PLAYER)
+                {
+                    Synchronizer.GetInstance().QueueBuilding(this);
+                }
+            }
+            catch (Exception ex) { }
         }
 
         /// <summary>
@@ -345,6 +361,9 @@ namespace PathfindingTest.Buildings
                 produced.y = waypoint.Y;
                 productionQueue.RemoveFirst();
                 this.state = State.Finished;
+
+                // Synchronize this unit, since the unit has moved (in other words, teleported)
+                if (Game1.GetInstance().IsMultiplayerGame()) Synchronizer.GetInstance().QueueUnit(produced);
             }
         }
 

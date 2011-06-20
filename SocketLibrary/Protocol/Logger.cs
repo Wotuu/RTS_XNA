@@ -323,6 +323,32 @@ namespace SocketLibrary.Protocol
                             PacketUtil.DecodePacketInt(p, 12), isReceived));
                         break;
                     }
+                case BuildingHeaders.GAME_NEW_BUILDING:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_NEW_BUILDING Received client wants to create a new building: ownerID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", serverID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", type = " +
+                            PacketUtil.DecodePacketInt(p, 8) + ", by = " +
+                            PacketUtil.DecodePacketInt(p, 12), isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_NEW_BUILDING Sent create building request: ownerID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", serverID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", type = " +
+                            PacketUtil.DecodePacketInt(p, 8) + ", by = " +
+                            PacketUtil.DecodePacketInt(p, 12), isReceived));
+                        break;
+                    }
+                case BuildingHeaders.GAME_BUILDING_LOCATION:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_BUILDING_LOCATION Received building location update request: serverID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", (" +
+                            PacketUtil.DecodePacketInt(p, 4) + ", " +
+                            PacketUtil.DecodePacketInt(p, 8) + ")", isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_BUILDING_LOCATION Sent building location request: serverID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", (" +
+                            PacketUtil.DecodePacketInt(p, 4) + ", " +
+                            PacketUtil.DecodePacketInt(p, 8) + ")", isReceived));
+                        break;
+                    }
 
                 /*
                  * 

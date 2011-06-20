@@ -21,7 +21,7 @@ namespace SocketLibrary.Protocol
 
         /// <summary>
         /// Someone made a new unit. A unit location package will follow soon enough.
-        /// [Header] [Int32 playerID] [Int32 serverID] [Int32 type]
+        /// [Header] [Int32 playerID] [Int32 serverID] [Int32 unitType]
         /// </summary>
         public const byte GAME_NEW_UNIT = 0x31;
 
