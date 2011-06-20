@@ -299,7 +299,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Fast:
                     if (this.type == Type.Barracks)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
+                        newUnit = p.fastStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
                         newUnit.state = Unit.State.Producing;
                         productionQueue.AddLast(newUnit);
                     }

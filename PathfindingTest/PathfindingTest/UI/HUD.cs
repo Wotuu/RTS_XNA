@@ -139,6 +139,10 @@ namespace PathfindingTest.UI
                 HUDObject rangedObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDRanged"), HUDObject.Type.Ranged, startObjectX, startObjectY, color);
                 objects.AddLast(rangedObject);
                 IncrementStartObjectXY(startObjectX);
+
+                HUDObject fastObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDHorseman"), HUDObject.Type.Fast, startObjectX, startObjectY, color);
+                objects.AddLast(fastObject);
+                IncrementStartObjectXY(startObjectX);
             }
             if (loadForFortress)
             {
@@ -271,6 +275,13 @@ namespace PathfindingTest.UI
                                 foreach (Barracks building in player.buildingSelection.buildings)
                                 {
                                     building.CreateUnit(Unit.Type.Melee);
+                                }
+                                break;
+
+                            case HUDObject.Type.Fast:
+                                foreach (Barracks building in player.buildingSelection.buildings)
+                                {
+                                    building.CreateUnit(Unit.Type.Fast);
                                 }
                                 break;
 
