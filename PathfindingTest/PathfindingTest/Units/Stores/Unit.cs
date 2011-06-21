@@ -15,6 +15,7 @@ using AStarCollisionMap.Collision;
 using XNAInputHandler.MouseInput;
 using PathfindingTest.State;
 using PathfindingTest.Multiplayer.Data;
+using System.Diagnostics;
 
 namespace PathfindingTest.Units
 {
@@ -41,9 +42,6 @@ namespace PathfindingTest.Units
         public LinkedList<Unit> friendliesProtectingMe { get; set; }
         public int baseDamage { get; set; }
 
-        public State state { get; set; }
-        public double productionDuration { get; set; }
-        public double productionProgress { get; set; }
         public Boolean isDead = false;
         public Job job { get; set; }
 
@@ -71,12 +69,6 @@ namespace PathfindingTest.Units
             Fast,
             Ranged,
             HeavyRanged
-        }
-
-        public enum State
-        {
-            Producing,
-            Finished
         }
 
         public enum Job
@@ -432,7 +424,6 @@ namespace PathfindingTest.Units
             this.currentHealth = 100;
             this.maxHealth = 100;
 
-            this.state = State.Finished;
             this.player.units.AddLast(this);
 
             if (Game1.GetInstance().IsMultiplayerGame())

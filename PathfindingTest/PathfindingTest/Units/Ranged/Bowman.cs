@@ -28,15 +28,10 @@ namespace PathfindingTest.Units
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/bowman");
             Console.Out.WriteLine("Constructed a bowman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
-
-            this.productionDuration = 5;
-            this.productionProgress = 0;
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            if (this.state == State.Finished)
-            {
                 UpdateMovement();
                 AttemptReload();
                 if (Game1.GetInstance().frames % 15 == 0 && unitToDefend == null)
@@ -57,13 +52,10 @@ namespace PathfindingTest.Units
                 {
                     projectiles.ElementAt(i).Update(ks, ms);
                 }
-            }
         }
 
         internal override void Draw(SpriteBatch sb)
         {
-            if (this.state == State.Finished)
-            {
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
 
                 /*if (this.DefineRectangle().Contains(Mouse.GetState().X, Mouse.GetState().Y))
@@ -75,7 +67,6 @@ namespace PathfindingTest.Units
                 {
                     projectiles.ElementAt(i).Draw(sb);
                 }
-            }
         }
 
         public override void OnAggroRecieved(AggroEvent e)
