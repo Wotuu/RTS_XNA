@@ -27,7 +27,7 @@ namespace PathfindingTest.Units
             this.projectiles = new LinkedList<Projectile>();
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/bowman");
-            Console.Out.WriteLine("Constructed a bowman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
+            // Console.Out.WriteLine("Constructed a bowman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
         }
 
         public override void Update(KeyboardState ks, MouseState ms)

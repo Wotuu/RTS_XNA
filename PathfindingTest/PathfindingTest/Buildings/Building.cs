@@ -427,6 +427,15 @@ namespace PathfindingTest.Buildings
             if (this.mesh != null) mesh.Reverse();
         }
 
+        /// <summary>
+        /// Gets the point location of this building.
+        /// </summary>
+        /// <returns>The new point.</returns>
+        public Point GetLocation()
+        {
+            return new Point((int)x, (int)y);
+        }
+
         public Building(Player player)
         {
             this.p = player;

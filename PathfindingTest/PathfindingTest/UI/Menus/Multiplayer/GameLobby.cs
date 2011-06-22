@@ -119,9 +119,9 @@ namespace PathfindingTest.UI.Menus.Multiplayer
             // I prefer the ID function ..
             if (!UserExists(user.id))
             {
-                Console.Out.WriteLine(this.creationTime + ": " + user + " has joined the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
+                // Console.Out.WriteLine(this.creationTime + ": " + user + " has joined the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
                 this.userDisplayPanels.AddLast(new UserDisplayPanel(gameOptionsPanel, user, this.userDisplayPanels.Count));
-                Console.Out.WriteLine(this.creationTime + ": " + "Users now in lobby: " + this.userDisplayPanels.Count);
+                // Console.Out.WriteLine(this.creationTime + ": " + "Users now in lobby: " + this.userDisplayPanels.Count);
             }
         }
 
@@ -131,7 +131,7 @@ namespace PathfindingTest.UI.Menus.Multiplayer
         /// <param name="user">The user that left.</param>
         public void UserLeft(User user)
         {
-            Console.Out.WriteLine(this.creationTime + ": " + user + " has left the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
+            // Console.Out.WriteLine(this.creationTime + ": " + user + " has left the game lobby (from " + ChatServerConnectionManager.GetInstance().user + ")");
             Boolean removed = false;
             for (int i = 0; i < userDisplayPanels.Count; i++)
             {
@@ -142,9 +142,9 @@ namespace PathfindingTest.UI.Menus.Multiplayer
                 }
                 else if (p.user.id == user.id)
                 {
-                    Console.Out.WriteLine(this.creationTime + ": " + "Removed a panel from the list because " + p.user + " == " + user.id + "!");
+                    // Console.Out.WriteLine(this.creationTime + ": " + "Removed a panel from the list because " + p.user + " == " + user.id + "!");
                     userDisplayPanels.Remove(p);
-                    Console.Out.WriteLine(this.creationTime + ": " + "Users now in lobby: " + this.userDisplayPanels.Count);
+                    // Console.Out.WriteLine(this.creationTime + ": " + "Users now in lobby: " + this.userDisplayPanels.Count);
                     p.Unload();
                     i--;
                     removed = true;

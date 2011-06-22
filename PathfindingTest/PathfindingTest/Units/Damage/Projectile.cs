@@ -8,6 +8,7 @@ using PathfindingTest.Players;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using PathfindingTest.Combat;
+using PathfindingTest.Multiplayer.Data;
 
 namespace PathfindingTest.Units.Projectiles
 {
@@ -26,12 +27,13 @@ namespace PathfindingTest.Units.Projectiles
 
         protected Point waypoint { get; set; }
 
-        private Bowman parent { get; set; }
+        public Bowman parent { get; set; }
+        public ProjectileMultiplayerData multiplayerData { get; set; }
 
 
         public Projectile(Unit parent, Unit target, DamageEvent.DamageType type, float movementSpeed, int maxRange, int baseDamage)
         {
-            this.parent = (Bowman) parent;
+            this.parent = (Bowman)parent;
             this.x = parent.x;
             this.y = parent.y;
             this.startX = this.x;
@@ -50,6 +52,16 @@ namespace PathfindingTest.Units.Projectiles
             int targetY = (int)target.y;
 
             SetMoveToTarget(targetX, targetY);
+
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Boolean isLocal = this.parent.player == Game1.CURRENT_PLAYER;
+                this.multiplayerData = new ProjectileMultiplayerData(this, isLocal);
+                if (isLocal)
+                {
+                    this.multiplayerData.RequestServerID();
+                }
+            }
         }
 
         /// <summary>
@@ -137,11 +149,11 @@ namespace PathfindingTest.Units.Projectiles
                 y -= ySpeedDirection;
             }
 
-
-            if (Game1.GetInstance().collision.CollisionAt(
+            // Commented = code that makes the arrow die on impact with collision
+            if (/*Game1.GetInstance().collision.CollisionAt(
                 Util.GetPointOnCircle(this.GetLocation(), this.texture.Height / 2,
-                        (float)(Util.GetHypoteneuseAngleDegrees(this.GetLocation(), this.waypoint)))) || 
-                Math.Abs(x - waypoint.X) < 2 && Math.Abs(y - waypoint.Y) < 2)
+                        (float)(Util.GetHypoteneuseAngleDegrees(this.GetLocation(), this.waypoint)))) ||*/
+                Math.Abs(x - waypoint.X) < movementSpeed && Math.Abs(y - waypoint.Y) < movementSpeed)
             {
                 // Console.Out.WriteLine("Projectile went out of range.");
                 this.Dispose();
@@ -154,6 +166,12 @@ namespace PathfindingTest.Units.Projectiles
 
         private void CheckCollision()
         {
+            // Collision events are handled by the owning player, including arrow remove events
+            if (Game1.GetInstance().IsMultiplayerGame() &&
+                ( this.parent.player != Game1.CURRENT_PLAYER )) return;
+
+            Point collisionLocation = Util.GetPointOnCircle(this.GetLocation(), this.texture.Height / 2,
+                        (float)(Util.GetHypoteneuseAngleDegrees(this.GetLocation(), this.waypoint)));
             foreach (Player player in Game1.GetInstance().players)
             {
                 foreach (Unit unit in player.units)
@@ -165,13 +183,13 @@ namespace PathfindingTest.Units.Projectiles
                     // Check if the units are close enough
                     if (unit.DefineRectangle().Contains(
                         // Front of projectile!
-                        //this.GetLocation() ) )
-                        Util.GetPointOnCircle(this.GetLocation(), this.texture.Height / 2,
-                        (float)(Util.GetHypoteneuseAngleDegrees(this.GetLocation(), this.waypoint)))))
+                        collisionLocation))
                     {
-                        unit.OnDamage(new DamageEvent(this, unit, parent));
+                        DamageEvent e = new DamageEvent(this, unit, parent);
+                        unit.OnDamage(e);
+                        if( Game1.GetInstance().IsMultiplayerGame() ) Synchronizer.GetInstance().QueueDamageEvent(e);
                         // Console.Out.WriteLine("Projectile had an impact!");
-                        this.Dispose();
+                        else this.Dispose();
                         return;
                     }
                     //}
@@ -195,6 +213,8 @@ namespace PathfindingTest.Units.Projectiles
             this.x = -20;
             this.y = -20;
             this.maxRange = 1;
+
+            Console.Out.WriteLine("Disposing projectile " + this.multiplayerData.serverID);
         }
     }
 }

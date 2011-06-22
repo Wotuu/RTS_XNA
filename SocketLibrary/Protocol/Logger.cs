@@ -252,23 +252,19 @@ namespace SocketLibrary.Protocol
                 case Headers.GAME_REQUEST_OBJECT_ID:
                     {
                         if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_REQUEST_OBJECT_ID Received client wants object ID message: local = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", type = " + +
-                            PacketUtil.DecodePacketInt(p, 4), isReceived));
+                            PacketUtil.DecodePacketInt(p, 0), isReceived));
                         else this.messageLog.AddLast(new LogMessage(currTime + "GAME_REQUEST_OBJECT_ID Sent server ID package: local = " +
-                            PacketUtil.DecodePacketInt(p, 0) + ", type = " +
-                            PacketUtil.DecodePacketInt(p, 4), isReceived));
+                            PacketUtil.DecodePacketInt(p, 0), isReceived));
                         break;
                     }
                 case Headers.GAME_OBJECT_ID:
                     {
                         if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_OBJECT_ID Received client wants object ID message: local = " +
                             PacketUtil.DecodePacketInt(p, 0) + ", serverID = " +
-                            PacketUtil.DecodePacketInt(p, 4) + ", type = " +
-                            PacketUtil.DecodePacketInt(p, 8), isReceived));
+                            PacketUtil.DecodePacketInt(p, 4), isReceived));
                         else this.messageLog.AddLast(new LogMessage(currTime + "GAME_OBJECT_ID Sent server ID package: local = " +
                             PacketUtil.DecodePacketInt(p, 0) + ", serverID = " +
-                            PacketUtil.DecodePacketInt(p, 4) + ", type = " +
-                            PacketUtil.DecodePacketInt(p, 8), isReceived));
+                            PacketUtil.DecodePacketInt(p, 4), isReceived));
                         break;
                     }
                 case UnitHeaders.GAME_UNIT_LOCATION:
@@ -321,6 +317,68 @@ namespace SocketLibrary.Protocol
                             PacketUtil.DecodePacketInt(p, 4) + ", serverID = " +
                             PacketUtil.DecodePacketInt(p, 8) + ", type = " +
                             PacketUtil.DecodePacketInt(p, 12), isReceived));
+                        break;
+                    }
+                case BuildingHeaders.GAME_NEW_BUILDING:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_NEW_BUILDING Received client wants to create a new building: ownerID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", serverID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", type = " +
+                            PacketUtil.DecodePacketInt(p, 8) + ", by = " +
+                            PacketUtil.DecodePacketInt(p, 12), isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_NEW_BUILDING Sent create building request: ownerID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", serverID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", type = " +
+                            PacketUtil.DecodePacketInt(p, 8) + ", by = " +
+                            PacketUtil.DecodePacketInt(p, 12), isReceived));
+                        break;
+                    }
+                case BuildingHeaders.GAME_BUILDING_LOCATION:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_BUILDING_LOCATION Received building location update request: serverID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", (" +
+                            PacketUtil.DecodePacketInt(p, 4) + ", " +
+                            PacketUtil.DecodePacketInt(p, 8) + ")", isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_BUILDING_LOCATION Sent building location request: serverID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", (" +
+                            PacketUtil.DecodePacketInt(p, 4) + ", " +
+                            PacketUtil.DecodePacketInt(p, 8) + ")", isReceived));
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_MELEE_DAMAGE:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_UNIT_MELEE_DAMAGE Received unit damage done request: typeSource = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", targetID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", fromID =  " +
+                            PacketUtil.DecodePacketInt(p, 8), isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_UNIT_MELEE_DAMAGE Sent unit damage done request: typeSource = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", targetID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", fromID =  " +
+                            PacketUtil.DecodePacketInt(p, 8), isReceived));
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_RANGED_DAMAGE:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_UNIT_RANGED_DAMAGE Received unit ranged damage done request: projectileID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", targetID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", fromID =  " +
+                            PacketUtil.DecodePacketInt(p, 8), isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_UNIT_RANGED_DAMAGE Sent unit ranged damage done request: projectileID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", targetID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", fromID =  " +
+                            PacketUtil.DecodePacketInt(p, 8), isReceived));
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_RANGED_SHOT:
+                    {
+                        if (isReceived) this.messageLog.AddLast(new LogMessage(currTime + "GAME_UNIT_RANGED_SHOT Received unit ranged damage done request: arrowID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", sourceID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", targetID = " +
+                            PacketUtil.DecodePacketInt(p, 8), isReceived));
+                        else this.messageLog.AddLast(new LogMessage(currTime + "GAME_UNIT_RANGED_SHOT Sent unit ranged damage done request: arrowID = " +
+                            PacketUtil.DecodePacketInt(p, 0) + ", sourceID = " +
+                            PacketUtil.DecodePacketInt(p, 4) + ", targetID = " +
+                            PacketUtil.DecodePacketInt(p, 8), isReceived));
                         break;
                     }
 

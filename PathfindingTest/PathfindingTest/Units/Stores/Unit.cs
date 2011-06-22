@@ -374,8 +374,7 @@ namespace PathfindingTest.Units
         }
 
         /// <summary>
-        /// DO NOT EVER EVER CALL THIS FUNCTION OR I WILL CUT YOUR BALLS OFF.
-        /// If you want a path right now, call CalculatePath(Point p)
+        /// Feel free to use "\ <(*^_^*)> /"
         /// </summary>
         /// <param name="p">The point to move to</param>
         public void MoveToNow(Point p)
@@ -502,7 +501,11 @@ namespace PathfindingTest.Units
             if (Util.GetHypoteneuseLength(unitToStalk.GetLocation(), this.GetLocation()) < this.attackRange)
             {
                 this.waypoints.Clear();
-                Swing();
+                if (!Game1.GetInstance().IsMultiplayerGame() ||
+                    this.multiplayerData.isLocal)
+                {
+                    Swing();
+                }
             }
             else
             {

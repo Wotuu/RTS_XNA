@@ -21,8 +21,6 @@ namespace PathfindingTest.Units.Fast
             this.type = Type.Fast;
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/horseman");
 
-            Console.Out.WriteLine("The Horseman Cometh! @ " + this.GetLocation() + " (" + x + ", " + y + ")");
-
             this.collisionRadius = texture.Width / 2;
         }
 
@@ -79,6 +77,12 @@ namespace PathfindingTest.Units.Fast
             DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), unitToStalk, this);
             unitToStalk.OnDamage(dmgEvent);
             this.fireCooldown = this.rateOfFire;
+
+            // We already know that this unit is local
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Synchronizer.GetInstance().QueueDamageEvent(dmgEvent);
+            }
         }
     }
 }

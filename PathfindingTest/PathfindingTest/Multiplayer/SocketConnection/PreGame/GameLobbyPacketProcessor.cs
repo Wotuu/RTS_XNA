@@ -41,7 +41,6 @@ namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
                         {
                             GameLobby lobby = ((GameLobby)menu);
                             lobby.UserJoined(user);
-                            Console.Out.WriteLine(user + " has joined the game lobby!");
                         }
 
                         break;
@@ -57,7 +56,6 @@ namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
                             {
                                 GameLobby lobby = ((GameLobby)menu);
                                 lobby.UserLeft(user);
-                                Console.Out.WriteLine(user + " User has left the game lobby!");
                             }
                         }
 
@@ -67,7 +65,6 @@ namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
                 case Headers.GAME_ID:
                     {
                         int gameID = PacketUtil.DecodePacketInt(p, 0);
-                        Console.Out.WriteLine("Received game ID: " + gameID);
 
                         MultiplayerLobby lobby = ((MultiplayerLobby)MenuManager.GetInstance().GetCurrentlyDisplayedMenu());
                         String gameName = lobby.gameNameInput.textfield.text;
@@ -89,7 +86,6 @@ namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
                         }
                         else if (menu is MultiplayerLobby)
                         {
-                            Console.Out.WriteLine("Host is: " + manager.user);
                             MultiplayerGame game = new MultiplayerGame(
                                 PacketUtil.DecodePacketInt(p, 0),
                                 PacketUtil.DecodePacketString(p, 4),

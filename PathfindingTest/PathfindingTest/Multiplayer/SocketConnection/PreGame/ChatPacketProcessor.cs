@@ -55,7 +55,7 @@ namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
                         UserManager.GetInstance().users.Clear();
                         // UserManager.GetInstance().users.Clear();
                         ChatServerConnectionManager.GetInstance().user.channelID = PacketUtil.DecodePacketInt(p, 0);
-                        Console.Out.WriteLine("Switched channel to: " + ChatServerConnectionManager.GetInstance().user.channelID);
+                        // Console.Out.WriteLine("Switched channel to: " + ChatServerConnectionManager.GetInstance().user.channelID);
                         break;
                     }
                 case Headers.CHAT_MESSAGE:
@@ -89,7 +89,6 @@ namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
 
                         if (menu is MultiplayerLobby)
                         {
-                            Console.Out.WriteLine("New user in multiplayer lobby! -> " + user);
                             MultiplayerLobby lobby = ((MultiplayerLobby)menu);
                             lobby.AddUser(user);
                         }

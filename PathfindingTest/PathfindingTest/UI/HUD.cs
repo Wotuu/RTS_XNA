@@ -325,8 +325,6 @@ namespace PathfindingTest.UI
                         {
                             if (u.type == Unit.Type.Engineer)
                             {
-                                Console.Out.WriteLine("Moving an engineer to a building now.");
-
                                 LinkedList<Point> path = u.CalculatePath(new Point(me.location.X, me.location.Y));
                                 // Get the last point of the pathfinding result
                                 Point lastPoint = path.ElementAt(path.Count - 1);

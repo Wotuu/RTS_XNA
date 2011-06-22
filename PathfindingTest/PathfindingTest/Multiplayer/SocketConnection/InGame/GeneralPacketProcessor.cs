@@ -9,6 +9,7 @@ using PathfindingTest.Units;
 using Microsoft.Xna.Framework;
 using System.Threading;
 using PathfindingTest.Buildings;
+using PathfindingTest.Units.Projectiles;
 
 namespace PathfindingTest.Multiplayer.SocketConnection.InGame
 {
@@ -61,6 +62,13 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                         {
                             Building building = ((BuildingMultiplayerData)data).building;
                             building.multiplayerData.serverID = serverID;
+                        }
+                        else if (data is ProjectileMultiplayerData)
+                        {
+                            Projectile projectile = ((ProjectileMultiplayerData)data).projectile;
+                            projectile.multiplayerData.serverID = serverID;
+                            // Sync the projectile with the rest
+                            Synchronizer.GetInstance().QueueProjectile(projectile);
                         }
                         break;
                     }

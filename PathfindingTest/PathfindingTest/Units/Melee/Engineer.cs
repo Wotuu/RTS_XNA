@@ -39,7 +39,7 @@ namespace PathfindingTest.Units
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/Engineer");
             this.collisionRadiusTexture = Game1.GetInstance().Content.Load<Texture2D>("Misc/patternPreview");
 
-            Console.Out.WriteLine("Constructed an engineer @ " + this.GetLocation() + " (" + x + ", " + y + ")");
+            // Console.Out.WriteLine("Constructed an engineer @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
             this.collisionRadius = texture.Width / 2;
         }
@@ -100,7 +100,7 @@ namespace PathfindingTest.Units
             this.MoveToQueue(
                 Util.GetPointOnCircle(p, b.GetCircleRadius() + this.texture.Width / 2,
                 Util.GetHypoteneuseAngleDegrees(p, targetPoint)));
-
+            
             b.constructedBy = this;
             this.constructing = b;
 

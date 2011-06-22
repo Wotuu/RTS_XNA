@@ -84,6 +84,7 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
             this.connection.packetProcessor.onProcessPacket += unitPacketProcessor.DataReceived;
             this.connection.packetProcessor.onProcessPacket += buildingPacketProcessor.DataReceived;
             this.connection.packetProcessor.onProcessPacket += generalPacketProcessor.DataReceived;
+            this.connection.DisableLogging();
             this.connection.onDisconnectListeners += this.OnDisconnect;
 
             this.SendPacket(new Packet(Headers.HANDSHAKE_1));

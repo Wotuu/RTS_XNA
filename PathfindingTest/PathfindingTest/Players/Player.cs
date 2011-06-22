@@ -541,7 +541,7 @@ namespace PathfindingTest.Players
                                 this.currentSelection.MoveTo(previewPattern);
                             }
                             // If we're suppose to move in the first place
-                            else
+                            else if( this.command == null || ( this.command != null && this.command.type != Command.Type.Repair ) )
                             {
                                 stopUnitSelection();
                                 this.currentSelection.MoveTo(GetNewPreviewPattern(m.location, 0));

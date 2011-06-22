@@ -7,6 +7,9 @@ using SocketLibrary.Protocol;
 using PathfindingTest.Units;
 using PathfindingTest.Multiplayer.Data;
 using Microsoft.Xna.Framework;
+using PathfindingTest.Combat;
+using PathfindingTest.Units.Projectiles;
+using PathfindingTest.Units.Damage;
 
 namespace PathfindingTest.Multiplayer.SocketConnection.InGame
 {
@@ -111,7 +114,83 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                         CreateUnit(playerID, serverID, type);
                         break;
                     }
+                case UnitHeaders.GAME_UNIT_MELEE_DAMAGE:
+                    {
+                        int damageSource = PacketUtil.DecodePacketInt(p, 0);
+                        int fromServerID = PacketUtil.DecodePacketInt(p, 4);
+                        int toServerID = PacketUtil.DecodePacketInt(p, 8);
+                        Unit fromUnit = ((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(fromServerID)).unit;
+                        Unit targetUnit = ((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(toServerID)).unit;
+
+
+                        DamageEvent e = new DamageEvent(DecodeSource(damageSource, fromServerID), targetUnit, fromUnit);
+
+                        targetUnit.OnDamage(e);
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_RANGED_SHOT:
+                    {
+                        int arrowServerID = PacketUtil.DecodePacketInt(p, 4);
+                        int sourceServerID = PacketUtil.DecodePacketInt(p, 4);
+                        int targetServerID = PacketUtil.DecodePacketInt(p, 8);
+                        Unit sourceUnit = 
+                            ((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(sourceServerID)).unit;
+                        Arrow arrow = new Arrow(sourceUnit,
+                            ((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(targetServerID)).unit);
+                        arrow.multiplayerData.serverID = arrowServerID;
+                        ((Bowman)sourceUnit).projectiles.AddLast(arrow);
+
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_RANGED_DAMAGE:
+                    {
+                        int projectileID = PacketUtil.DecodePacketInt(p, 0);
+                        int sourceID = PacketUtil.DecodePacketInt(p, 4);
+                        int targetID = PacketUtil.DecodePacketInt(p, 8);
+                        Unit sourceUnit = ((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(sourceID)).unit;
+                        Unit targetUnit = ((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(targetID)).unit;
+                        Projectile projectile = 
+                            ((ProjectileMultiplayerData) MultiplayerDataManager.GetInstance().GetDataByServerID(projectileID)).projectile;
+
+                        DamageEvent e = new DamageEvent(projectile, targetUnit, sourceUnit);
+                        targetUnit.OnDamage(e);
+
+                        projectile.Dispose();
+                        break;
+                    }
             }
+        }
+
+        /// <summary>
+        /// Gets the damage source from the identifier.
+        /// </summary>
+        /// <param name="damageSource">The source.</param>
+        /// <param name="fromServerID">The server ID that created this event.</param>
+        /// <returns>The damageSource, or null</returns>
+        private DamageSource DecodeSource(int damageSource, int fromServerID)
+        {
+            Unit fromUnit = ((UnitMultiplayerData)MultiplayerDataManager.GetInstance().GetDataByServerID(fromServerID)).unit;
+
+            switch (damageSource)
+            {
+                case UnitHeaders.DAMAGE_TYPE_FAST:
+                    {
+                        return new MeleeSwing(DamageEvent.DamageType.Fast, fromUnit.baseDamage);
+                    }
+                case UnitHeaders.DAMAGE_TYPE_HEAVY_MELEE:
+                    {
+                        return new MeleeSwing(DamageEvent.DamageType.HeavyMelee, fromUnit.baseDamage);
+                    }
+                case UnitHeaders.DAMAGE_TYPE_MELEE:
+                    {
+                        return new MeleeSwing(DamageEvent.DamageType.Melee, fromUnit.baseDamage);
+                    }
+                case UnitHeaders.DAMAGE_TYPE_RANGED:
+                    {
+                        return new MeleeSwing(DamageEvent.DamageType.Ranged, fromUnit.baseDamage);
+                    }
+            }
+            return null;
         }
 
         /// <summary>
@@ -144,7 +223,6 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                         break;
                     }
             }
-            Console.Out.WriteLine("New unit! : " + serverID);
             unit.multiplayerData.serverID = serverID;
         }
     }

@@ -98,6 +98,14 @@ namespace SocketLibrary
         }
 
         /// <summary>
+        /// Disables logging for this client, increasing performance.
+        /// </summary>
+        public void DisableLogging()
+        {
+            packetProcessor.onProcessPacket -= this.OnProcessPacket;
+        }
+
+        /// <summary>
         /// Packet processor has determined that the packet needed processing.
         /// </summary>
         /// <param name="p">The packet that needed processing</param>
