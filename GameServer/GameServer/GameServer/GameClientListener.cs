@@ -108,7 +108,6 @@ namespace GameServer.GameServer
                 case Headers.GAME_REQUEST_OBJECT_ID:
                     {
                         int localID = PacketUtil.DecodePacketInt(p, 0);
-                        int unitType = PacketUtil.DecodePacketInt(p, 4);
                         int serverID = 0;
                         lock (gameObjectCountLock)
                         {
@@ -118,7 +117,6 @@ namespace GameServer.GameServer
                         Packet packet = new Packet(Headers.GAME_OBJECT_ID);
                         packet.AddInt(localID);
                         packet.AddInt(serverID);
-                        packet.AddInt(unitType);
                         this.client.SendPacket(packet);
                         break;
                     }
@@ -172,6 +170,72 @@ namespace GameServer.GameServer
                         int targetUserID = PacketUtil.DecodePacketInt(p, 0);
                         ServerUser targetUser = ChannelManager.GetInstance().GetChannelByID(this.user.channelID).GetUserAt(targetUserID);
                         targetUser.gameListener.client.SendPacket(p);
+
+                        break;
+                    }
+                case BuildingHeaders.GAME_NEW_BUILDING:
+                    {
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(user.channelID);
+                        for (int i = 0; i < c.GetUserCount(); i++)
+                        {
+                            ServerUser serverUser = c.GetUserAt(i);
+                            if (serverUser != this.user)
+                            {
+                                // Notify everyone but the one who created the unit, that the unit has been created.
+                                serverUser.gameListener.client.SendPacket(p);
+                            }
+                        }
+
+                        break;
+                    }
+                case BuildingHeaders.GAME_BUILDING_LOCATION:
+                    {
+                        // Send the packet back to everyone.
+                        ChannelManager.GetInstance().GetChannelByID(user.channelID).SendGamePacketToAll(p);
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_MELEE_DAMAGE:
+                    {
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(user.channelID);
+                        for (int i = 0; i < c.GetUserCount(); i++)
+                        {
+                            ServerUser serverUser = c.GetUserAt(i);
+                            if (serverUser != this.user)
+                            {
+                                // Notify everyone but the one who created the unit, that the unit has been created.
+                                serverUser.gameListener.client.SendPacket(p);
+                            }
+                        }
+
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_RANGED_SHOT:
+                    {
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(user.channelID);
+                        for (int i = 0; i < c.GetUserCount(); i++)
+                        {
+                            ServerUser serverUser = c.GetUserAt(i);
+                            if (serverUser != this.user)
+                            {
+                                // Notify everyone but the one who created the unit, that the shot has been created.
+                                serverUser.gameListener.client.SendPacket(p);
+                            }
+                        }
+
+                        break;
+                    }
+                case UnitHeaders.GAME_UNIT_RANGED_DAMAGE:
+                    {
+                        Channel c = ChannelManager.GetInstance().GetChannelByID(user.channelID);
+                        for (int i = 0; i < c.GetUserCount(); i++)
+                        {
+                            ServerUser serverUser = c.GetUserAt(i);
+                            if (serverUser != this.user)
+                            {
+                                // Notify everyone but the one who created the unit, that the damage has been done
+                                serverUser.gameListener.client.SendPacket(p);
+                            }
+                        }
 
                         break;
                     }

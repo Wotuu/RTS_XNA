@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using XNAInputHandler.MouseInput;
 using PathfindingTest.Players;
 using PathfindingTest.Units;
+using System.Diagnostics;
 
 namespace PathfindingTest.UI.Commands
 {
@@ -39,7 +40,7 @@ namespace PathfindingTest.UI.Commands
             // Was false
             Game1.GetInstance().IsMouseVisible = true;
 
-            MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
+            //MouseManager.GetInstance().mouseClickedListeners += ((MouseClickListener)this).OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners += ((MouseClickListener)this).OnMouseRelease;
         }
 
@@ -57,7 +58,7 @@ namespace PathfindingTest.UI.Commands
         public void Dispose()
         {
             Game1.GetInstance().IsMouseVisible = true;
-            MouseManager.GetInstance().mouseClickedListeners -= ((MouseClickListener)this).OnMouseClick;
+            //MouseManager.GetInstance().mouseClickedListeners -= ((MouseClickListener)this).OnMouseClick;
             MouseManager.GetInstance().mouseReleasedListeners -= ((MouseClickListener)this).OnMouseRelease;
             player.command = null;
         }

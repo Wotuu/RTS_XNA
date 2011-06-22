@@ -39,12 +39,9 @@ namespace PathfindingTest.Units
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/Engineer");
             this.collisionRadiusTexture = Game1.GetInstance().Content.Load<Texture2D>("Misc/patternPreview");
 
-            Console.Out.WriteLine("Constructed an engineer @ " + this.GetLocation() + " (" + x + ", " + y + ")");
+            // Console.Out.WriteLine("Constructed an engineer @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
             this.collisionRadius = texture.Width / 2;
-
-            this.productionDuration = 5;
-            this.productionProgress = 0;
         }
 
         /// <summary>
@@ -54,10 +51,7 @@ namespace PathfindingTest.Units
         /// <param name="ms"></param>
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            if (this.state == State.Finished)
-            {
                 UpdateMovement();
-            }
         }
 
         /// <summary>
@@ -66,8 +60,6 @@ namespace PathfindingTest.Units
         /// <param name="sb"></param>
         internal override void Draw(SpriteBatch sb)
         {
-            if (this.state == State.Finished)
-            {
                 //sb.Draw(this.collisionRadiusTexture,
                 //    new Rectangle((int)(x - collisionRadius), (int)(y - collisionRadius), 
                 //        (int)(collisionRadius * 2), (int)(collisionRadius * 2)), this.color);
@@ -77,7 +69,6 @@ namespace PathfindingTest.Units
                 {
                     this.DrawHealthBar(sb);
                 }*/
-            }
         }
 
         public override void OnAggroRecieved(AggroEvent e)
@@ -109,7 +100,7 @@ namespace PathfindingTest.Units
             this.MoveToQueue(
                 Util.GetPointOnCircle(p, b.GetCircleRadius() + this.texture.Width / 2,
                 Util.GetHypoteneuseAngleDegrees(p, targetPoint)));
-
+            
             b.constructedBy = this;
             this.constructing = b;
 

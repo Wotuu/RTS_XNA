@@ -122,7 +122,6 @@ namespace PathfindingTest.Multiplayer.SocketConnection.InGame
                         }
                 }
             building.constructedBy = engineer;
-            Console.Out.WriteLine("New building! : " + serverID);
             building.multiplayerData.serverID = serverID;
         }
     }

@@ -96,6 +96,7 @@ namespace PathfindingTest.Multiplayer.PreGame.SocketConnection
             Thread.Sleep(50);
             this.connection.packetProcessor.onProcessPacket += chatPacketProcessor.DataReceived;
             this.connection.packetProcessor.onProcessPacket += gameLobbyPacketProcessor.DataReceived;
+            this.connection.DisableLogging();
             this.connection.onDisconnectListeners += this.OnDisconnect;
 
             SetLoginStatus("Handshaking..");

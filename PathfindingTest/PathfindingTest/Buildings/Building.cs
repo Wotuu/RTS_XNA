@@ -41,7 +41,7 @@ namespace PathfindingTest.Buildings
         public Boolean constructionStarted { get; set; }
         public State state { get; set; }
 
-        public LinkedList<Unit> productionQueue { get; set; }
+        public LinkedList<ProductionUnit> productionQueue { get; set; }
 
         public Type type { get; set; }
         public Texture2D texture { get; set; }
@@ -231,8 +231,8 @@ namespace PathfindingTest.Buildings
             }
             else if (this.state == State.Producing)
             {
-                Unit produced = productionQueue.ElementAt(0);
-                progressBar.progress = produced.productionProgress;
+                ProductionUnit pu = productionQueue.ElementAt(0);
+                progressBar.progress = pu.productionProgress;
                 progressBar.Draw(sb);
             }
         }
@@ -265,15 +265,14 @@ namespace PathfindingTest.Buildings
 
         public void CreateUnit(Unit.Type type)
         {
-            Unit newUnit = null;
+            ProductionUnit newUnit = null;
 
             switch (type)
             {
                 case Unit.Type.Engineer:
                     if (this.type == Type.Fortress)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
-                        newUnit.state = Unit.State.Producing;
+                        newUnit = new ProductionUnit(100f, 5.0, type);
                         productionQueue.AddLast(newUnit);
                     }
                     break;
@@ -281,8 +280,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Melee:
                     if (this.type == Type.Barracks)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
-                        newUnit.state = Unit.State.Producing;
+                        newUnit = new ProductionUnit(100f, 5.0, type);
                         productionQueue.AddLast(newUnit);
                     }
                     break;
@@ -290,8 +288,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.HeavyMelee:
                     if (this.type == Type.Factory)
                     {
-                        newUnit = p.meleeStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
-                        newUnit.state = Unit.State.Producing;
+                        newUnit = new ProductionUnit(100f, 5.0, type);
                         productionQueue.AddLast(newUnit);
                     }
                     break;
@@ -299,8 +296,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Fast:
                     if (this.type == Type.Barracks)
                     {
-                        newUnit = p.fastStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
-                        newUnit.state = Unit.State.Producing;
+                        newUnit = new ProductionUnit(100f, 5.0, type);
                         productionQueue.AddLast(newUnit);
                     }
                     break;
@@ -308,8 +304,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.Ranged:
                     if (this.type == Type.Barracks)
                     {
-                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
-                        newUnit.state = Unit.State.Producing;
+                        newUnit = new ProductionUnit(100f, 5.0, type);
                         productionQueue.AddLast(newUnit);
                     }
                     break;
@@ -317,8 +312,7 @@ namespace PathfindingTest.Buildings
                 case Unit.Type.HeavyRanged:
                     if (this.type == Type.Factory)
                     {
-                        newUnit = p.rangedStore.getUnit(type, (int)this.x + (this.texture.Width / 2), (int)this.y + (this.texture.Height / 2));
-                        newUnit.state = Unit.State.Producing;
+                        newUnit = new ProductionUnit(100f, 5.0, type);
                         productionQueue.AddLast(newUnit);
                     }
                     break;
@@ -330,21 +324,70 @@ namespace PathfindingTest.Buildings
 
         public void Produce()
         {
-            Unit produced = productionQueue.ElementAt(0);
+            ProductionUnit pu = productionQueue.ElementAt(0);
 
-            produced.productionProgress += (1 / produced.productionDuration);
+            pu.productionProgress += (1 / pu.productionDuration);
 
-            if (produced.productionProgress >= 100)
+            if (pu.productionProgress >= 100)
             {
-                produced.currentHealth = produced.maxHealth;
-                produced.state = Unit.State.Finished;
-                produced.x = waypoint.X;
-                produced.y = waypoint.Y;
-                productionQueue.RemoveFirst();
-                this.state = State.Finished;
+                Unit newUnit = null;
 
-                // Synchronize this unit, since the unit has moved (in other words, teleported)
-                if (Game1.GetInstance().IsMultiplayerGame()) Synchronizer.GetInstance().QueueUnit(produced);
+                switch (pu.type)
+                {
+                    case Unit.Type.Engineer:
+                        if (this.type == Type.Fortress)
+                        {
+                            newUnit = p.meleeStore.getUnit(pu.type, waypoint.X, waypoint.Y);
+                            productionQueue.RemoveFirst();
+                        }
+                        break;
+
+                    case Unit.Type.Melee:
+                        if (this.type == Type.Barracks)
+                        {
+                            newUnit = p.meleeStore.getUnit(pu.type, waypoint.X, waypoint.Y);
+                            productionQueue.RemoveFirst();
+                        }
+                        break;
+
+                    case Unit.Type.HeavyMelee:
+                        if (this.type == Type.Factory)
+                        {
+                            newUnit = p.meleeStore.getUnit(pu.type, waypoint.X, waypoint.Y);
+                            productionQueue.RemoveFirst();
+                        }
+                        break;
+
+                    case Unit.Type.Fast:
+                        if (this.type == Type.Barracks)
+                        {
+                            newUnit = p.fastStore.getUnit(pu.type, waypoint.X, waypoint.Y);
+                            productionQueue.RemoveFirst();
+                        }
+                        break;
+
+                    case Unit.Type.Ranged:
+                        if (this.type == Type.Barracks)
+                        {
+                            newUnit = p.rangedStore.getUnit(pu.type, waypoint.X, waypoint.Y);
+                            productionQueue.RemoveFirst();
+                        }
+                        break;
+
+                    case Unit.Type.HeavyRanged:
+                        if (this.type == Type.Factory)
+                        {
+                            newUnit = p.rangedStore.getUnit(pu.type, waypoint.X, waypoint.Y);
+                            productionQueue.RemoveFirst();
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+
+                //// Synchronize this unit, since the unit has moved (in other words, teleported)
+                //if (Game1.GetInstance().IsMultiplayerGame()) Synchronizer.GetInstance().QueueUnit(pu);
             }
         }
 
@@ -379,13 +422,18 @@ namespace PathfindingTest.Buildings
         /// </summary>
         public void Dispose()
         {
-            foreach (Unit u in this.productionQueue)
-            {
-                p.units.Remove(u);
-            }
-
+            productionQueue = null;
             p.buildings.Remove(this);
             if (this.mesh != null) mesh.Reverse();
+        }
+
+        /// <summary>
+        /// Gets the point location of this building.
+        /// </summary>
+        /// <returns>The new point.</returns>
+        public Point GetLocation()
+        {
+            return new Point((int)x, (int)y);
         }
 
         public Building(Player player)
@@ -397,7 +445,7 @@ namespace PathfindingTest.Buildings
             this.progressBar = new ProgressBar(this);
             this.healthBar = new HealthBar(this);
 
-            this.productionQueue = new LinkedList<Unit>();
+            this.productionQueue = new LinkedList<ProductionUnit>();
 
             if (Game1.GetInstance().IsMultiplayerGame())
             {

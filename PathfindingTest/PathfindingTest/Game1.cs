@@ -150,8 +150,8 @@ namespace PathfindingTest
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            try
-            {
+            // try
+            // {
                 GameTimeManager.GetInstance().OnStartUpdate();
                 // Allows the game to exit
                 if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
@@ -225,7 +225,7 @@ namespace PathfindingTest
                     default: break;
                 }
                 base.Update(gameTime);
-            }
+            /*}
             catch (Exception e)
             {
                 if (exceptionsCount < 0) exceptionsCount = 1;
@@ -233,7 +233,7 @@ namespace PathfindingTest
 
                 if (exceptionsCount > 3) 
                     throw e; 
-            }
+            }*/
         }
 
         /// <summary>

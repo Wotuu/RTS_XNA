@@ -62,7 +62,6 @@ namespace PathfindingTest.Pathfinding
                     {
                         UnitProcess up = toProcess.ElementAt(0);
                         up.unit.MoveToNow(up.target);
-                        Console.Out.WriteLine("Processed a path! Left: " + toProcess.Count);
                         toProcess.Remove(up);
                     }
                     else break;

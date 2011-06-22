@@ -25,21 +25,11 @@ namespace PathfindingTest.Units.Melee
             this.y = y;
             this.type = Type.Melee;
 
-
-            Console.Out.WriteLine("Constructed a swordsman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
-
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/melee");
-
-            this.productionDuration = 5;
-            this.productionProgress = 0;
-
-
         }
 
         public override void Update(KeyboardState ks, MouseState ms)
         {
-            if (this.state == State.Finished)
-            {
                 UpdateMovement();
                 if (Game1.GetInstance().frames % 15 == 0 && unitToDefend == null)
                 {
@@ -54,15 +44,11 @@ namespace PathfindingTest.Units.Melee
                 {
                     TryToSwing();
                 }
-            }
         }
 
         internal override void Draw(SpriteBatch sb)
         {
-            if (this.state == State.Finished)
-            {
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-            }
         }
 
         /// <summary>
@@ -76,6 +62,12 @@ namespace PathfindingTest.Units.Melee
             DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), unitToStalk, this);
             unitToStalk.OnDamage(dmgEvent);
             this.fireCooldown = this.rateOfFire;
+
+            // We already know that this unit is local
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Synchronizer.GetInstance().QueueDamageEvent(dmgEvent);
+            }
         }
 
         public override void OnAggroRecieved(AggroEvent e)

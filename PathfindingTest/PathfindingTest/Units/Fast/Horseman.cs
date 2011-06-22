@@ -21,18 +21,12 @@ namespace PathfindingTest.Units.Fast
             this.type = Type.Fast;
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/horseman");
 
-            Console.Out.WriteLine("The Horseman Cometh! @ " + this.GetLocation() + " (" + x + ", " + y + ")");
-
             this.collisionRadius = texture.Width / 2;
-
-            this.productionDuration = 5;
-            this.productionProgress = 0;
         }
 
-        public override void Update(Microsoft.Xna.Framework.Input.KeyboardState ks, Microsoft.Xna.Framework.Input.MouseState ms)
+        public override void Update(Microsoft.Xna.Framework.Input.KeyboardState ks, 
+            Microsoft.Xna.Framework.Input.MouseState ms)
         {
-            if (this.state == State.Finished)
-            {
                 UpdateMovement();
                 if (Game1.GetInstance().frames % 15 == 0 && unitToDefend == null)
                 {
@@ -47,15 +41,11 @@ namespace PathfindingTest.Units.Fast
                 {
                     TryToSwing();
                 }
-            }
         }
 
         internal override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
         {
-            if (this.state == State.Finished)
-            {
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-            }
         }
 
         public override void OnAggroRecieved(AggroEvent e)
@@ -87,6 +77,12 @@ namespace PathfindingTest.Units.Fast
             DamageEvent dmgEvent = new DamageEvent(new MeleeSwing(PathfindingTest.Combat.DamageEvent.DamageType.Melee, baseDamage), unitToStalk, this);
             unitToStalk.OnDamage(dmgEvent);
             this.fireCooldown = this.rateOfFire;
+
+            // We already know that this unit is local
+            if (Game1.GetInstance().IsMultiplayerGame())
+            {
+                Synchronizer.GetInstance().QueueDamageEvent(dmgEvent);
+            }
         }
     }
 }
