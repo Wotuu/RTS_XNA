@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MapEditor.Helpers
 {
@@ -55,6 +56,18 @@ namespace MapEditor.Helpers
         {
             return new Point((int)(location.X + radius * Math.Cos(angle * Math.PI / 180F)),
                 (int)(location.Y + radius * Math.Sin(angle * Math.PI / 180F)));
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <returns></returns>
+        public static Texture2D GetCustomTexture2D(SpriteBatch batch,Color color)
+        {
+            Texture2D lineTexture = new Texture2D(batch.GraphicsDevice, 1, 1);
+            int[] intColor = { (int)color.PackedValue  };
+            lineTexture.SetData(intColor);
+            return lineTexture;
         }
     }
 }

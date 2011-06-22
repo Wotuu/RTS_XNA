@@ -15,11 +15,12 @@ using System.Threading;
 using MapEditor.Display;
 using Microsoft.Xna.Framework.Input;
 using MapEditor.Helpers;
+using System.Reflection;
 namespace MapEditor
 {
     public partial class Form1 : Form
     {
-
+#region class fields
         NewMapForm mapform = new NewMapForm();
 
         TileMap.TileMap tileMap = null;
@@ -29,7 +30,11 @@ namespace MapEditor
         public Texture2D EraseTexture;
         public Texture2D tilemaptexture;
         Texture2D linetexture;
-        
+
+
+        Texture2D CollisionMap;
+        int[] CollisionData;
+
         Camera camera = new Camera();
         Tileset tileset = null;
         Vector2 position = new Vector2();
@@ -47,10 +52,11 @@ namespace MapEditor
         Shapes shapehelper = new Shapes();
         Brush currentbrush = Brush.Paint;
 
-
+        Assembly assembly;
 
         int mouseX;
         int mouseY;
+
 
         enum Brush
         {
@@ -58,6 +64,8 @@ namespace MapEditor
             Marquee = 2,
             painterase = 3,
             Marqueeerase = 4,
+            Fill = 5,
+            CollisionPaint = 6
         }
         public struct MarqueeData
         {
@@ -75,10 +83,13 @@ namespace MapEditor
         {
             get { return tileMapDisplay1.GraphicsDevice; }
         }
+#endregion
 
+        #region Constructor
         public Form1()
         {
             InitializeComponent();
+            assembly = Assembly.GetExecutingAssembly();
             BtnShowGrid.CheckOnClick = true;
             tileMapDisplay1.OnInitialize += new EventHandler(tileDisplay1_OnInitialize);
             tileMapDisplay1.OnDraw += new EventHandler(tileDisplay1_OnDraw);
@@ -101,9 +112,12 @@ namespace MapEditor
 
             tileMapDisplay1.MouseUp +=
                  new MouseEventHandler(tileDisplay1_MouseUp);
+            
+            
         }
+        #endregion
 
-
+        #region Display 
         void tileDisplay1_OnInitialize(object sender, EventArgs e)
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -147,7 +161,6 @@ namespace MapEditor
 
 
         }
-
 
         private void Logic()
         {
@@ -214,10 +227,9 @@ namespace MapEditor
             }
         }
 
-
         private void Render()
         {
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.PowderBlue);
             if (tileMap != null)
             {
 
@@ -236,6 +248,11 @@ namespace MapEditor
 
                 //DrawLayer(0);
                 DrawDisplay();
+                //CollisionmapDrawn
+                
+                    spriteBatch.Draw(CollisionMap, new Rectangle(0, 0, tileMapDisplay1.Width, tileMapDisplay1.Height), Color.White);
+             
+                
             }
         }
 
@@ -340,25 +357,10 @@ namespace MapEditor
                     Engine.TileWidth,
                     Engine.TileHeight),
                     Color.Red);
-
+            
 
         }
-        // New map menuitem clicked
-        private void newMapToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            mapform.ShowDialog();
-            createNewMap();
-        }
-
-
-
-        private void createNewMap()
-        {
-            //get values from newmapform
-
-            tileMap = new TileMap.TileMap(mapform.MapWidth, mapform.MapHeight);
-            currentLayer = tileMap.layers[0];
-        }
+        #endregion
 
         #region Menu Strip events
         private void openTilesetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -397,14 +399,30 @@ namespace MapEditor
 
 
         }
-        #endregion
 
+        private void createNewMap()
+        {
+            //get values from newmapform
+
+            tileMap = new TileMap.TileMap(mapform.MapWidth, mapform.MapHeight);
+            CollisionMap = new Texture2D(GraphicsDevice, mapform.MapWidth * Engine.TileWidth, mapform.MapHeight * Engine.TileHeight);
+            CollisionData  = new int[(mapform.MapWidth * Engine.TileWidth) * (mapform.MapHeight * Engine.TileHeight)];
+            currentLayer = tileMap.layers[0];
+        }
+
+        private void newMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mapform.ShowDialog();
+            createNewMap();
+        }
+        #endregion
 
         #region Mouse Handlers
 
 
         void tileDisplay1_MouseEnter(object sender, EventArgs e)
         {
+            ChangeMouseCursor(currentbrush);
             trackMouse = true;
         }
 
@@ -423,7 +441,11 @@ namespace MapEditor
             {
                 //final location opslaan
                 MarqueeSelection.FinalLocation = new System.Drawing.Point((int)e.X, (int)e.Y);
-
+                if (currentbrush == Brush.Paint || currentbrush == Brush.CollisionPaint)
+                {
+                    tileDisplay1_MouseDown(sender, e);
+                }
+                
             }
         }
 
@@ -504,7 +526,7 @@ namespace MapEditor
         }
         #endregion
 
-
+        #region MarqueeHelpers
         private void DrawMarqueeSelection()
         {
             System.Drawing.Rectangle aux_inital_rectangle = SnapToGrid(MarqueeSelection.InitialLocation);
@@ -591,201 +613,16 @@ namespace MapEditor
 
         System.Drawing.Rectangle SnapToGrid(System.Drawing.Point Location)
         {
-            //Vector2 SquareOffSet = new Vector2(camera.Position.X % Engine.TileWidth, camera.Position.Y % Engine.TileHeight);
-            //for (int id_y = 0; id_y < tileMap.MapHeight * Engine.TileWidth; id_y += Engine.TileWidth)
-            //{
-            //    for (int id_x = 0; id_x < tileMap.MapWidth * Engine.TileHeight; id_x += Engine.TileHeight)
-            //    {
-            //        if ((Location.X >= id_x && Location.X <= id_x + Engine.TileHeight) &&
-            //            (Location.Y >= id_y && Location.Y <= id_y + Engine.TileHeight))
-            //        {
-            //            // FOUND                        
-            //            return new System.Drawing.Rectangle(new System.Drawing.Point(id_x - (int)SquareOffSet.X, id_y - (int)SquareOffSet.Y), new System.Drawing.Size(Engine.TileHeight, Engine.TileWidth));
-            //        }
-            //    }
-            //}
-
-            //return new System.Drawing.Rectangle(0, 0, 0, 0);
             System.Drawing.Point point = new System.Drawing.Point((((int)Location.X + (int)camera.Position.X) / Engine.TileWidth) * Engine.TileWidth - (int)camera.Position.X, (((int)Location.Y + (int)camera.Position.Y )/ Engine.TileWidth) * Engine.TileWidth - (int)camera.Position.Y);
             return new System.Drawing.Rectangle(point, new System.Drawing.Size(Engine.TileHeight, Engine.TileWidth));
         }
-
-
-        #region Brushes
-        private void BtnPaint_Click(object sender, EventArgs e)
-        {
-            currentbrush = Brush.Paint;
-            BtnPaint.Checked = true;
-            BtnErase.Checked = false;
-            BtnMarqueeerase.Checked = false;
-            BtnMarqueePaint.Checked = false;
-
-        }
-
-        private void BtnMarqueePaint_Click(object sender, EventArgs e)
-        {
-            currentbrush = Brush.Marquee;
-            BtnPaint.Checked = false;
-            BtnErase.Checked = false;
-            BtnMarqueeerase.Checked = false;
-            BtnMarqueePaint.Checked = true;
-        }
-
-        private void BtnErase_Click(object sender, EventArgs e)
-        {
-            currentbrush = Brush.painterase;
-            BtnPaint.Checked = false;
-            BtnErase.Checked = true;
-            BtnMarqueeerase.Checked = false;
-            BtnMarqueePaint.Checked = false;
-        }
-
-        private void BtnMarqueeerase_Click(object sender, EventArgs e)
-        {
-            currentbrush = Brush.Marqueeerase;
-            BtnPaint.Checked = false;
-            BtnErase.Checked = false;
-            BtnMarqueeerase.Checked = true;
-            BtnMarqueePaint.Checked = false;
-        }
-
-
-
-        private void DoBrushLogic(object sender, MouseEventArgs e)
-        {
-            switch (currentbrush)
-            {
-                case Brush.Paint:
-                    Paint(sender, e);
-                    break;
-                case Brush.Marquee:
-                    MarqueePaint();
-                    break;
-                case Brush.painterase:
-                    ErasePaint(sender, e);
-                    break;
-                case Brush.Marqueeerase:
-                    MarqueeErase();
-                    break;
-
-            }
-        }
-
-        private void Paint(object sender, MouseEventArgs e)
-        {
-
-            if (trackMouse)
-            {
-                position.X = e.X + camera.Position.X;
-                position.Y = e.Y + camera.Position.Y;
-            }
-            int tileX = (int)position.X / Engine.TileWidth;
-            int tileY = (int)position.Y / Engine.TileHeight;
-            //Texture ID opvragen
-            for (int y = 0; y < selectedrectangle.Height / Engine.TileHeight; y++)
-            {
-                for (int x = 0; x < selectedrectangle.Width / Engine.TileWidth; x++)
-                {
-                    currentLayer.SetTile(
-                    tileX + x,
-                    tileY + y,
-                    tileset.GetTileID(new Rectangle(selectedrectangle.X + (x * Engine.TileWidth), selectedrectangle.Y + (y * Engine.TileHeight), Engine.TileWidth, Engine.TileHeight), tilemaptexture));
-
-                }
-            }
-        }
-        private void MarqueePaint()
-        {
-            System.Drawing.Rectangle aux_inital_rectangle = SnapToGrid(MarqueeSelection.InitialLocation);
-            System.Drawing.Rectangle aux_final_rectangle = SnapToGrid(MarqueeSelection.FinalLocation);
-            Rectangle rect = CreateMarqueeArea(aux_inital_rectangle, aux_final_rectangle);
-            for (int y = 0; y < MarqueeSelection.Height; y++)
-            {
-                for (int x = 0; x < MarqueeSelection.Width; x++)
-                {
-                    int tileid;
-                    int testx = x % (selectedrectangle.Width / Engine.TileWidth);
-                    int testy = y % (selectedrectangle.Height / Engine.TileHeight);
-
-                    int seltilex = (selectedrectangle.X + (testx * Engine.TileWidth));
-                    int seltiley = (selectedrectangle.Y + (testy * Engine.TileHeight));
-
-                    tileid = tileset.GetTileID(new Rectangle(seltilex, seltiley, Engine.TileWidth, Engine.TileHeight), tilemaptexture);
-                    currentLayer.SetTile( x + ((int)camera.Position.X + rect.X) / Engine.TileWidth,
-                         y + (rect.Y + (int)camera.Position.Y) / Engine.TileHeight,
-                         tileid);
-                }
-            }
-        }
-
-        private void MarqueeErase()
-        {
-            System.Drawing.Rectangle aux_inital_rectangle = SnapToGrid(MarqueeSelection.InitialLocation);
-            System.Drawing.Rectangle aux_final_rectangle = SnapToGrid(MarqueeSelection.FinalLocation);
-            Rectangle rect = CreateMarqueeArea(aux_inital_rectangle, aux_final_rectangle);
-            for (int y = 0; y < MarqueeSelection.Height; y++)
-            {
-                for (int x = 0; x < MarqueeSelection.Width; x++)
-                {
-                    currentLayer.SetTile(x + ((int)camera.Position.X + rect.X) / Engine.TileWidth,
-                        y + (rect.Y + (int)camera.Position.Y) / Engine.TileHeight,
-                        -1);
-                }
-            }
-        }
-        private void ErasePaint(object sender, MouseEventArgs e)
-        {
-            if (trackMouse)
-            {
-                position.X = e.X + camera.Position.X;
-                position.Y = e.Y + camera.Position.Y;
-            }
-            int tileX = (int)position.X / Engine.TileWidth;
-            int tileY = (int)position.Y / Engine.TileHeight;
-            //Texture ID opvragen
-            
-                    currentLayer.SetTile(
-                    tileX ,
-                    tileY ,
-                    -1);
-
-           
-        }
-        private void MarqueePreview(Rectangle rect, bool erase)
-        {
-            for (int y = 0; y < MarqueeSelection.Height; y++)
-            {
-                for (int x = 0; x < MarqueeSelection.Width; x++)
-                {
-                    int testx = x % (selectedrectangle.Width / Engine.TileWidth);
-                    int testy = y % (selectedrectangle.Height / Engine.TileHeight);
-                    if (!erase)
-                    {
-                        spriteBatch.Draw(tilemaptexture, new Rectangle(
-                            rect.X + x * Engine.TileWidth, 
-                            rect.Y + y * Engine.TileHeight, 
-                            Engine.TileWidth, 
-                            Engine.TileHeight), 
-                            new Rectangle(selectedrectangle.X + testx * Engine.TileWidth, 
-                                selectedrectangle.Y + testy * Engine.TileHeight, 
-                                Engine.TileWidth, 
-                                Engine.TileHeight), 
-                                Color.White);
-                    }
-                    else
-                    {
-                        //black texture drawen ?
-                        spriteBatch.Draw(EraseTexture,new Rectangle(
-                            rect.X + x * Engine.TileWidth,
-                            rect.Y + y * Engine.TileHeight,
-                            Engine.TileWidth,
-                            Engine.TileHeight),Color.Black);
-                        
-                    }
-
-                }
-            }
-        }
         #endregion
+
+        
+
+       
+
+        
+
     }
 }

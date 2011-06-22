@@ -12,19 +12,28 @@ namespace MapEditor.TileMap
         public List<string> layerNames = new List<string>();
         static int mapWidth;
         static int mapHeight;
+        int layercount = 3;
 
+        /// <summary>
+        /// Initializes a new map with 3 layers !
+        /// </summary>
+        /// <param name="mapWidth">Width of map</param>
+        /// <param name="mapHeight">Height of Map</param>
         public TileMap(int mapWidth, int mapHeight)
         {
             TileMap.mapWidth = mapWidth;
             TileMap.mapHeight = mapHeight;
 
-            TileMapLayer layer = new TileMapLayer(mapWidth, mapHeight);
+            for (int l = 0; l < layercount; l++)
+            {
+                TileMapLayer layer = new TileMapLayer(mapWidth, mapHeight);
+                for (int y = 0; y < mapHeight; y++)
+                    for (int x = 0; x < mapWidth; x++)
+                        layer.SetTile(x, y, -1);
 
-            for (int y = 0; y < mapHeight; y++)
-                for (int x = 0; x < mapWidth; x++)
-                    layer.SetTile(x, y, -1);
-
-            layers.Add(layer);
+                layers.Add(layer);
+            }
+            //Initialize a new tilemap with 3 layers !
         }
 
         public TileMap(string mapName)
