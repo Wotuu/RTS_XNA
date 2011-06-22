@@ -94,7 +94,10 @@ namespace PathfindingTest.UI
         /// <param name="ms">Default MouseState</param>
         public void Update(KeyboardState ks, MouseState ms)
         {
-            draw = CheckDraw();
+            if (!draw)
+            {
+                draw = true;
+            }
             CountUnits();
 
             objects = new LinkedList<HUDObject>();
@@ -138,6 +141,10 @@ namespace PathfindingTest.UI
 
                 HUDObject rangedObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDRanged"), HUDObject.Type.Ranged, startObjectX, startObjectY, color);
                 objects.AddLast(rangedObject);
+                IncrementStartObjectXY(startObjectX);
+
+                HUDObject fastObject = new HUDObject(Game1.GetInstance().Content.Load<Texture2D>("HUD/HUDHorseman"), HUDObject.Type.Fast, startObjectX, startObjectY, color);
+                objects.AddLast(fastObject);
                 IncrementStartObjectXY(startObjectX);
             }
             if (loadForFortress)
@@ -274,6 +281,13 @@ namespace PathfindingTest.UI
                                 }
                                 break;
 
+                            case HUDObject.Type.Fast:
+                                foreach (Barracks building in player.buildingSelection.buildings)
+                                {
+                                    building.CreateUnit(Unit.Type.Fast);
+                                }
+                                break;
+
                             default:
                                 break;
                         }
@@ -289,7 +303,7 @@ namespace PathfindingTest.UI
                             case HUDCommandObject.Type.Repair:
                                 if (!co.disabled)
                                 {
-                                    player.command = new Command(Game1.GetInstance().Content.Load<Texture2D>("HUD/Commands/HUDRepair"), this.player, Command.Type.Repair, Mouse.GetState().X, Mouse.GetState().Y, new Color(224, 187, 0, 255));
+                                    player.command = new Command(Game1.GetInstance().Content.Load<Texture2D>("HUD/Commands/HUDRepair"), this.player, Command.Type.Repair, Mouse.GetState().X, Mouse.GetState().Y, new Color(255, 187, 0, 255));
                                 }
                                 break;
 
@@ -459,31 +473,6 @@ namespace PathfindingTest.UI
             {
                 loadForFortress = false;
             }
-        }
-
-        /// <summary>
-        /// Checks whether the HUD should be drawn or not.
-        /// </summary>
-        /// <returns>Returns false if there are no selected units/buildings, else returns true</returns>
-        public Boolean CheckDraw()
-        {
-            if (player.currentSelection != null)
-            {
-                if (player.currentSelection.units.Count > 0)
-                {
-                    return true;
-                }
-            }
-
-            if (player.buildingSelection != null)
-            {
-                if (player.buildingSelection.buildings.Count > 0)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>

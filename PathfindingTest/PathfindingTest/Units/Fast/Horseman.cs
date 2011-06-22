@@ -24,15 +24,11 @@ namespace PathfindingTest.Units.Fast
             Console.Out.WriteLine("The Horseman Cometh! @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
             this.collisionRadius = texture.Width / 2;
-
-            this.productionDuration = 5;
-            this.productionProgress = 0;
         }
 
-        public override void Update(Microsoft.Xna.Framework.Input.KeyboardState ks, Microsoft.Xna.Framework.Input.MouseState ms)
+        public override void Update(Microsoft.Xna.Framework.Input.KeyboardState ks, 
+            Microsoft.Xna.Framework.Input.MouseState ms)
         {
-            if (this.state == State.Finished)
-            {
                 UpdateMovement();
                 if (Game1.GetInstance().frames % 15 == 0 && unitToDefend == null)
                 {
@@ -47,15 +43,11 @@ namespace PathfindingTest.Units.Fast
                 {
                     TryToSwing();
                 }
-            }
         }
 
         internal override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
         {
-            if (this.state == State.Finished)
-            {
                 sb.Draw(this.texture, new Vector2(x - (texture.Width / 2), y - (texture.Height / 2)), this.color);
-            }
         }
 
         public override void OnAggroRecieved(AggroEvent e)

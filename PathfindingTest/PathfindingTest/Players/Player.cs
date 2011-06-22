@@ -346,7 +346,7 @@ namespace PathfindingTest.Players
             UnitSelection selection = new UnitSelection(new LinkedList<Unit>());
             foreach (Unit unit in units)
             {
-                if (unit.state != Unit.State.Producing && this.selectBox.GetRectangle().Contains((int)unit.x, (int)unit.y))
+                if (this.selectBox.GetRectangle().Contains((int)unit.x, (int)unit.y))
                 {
                     selection.units.AddLast(unit);
                 }
@@ -436,7 +436,7 @@ namespace PathfindingTest.Players
                             }
                             this.currentSelection = new UnitSelection(selectionUnits);
                         }
-                        else if (!mouseOverUnit.selected && mouseOverUnit.state != Unit.State.Producing)
+                        else if (!mouseOverUnit.selected)
                         {
                             LinkedList<Unit> selectionUnits = new LinkedList<Unit>();
                             selectionUnits.AddLast(mouseOverUnit);
@@ -558,6 +558,7 @@ namespace PathfindingTest.Players
         {
             foreach (Unit unit in currentSelection.units)
             {
+                unit.unitToDefend = null;
                 unit.unitToStalk = null;
                 unit.waypoints.Clear();
             }

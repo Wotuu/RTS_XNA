@@ -74,7 +74,7 @@ namespace PathfindingTest.Primitives
 
             double angleStep = 1f / radius;
 
-            for (double angle = 0; angle < Math.PI * 2; angle += angleStep * (4 * Math.PI))
+            for (double angle = 0; angle < Math.PI * 2; angle += angleStep * (8 * Math.PI))
             {
                 int x = (int)Math.Round(radius + radius * Math.Cos(angle)) + (int)px + 1;
                 int y = (int)Math.Round(radius + radius * Math.Sin(angle)) + (int)py;
@@ -104,7 +104,7 @@ namespace PathfindingTest.Primitives
                 {
                     for (int j = 0; j < r.Height; j += 8)
                     {
-                        data[j * outerRadius + i + 1] = Color.White;
+                        data[i * outerRadius + j + 1] = Color.White;
                     }
                 }
             }
