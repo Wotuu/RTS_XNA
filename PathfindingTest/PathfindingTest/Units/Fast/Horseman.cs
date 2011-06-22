@@ -26,7 +26,8 @@ namespace PathfindingTest.Units.Fast
             this.collisionRadius = texture.Width / 2;
         }
 
-        public override void Update(Microsoft.Xna.Framework.Input.KeyboardState ks, Microsoft.Xna.Framework.Input.MouseState ms)
+        public override void Update(Microsoft.Xna.Framework.Input.KeyboardState ks, 
+            Microsoft.Xna.Framework.Input.MouseState ms)
         {
                 UpdateMovement();
                 if (Game1.GetInstance().frames % 15 == 0 && unitToDefend == null)

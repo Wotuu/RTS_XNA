@@ -558,6 +558,7 @@ namespace PathfindingTest.Players
         {
             foreach (Unit unit in currentSelection.units)
             {
+                unit.unitToDefend = null;
                 unit.unitToStalk = null;
                 unit.waypoints.Clear();
             }

@@ -25,7 +25,6 @@ namespace PathfindingTest.Units.Melee
             this.y = y;
             this.type = Type.Melee;
 
-
             Console.Out.WriteLine("Constructed a swordsman @ " + this.GetLocation() + " (" + x + ", " + y + ")");
 
             this.texture = Game1.GetInstance().Content.Load<Texture2D>("Units/melee");
